@@ -1,0 +1,4 @@
+name = comment_form_above_comments
+description = This module placed comment form above comments
+core = 7.x
+package = Ruswebs

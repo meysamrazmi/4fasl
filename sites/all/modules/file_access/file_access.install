@@ -1,0 +1,67 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the file_access module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function file_access_schema() {
+  $schema['file_access'] = array(
+    'description'     => 'Stores file ids with associated object ids to control file access.',
+    'fields'          => array(
+      'fid'           => array(
+        'description' => 'fid value from {file_managed} table',
+        'type'        => 'int',
+        'not null'    => TRUE,
+      ),
+      'nid'           => array(
+        'description' => 'nid value from {node}',
+        'type'        => 'int',
+        'not null'    => FALSE,
+      ),
+      'aid'           => array(
+        'description' => 'Access id qualified by Drupal object type field',
+        'type'        => 'int',
+        'not null'    => TRUE,
+      ),
+      'type'          => array(
+        'description' => 'Type of access: defined by code, defaults to role',
+        'type'        => 'int',
+        'unsigned'    => TRUE,
+        'not null'    => TRUE,
+        'size'        => 'tiny',
+        'default'     => 0,
+      ),
+      'altfid'  => array(
+        'description' => 'Alternate file id when no access returned', // future feature.
+        'type' => 'int',
+      ),
+    ),
+    'primary key' => array('fid', 'aid', 'type'),
+    'indexes' => array(
+      'fid' => array('fid'),
+      'nid' => array('nid'),
+    ),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function file_access_uninstall() {
+  // Remove variables.
+  $vars = array(
+    'file_access_global_roles',
+    'file_access_per_node',
+    'file_access_redirect',
+    'file_access_extensions',
+  );
+  foreach ($vars as $name) {
+    variable_del($name);
+  }
+}

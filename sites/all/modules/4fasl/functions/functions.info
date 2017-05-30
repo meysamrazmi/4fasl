@@ -1,0 +1,4 @@
+name = 4fasl functions
+description = "4faslmusic custom functions and use cases"
+core = 7.x
+package = 4fasl

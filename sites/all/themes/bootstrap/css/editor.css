@@ -1,0 +1,26 @@
+@font-face {
+	font-family: hoda;
+	font-style: normal;
+	font-weight: normal;
+	src: 	url('../fonts/hoda/hoda.ttf') format('truetype');
+/*	src: 	url('../fonts/hoda/hoda.eot?#iefix') format('embedded-opentype'),  
+			url('../fonts/hoda/hoda.woff2') format('woff2'), 
+			url('../fonts/hoda/hoda.woff') format('woff'),  	
+			url('../fonts/hoda/hoda.eot'); */
+}
+@font-face {
+    font-family: "iransans";
+    src: local('â˜ºâ˜ºâ˜º'), url("../fonts/iransans.eot") format('eot'),
+         url("../fonts/iransans.woff") format("woff"),
+         url("../fonts/iransans.ttf") format("truetype"),
+         url("../fonts/iransans.svg") format("svg");
+    /*font-weight: bold;*/
+    font-weight: normal;
+    font-style: normal;
+}
+p{
+	font-family: iransans;	
+}
+.hoda {
+  font-family: hoda;
+}

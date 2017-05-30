@@ -1,0 +1,13 @@
+name = File Access
+description = Allows for individual file access control when using the Private setting in the File System.
+package = File System
+core = 7.x
+dependencies[] = file
+files[] = file_access.module
+
+; Information added by drupal.org packaging script on 2013-09-30
+version = "7.x-1.x-dev"
+core = "7.x"
+project = "file_access"
+datestamp = "1380579230"
+

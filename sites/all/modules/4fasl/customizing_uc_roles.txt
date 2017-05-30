@@ -1,0 +1,54 @@
+/*
+ * این فایل برای راهنمایی در مورد تغییری است که در ماژول خاصی داده شده است
+ * این فایل نمیتواند به صورت patch عمل کند
+ * باید به صورت دستی تغییرات اعمال شود
+ */
+
++++ /sites/all/modules/ubercart/uc_roles/uc_roles.module
+--- /sites/all/modules/ubercart/uc_roles/uc_roles.module
+@@ line 52 
+function uc_roles_cron() 
+@@
+
+// Cleanup if user or role was deleted already.
+if (!$account || !in_array($expiration->rid, array_keys($account->roles))) {
+-  uc_roles_delete($expiration, $expiration->rid, TRUE);
++  //uc_roles_delete($expiration, $expiration->rid, TRUE);
+}
+
+// Role expired.
+
+
+
++++ /sites/all/modules/ubercart/uc_roles/uc_roles.module
+--- /sites/all/modules/ubercart/uc_roles/uc_roles.module
+@@ line 1039 
+function uc_roles_revoke(&$account, $rid, $silent = FALSE) 
+
+@@
+  unset($roles_list[$rid]);
+
+  $account = user_save($account, array('roles' => $roles_list));
+
+  // Remove our record of the expiration.
+-  uc_roles_delete($account, $rid, $silent);
++  //uc_roles_delete($account, $rid, $silent);
+
+  $role_name = db_query("SELECT name FROM {role} WHERE rid = :rid", array(':rid' => $rid))->fetchField();
+
+
++++ /sites/all/modules/ubercart/uc_roles/uc_roles.module
+--- /sites/all/modules/ubercart/uc_roles/uc_roles.module
+@@ line 340 
+  function uc_roles_user_presave(&$edit, $account, $category) 
+  
+  
+  // If a user's role is removed using Drupal, then so is any expiration data.
+  if (isset($edit['roles']) && is_array($edit['roles']) && isset($account->roles)) {
+    foreach ($account->roles as $rid => $role) {
+      if (!in_array($rid, array_keys($edit['roles'])) && $rid != DRUPAL_AUTHENTICATED_RID) {
+-        uc_roles_delete($account, $rid);
++        //uc_roles_delete($account, $rid);
+      }
+    }
+  }

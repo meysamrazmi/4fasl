@@ -1,0 +1,397 @@
+<?php
+/**
+ * Implementation of hook_uc_order();
+ */
+function uc_user_uc_order($op, $order, $status) {
+  switch ($op) {
+    case 'update':
+      // We might want to add the "Order Status" to the Userpoints Ubercart options...
+      if ($order->order_status != 'completed' && ($status == 'completed' && $order->uid > 0) && ($order_user = user_load($order->uid)) !== FALSE) {
+        if (is_array($order->products) && count($order->products)) {
+			foreach ($order->products as $product) {
+			
+				if ($product->nid == 139){// for renew registration
+					$expires = timetoexpire($order->uid);
+					
+					if(isset($product->data['attributes']['roles'])){
+						foreach ($product->data['attributes']['roles'] as $key=> $value) {
+							switch($key){
+								case 20: //honarjo option ID
+									$rid = 4;
+									if ($expires['honarjo'] < 1){
+										db_update('uc_roles_expirations')->fields(array('expiration' => time()))->condition('uid', $order->uid)->condition('rid', $rid)->execute();
+										// Punch the role into the user object.
+										$roles_list = $order_user->roles + array($rid => _uc_roles_get_name($rid));
+										$order_user = user_save($order_user, array('roles' => $roles_list));
+									}
+									break;
+								case 21: //vip option ID
+									$rid = 6;
+									if ($expires['vip'] < 1){
+										db_update('uc_roles_expirations')->fields(array('expiration' => time()))->condition('uid', $order->uid)->condition('rid', $rid)->execute();
+										// Punch the role into the user object.
+										$roles_list = $order_user->roles + array($rid => _uc_roles_get_name($rid));
+										$order_user = user_save($order_user, array('roles' => $roles_list));
+									}
+									break;
+								default:
+							}
+						}
+					}
+				}
+				
+				if(isset($product->data['attributes']['instrument'])){
+					foreach ($product->data['attributes']['instrument'] as $key=> $value) {
+
+						if ($product->nid == 35){ // registration in a course
+							if(which_instrument_key($key) != false){
+								//update the user 'field_collection' data
+								add_collection($order_user , which_instrument_key($key) , 'l1' , '1');
+								//update the user favorite instrument
+								$field_favorite['und'][0]['value'] =  which_instrument_key($key);
+								$order_user = user_save($order_user, array('field_favorite' => $field_favorite));
+							} else{
+								drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 4 , '@val' => $value ,)), 'error');
+							}
+						}
+						
+						if(which_teacher_key($key) != false){
+							$type = 1; //for student relationship type for default
+							$approved = true ;
+							if($product->nid == 142){ //vip registration
+								$type = 3; //for vip relationship type
+							}
+
+							if(($relationship = user_relationships_request_relationship($order->uid, which_teacher_key($key) , $type , $approved)) !== FALSE){
+								//message has been set in the function itself
+							} else{
+								drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 5 , '@val' => $value ,)), 'error');
+							}
+						} else{
+							drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 6 , '@val' => $value ,)), 'error');
+						}					
+					}
+				}
+            }  
+        }
+      }
+  }
+}
+
+function uc_user_forms($form_id, $args) {
+  $forms = array();
+  $users = entity_load('user');
+  foreach(array_keys($users) as $uid){
+	$forms['student_confirmation_form_'. $uid]['callback'] = 'student_confirmation_form';  
+  }
+  return $forms;
+}
+
+function student_confirmation_form($form, &$form_state, $uid) {
+	if (!is_array($form)) {
+		$form = array();
+	}
+	$form['approval'] = array(
+		'#type' => 'checkbox', 
+		'#required' => true,
+		'#title' => t('accept this student for watching next episode'),
+		'#description' => t('Required. if this student has done his/her homeworks, check this option.'),
+	);
+	$form['uid'] = array(
+		'#type' => 'hidden',
+		'#value' => $uid,
+	);
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('approve'),
+	);
+	return $form;
+}
+
+function student_confirmation_form_submit($form, &$form_state) {
+	$user = user_load($form_state['values']['uid']);
+
+	$node_query = "SELECT max(sn.field_sessionnumber_value) as session
+        FROM field_data_field_siteinfo_stu main
+        INNER JOIN field_data_field_instrument ins
+        INNER JOIN field_data_field_levelnumber levn
+        INNER JOIN field_data_field_sessionnumber sn
+        ON main.field_siteinfo_stu_value = ins.entity_id
+        AND main.field_siteinfo_stu_value = levn.entity_id
+        AND main.field_siteinfo_stu_value = sn.entity_id
+        WHERE main.entity_type = 'node'
+        AND ins.field_instrument_value = :instrument
+        AND levn.field_levelnumber_value = :level ";
+		
+	$user_query ="SELECT main.field_siteinfo_stu_value as field_id, ins.field_instrument_value as instrument, levn.field_levelnumber_value as level, sn.field_sessionnumber_value as session
+        FROM field_data_field_siteinfo_stu main
+        INNER JOIN field_data_field_instrument ins
+        INNER JOIN field_data_field_levelnumber levn
+        INNER JOIN field_data_field_sessionnumber sn
+        ON main.field_siteinfo_stu_value = ins.entity_id
+        AND main.field_siteinfo_stu_value = levn.entity_id
+        AND main.field_siteinfo_stu_value = sn.entity_id
+        WHERE main.entity_type = 'user'
+        AND main.entity_id = :uid  
+		ORDER BY `main`.`field_siteinfo_stu_value` DESC";
+	
+	$user_result = db_query($user_query, array(':uid' => $user->uid))->fetchObject();
+	$node_result = db_query($node_query, array(':instrument' => $user_result->instrument, ':level' => $user_result->level))->fetchObject();
+
+	if($user_result->session == $node_result->session){
+		switch($user_result->level){
+			case 'l1':
+				$user_result->level = 'l2';
+				break;
+			case 'l2':
+				$user_result->level = 'l3';
+				break;
+		}
+		$user_result->session = 1;
+	}else{
+		$user_result->session = intval($user_result->session) + 1;		
+	}
+	add_collection($user , $user_result->instrument , $user_result->level , $user_result->session);
+	drupal_set_message(t('Your approval successfully saved for student ') . $user->name, 'status');
+}
+
+function add_collection($user, $instrument , $level , $session) {
+  module_load_include('inc', 'entity', 'includes/entity.controller');
+  $values = array(
+		'field_name' => 'field_siteinfo_stu',
+		'field_instrument' => array(
+			LANGUAGE_NONE => array(array('value' => $instrument)),
+		),
+		'field_levelnumber' => array(
+			LANGUAGE_NONE => array(array('value' => $level)),
+		),
+		'field_sessionnumber' => array(
+			LANGUAGE_NONE => array(array('value' => $session)),
+		),
+  );
+  $entity = entity_create('field_collection_item', $values);
+  $entity->setHostEntity('user', $user);
+  $entity->save();
+  
+  //for giving user file access 
+  define('FILE_ACCESS_USER', 1);
+
+	$sql = "
+		SELECT main.entity_id as nid 
+        FROM field_data_field_siteinfo_stu main
+        INNER JOIN field_data_field_instrument ins ON main.field_siteinfo_stu_value = ins.entity_id
+        INNER JOIN field_data_field_levelnumber levn ON main.field_siteinfo_stu_value = levn.entity_id
+        INNER JOIN field_data_field_sessionnumber sn ON main.field_siteinfo_stu_value = sn.entity_id
+        WHERE main.entity_type = 'node' 
+        AND ins.field_instrument_value = :instrument
+        AND levn.field_levelnumber_value = :level
+        AND sn.field_sessionnumber_value = :session" ;
+	$result = db_query($sql, array(
+		':instrument' =>$instrument,
+		':level' =>$level,
+		':session' =>$session
+	));
+	
+	if($rows = $result->fetchAll()){
+		foreach($rows as $row){
+			$node = node_load($row->nid);
+			if(isset($node->field_course_film['und'][0])){
+				if(function_exists('file_access_set_file_access')){
+					file_access_set_file_access($node->field_course_film['und'][0]['fid'] , $user->uid , NULL , FILE_ACCESS_USER);
+				}else{
+					drupal_set_message('خطایی در تایید هنرجو رخ داده است. لطفا با مدیریت تماس بگیرید.','error');
+				}
+			}
+		}
+	}
+}
+
+function which_teacher($value){
+	switch($value){
+		case 'تار':
+			return 164;
+			break;
+		case 'تنبک':
+			return 108;
+			break;
+		case 'سنتور':
+			// return 106; //پوربخت
+			return 1996; //کیان
+			break;
+		case 'سه تار':
+			return 111;
+			break;
+		case 'ویولن':
+			return 107;
+			break;
+		case 'پیانو':
+			return 30;
+			break;
+		case 'گیتار کلاسیک':
+			return 64;
+			break;
+		case 'گیتار فلامنکو':
+			return 109;
+			break;
+		case 'گیتار پاپ':
+			return 110;
+			break;
+		case 'دف':
+			return 1011;
+			break;
+		default:
+		case 'نی':
+			return 2785;
+			break;
+		case 'هارمونیکا':
+			return 1;
+			break;
+		case 'تئوری موسیقی':
+			return 1;
+			break;
+		default:
+			return false;
+	}
+}
+
+function which_instrument($value){
+	switch($value){
+		case 'تار':
+			return 'tar';
+			break;
+		case 'تنبک':
+			return 'tonbak';
+			break;
+		case 'سنتور':
+			return 'santor';
+			break;
+		case 'سه تار':
+			return 'setar';
+			break;
+		case 'ویولن':
+			return 'violin';
+			break;
+		case 'پیانو':
+			return 'piano';
+			break;
+		case 'گیتار کلاسیک':
+			return 'guitar';
+			break;
+		case 'گیتار فلامنکو':
+			return 'guitarflamenco ';
+			break;
+		case 'گیتار پاپ':
+			return 'guitarpop ';
+			break;
+		case 'دف':
+			return 'daf';
+			break;
+		default:
+		case 'نی':
+			return 'ney';
+			break;
+		case 'هارمونیکا':
+			return 'harmonica';
+			break;
+		case 'تئوری موسیقی':
+			return 'music';
+			break;
+		default:
+			return false;
+	}
+}
+
+function which_teacher_key($value){
+	switch($value){
+		case 13: //'تار'
+			return 164;
+			break;
+		case 11://'تنبک'
+			return 108;
+			break;
+		case 10://'سنتور'
+			// return 106; //پوربخت
+			return 1996; //کیان
+			break;
+		case 14://'سه تار'
+			return 111;
+			break;
+		case 18://'ویولن'
+			return 107;
+			break;
+		case 9://'پیانو'
+			return 30;
+			break;
+		case 5://'گیتار کلاسیک'	
+			return 64;
+			break;
+		case 12://'گیتار فلامنکو'
+			return 109;
+			break;
+		case 16:// 'گیتار پاپ'
+			return 110;
+			break;
+		case 19://'دف'
+			return 1011;
+			break;
+		case 23://'نی'
+			return 2785;
+			break;
+		case 1: //'هارمونیکا':
+			return 1;
+			break;
+		case 2://'تئوری موسیقی':
+			return 1;
+			break;
+		default:
+			return false;
+	}
+}
+
+function which_instrument_key($value){
+	switch($value){
+		case 13: //'تار'
+			return 'tar';
+			break;
+		case 11://'تنبک'
+			return 'tonbak';
+			break;
+		case 10://'سنتور'
+			return 'santor';
+			break;
+		case 14://'سه تار'
+			return 'setar';
+			break;
+		case 18://'ویولن'
+			return 'violin';
+			break;
+		case 9://'پیانو'
+			return 'piano';
+			break;
+		case 5://'گیتار کلاسیک'	
+			return 'guitar';
+			break;
+		case 12://'گیتار فلامنکو'
+			return 'guitarflamenco ';
+			break;
+		case 16:// 'گیتار پاپ'
+			return 'guitarpop ';
+			break;
+		case 19://'دف'
+			return 'daf';
+			break;
+		default:
+		case 23://'نی'
+			return 'ney';
+			break;
+		case 1://'هارمونیکا':
+			return 1;
+			break;
+		case 2://'تئوری موسیقی':
+			return 1;
+			break;
+		default:
+			return false;
+	}
+}
+

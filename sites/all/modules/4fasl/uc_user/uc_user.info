@@ -1,0 +1,14 @@
+name = 4fasl
+description = "custom configuration and code's for 4 fasl music"
+dependencies[] = uc_order
+dependencies[] = uc_cart
+dependencies[] = uc_payment
+dependencies[] = user_relationships
+dependencies[] = userpoints
+
+core = 7.x
+php = 5.x 
+version = "7.x-1.x-dev"
+package = 4fasl
+
+

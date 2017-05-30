@@ -1,0 +1,4 @@
+name = required alt
+description = "make alt attribute of image required"
+core = 7.x
+package = 4fasl

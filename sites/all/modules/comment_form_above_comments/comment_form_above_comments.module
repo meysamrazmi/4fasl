@@ -1,0 +1,7 @@
+<?php
+
+function comment_form_above_comments_theme_registry_alter(&$theme_registry) {
+  $theme_registry['comment_wrapper']['template'] = drupal_get_path('module', 'comment_form_above_comments') . '/comment-wrapper'; 
+}
+
+ 

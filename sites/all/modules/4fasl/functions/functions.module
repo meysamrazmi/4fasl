@@ -1,0 +1,197 @@
+<?php
+if(!function_exists('in_array_r')) {
+	function in_array_r($needle, $haystack, $strict = false) {
+		foreach ($haystack as $item) {
+			if (($strict ? $item === $needle : $item == $needle) || (is_array($item) && in_array_r($needle, $item, $strict))) {
+				return true;
+			}
+		}
+		return false;
+	}
+}
+
+function unread_tickets($user){
+	$tickets_query = "SELECT DISTINCT node.nid AS nid, users_node.uid AS uid, GREATEST(node.changed, node_comment_statistics.last_comment_timestamp) AS changed
+		FROM node node
+		LEFT JOIN comment comment_node ON node.nid = comment_node.nid
+		LEFT JOIN users users_node ON node.uid = users_node.uid
+		LEFT JOIN users users_comment ON comment_node.uid = users_comment.uid
+		LEFT JOIN support_ticket support_ticket ON node.nid = support_ticket.nid
+		LEFT JOIN users users_support_ticket ON support_ticket.assigned = users_support_ticket.uid
+		LEFT JOIN support_states support_states ON support_ticket.state = support_states.sid
+		INNER JOIN node_comment_statistics node_comment_statistics ON node.nid = node_comment_statistics.nid
+		LEFT OUTER JOIN support_ticket st ON st.nid = node.nid
+		WHERE ((( (users_node.uid = :uid) )OR( (users_comment.uid = :uid) )OR( (users_support_ticket.uid = :uid) ))AND( (node.status = '1') AND (node.type IN  ('support_ticket')) AND (support_states.state IN  ('new', 'active', 'pending')) ))AND( (st.client IN  ('1')) OR (st.client IS NULL ) )
+		ORDER BY changed DESC";
+
+ 	$history_query=	"SELECT DISTINCT node.nid AS nid, history.timestamp AS history_timestamp, node.changed AS node_changed	FROM node node LEFT JOIN history history ON node.nid = history.nid AND history.uid = :uid	WHERE node.nid = :nid";
+
+	$output = array();
+	$i = 0;
+	$tickets = db_query($tickets_query , array(':uid' => $user->uid));
+	foreach($tickets as $ticket){
+		$history = db_query($history_query , array(':uid' => $user->uid , ':nid' => $ticket->nid));//->execute()->fetchAll();
+
+		foreach($history as $row){
+			if(!isset($row->history_timestamp) || $row->history_timestamp < $ticket->changed){
+				$output[$i]['nid'] = $ticket->nid;
+				$output[$i]['from'] = $ticket->uid;
+				$i++;
+			}
+		}
+	}
+
+	if(count($output)){
+		return $output;
+	}else{
+		return null;
+	}
+}
+
+function unread_tickets_count($user){
+	return count(unread_tickets($user));
+}
+
+function student_films($uid , $detail = false){
+	$user_q = "SELECT instrument.field_instrument_value AS instrument , _level.field_levelnumber_value AS level, _session.field_sessionnumber_value AS session
+    FROM field_data_field_siteinfo_stu field_stu
+    INNER JOIN field_data_field_instrument instrument
+    INNER JOIN field_data_field_levelnumber _level
+    INNER JOIN field_data_field_sessionnumber _session
+    ON field_stu.field_siteinfo_stu_value = instrument.entity_id
+    AND field_stu.field_siteinfo_stu_value = _level.entity_id
+    AND field_stu.field_siteinfo_stu_value = _session.entity_id
+    WHERE field_stu.entity_type = 'user' AND field_stu.entity_id = :uid";
+	
+	$nid_q = "SELECT field_stu.entity_id AS nid
+    FROM field_data_field_siteinfo_stu field_stu
+    INNER JOIN field_data_field_instrument instrument
+    INNER JOIN field_data_field_levelnumber _level
+    INNER JOIN field_data_field_sessionnumber _session
+    ON field_stu.field_siteinfo_stu_value = instrument.entity_id
+    AND field_stu.field_siteinfo_stu_value = _level.entity_id
+    AND field_stu.field_siteinfo_stu_value = _session.entity_id
+    WHERE field_stu.entity_type = 'node' AND instrument.field_instrument_value = :instrument AND _level.field_levelnumber_value = :level AND _session.field_sessionnumber_value = :session";
+	
+	$output = array();
+	$rows = db_query($user_q , array(':uid' => $uid))->fetchAll();
+
+	if($detail){
+		foreach($rows as $row){
+			$result = db_query($nid_q , array(':instrument' => $row->instrument , ':level' => $row->level , ':session' => $row->session))->fetchAll();
+			foreach($result as $nid){
+				$output[$row->instrument][$row->level][] = $nid->nid; 
+			}
+		}
+	}else{
+		foreach($rows as $row){
+			$result = db_query($nid_q , array(':instrument' => $row->instrument , ':level' => $row->level , ':session' => $row->session))->fetchAll();
+			foreach($result as $nid){
+				$output[] = $nid->nid; 
+			}
+		}
+	}
+
+	return count($output)? $output : null;
+}
+
+function timetoexpire($uid){
+	$q = db_select('uc_roles_expirations', 'r');
+	$rows = $q->fields('r', array())->condition('r.uid', $uid)->execute()->fetchAll();
+	$timetoexpire = 0;
+	$timetoexpire_vip = 0;
+	foreach ($rows as $r) {
+		if($r->rid == 4){ //honarjo role id
+			$timetoexpire = $r->expiration - time() ;
+			$timetoexpire = $timetoexpire / (24*60*60) ;
+		}else if($r->rid == 6){//vip role id
+			$timetoexpire_vip = $r->expiration - time() ;
+			$timetoexpire_vip = $timetoexpire_vip / (24*60*60) ;
+		}
+	}
+	return array('honarjo'=> $timetoexpire , 'vip'=> $timetoexpire_vip);
+}
+
+function mdump($var , $die = false){
+	global $user;
+	if($user->uid == 1 || $user->uid == 86){
+		echo '<pre>';
+		print_r($var);
+		echo '</pre>';
+		if($die){
+			die($die);
+		}
+	}
+}
+
+/**
+ * Implements hook_menu().
+ */
+function functions_menu() {
+  $items['admin/update-file-access'] = array(
+    'title' => 'File access',
+    'description' => 'File access settings.',
+    'page callback' => 'update_file_access',
+    'access arguments' => array('administer file access'),
+	'type' => MENU_LOCAL_TASK,
+  );
+  return $items;
+}
+
+function update_file_access(){
+  define('FILE_ACCESS_USER', 1);
+  $fails = $success = array();
+	$values = db_query("SELECT main.entity_id AS uid , ins.field_instrument_value AS instrument, levn.field_levelnumber_value AS level, sn.field_sessionnumber_value AS session
+        FROM field_data_field_siteinfo_stu main
+        INNER JOIN field_data_field_instrument ins ON main.field_siteinfo_stu_value = ins.entity_id
+        INNER JOIN field_data_field_levelnumber levn ON main.field_siteinfo_stu_value = levn.entity_id
+        INNER JOIN field_data_field_sessionnumber sn ON main.field_siteinfo_stu_value = sn.entity_id
+        WHERE main.entity_type = 'user' ORDER BY `uid` DESC");
+		
+	foreach($values as $row){
+		$uid = $row->uid;
+		$instrument = $row->instrument;
+		$level = $row->level;
+		$session = $row->session;
+		
+		
+		
+		//for giving user file access 
+		$sql = "
+			SELECT main.entity_id as nid 
+			FROM field_data_field_siteinfo_stu main
+			INNER JOIN field_data_field_instrument ins ON main.field_siteinfo_stu_value = ins.entity_id
+			INNER JOIN field_data_field_levelnumber levn ON main.field_siteinfo_stu_value = levn.entity_id
+			INNER JOIN field_data_field_sessionnumber sn ON main.field_siteinfo_stu_value = sn.entity_id
+			WHERE main.entity_type = 'node' 
+			AND ins.field_instrument_value = :instrument
+			AND levn.field_levelnumber_value = :level
+			AND sn.field_sessionnumber_value = :session" ;
+		$result = db_query($sql, array(
+			':instrument' =>$instrument,
+			':level' =>$level,
+			':session' =>$session
+		));
+		
+		if($rows = $result->fetchAll()){
+			foreach($rows as $row){
+				$node = node_load($row->nid);
+				if(isset($node->field_course_film['und'][0])){
+					if(file_access_set_file_access($node->field_course_film['und'][0]['fid'] , $uid , NULL , FILE_ACCESS_USER)){
+						$success[] = 'uid: '. $uid . ' | nid: '. $node->nid . ' | fid: '. $node->field_course_film['und'][0]['fid'] . '<br>';
+					}else{
+						$fails[] = 'uid: '. $uid . ' | nid: '. $node->nid . ' | fid: '. $node->field_course_film['und'][0]['fid'] . '<br>';
+					}
+				}
+			}
+		}
+	
+	
+	}
+	$resault = array('success' => $success, 'fail' => $fails);
+	mdump($resault ,true);
+}
+
+
+
+
