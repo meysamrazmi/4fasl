@@ -1,0 +1,13 @@
+diff --git a/sites/all/modules/file_access/file_access.module b/sites/all/modules/file_access/file_access.module
+index 0419784..3b3d359 100644
+--- a/sites/all/modules/file_access/file_access.module
++++ b/sites/all/modules/file_access/file_access.module
+@@ -508,7 +508,7 @@ function file_access_form_node_form_alter(&$form, &$form_state, $form_id) {
+         $form[$section]['roles'][$file_info['fid']] = array(
+           '#type' => 'checkboxes',
+           '#description' => t('Role based access for @filename.', array('@filename' => $file_info['filename'])),
+-          '#title' => check_plain($file['filename']),
++          '#title' => check_plain($file_info['filename']),
+           "#default_value" => $access,
+           '#options' => user_roles(),
+         );
