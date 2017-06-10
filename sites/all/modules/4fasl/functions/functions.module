@@ -25,6 +25,11 @@ function unread_tickets($user){
 		ORDER BY changed DESC";
 
  	$history_query=	"SELECT DISTINCT node.nid AS nid, history.timestamp AS history_timestamp, node.changed AS node_changed	FROM node node LEFT JOIN history history ON node.nid = history.nid AND history.uid = :uid	WHERE node.nid = :nid";
+	
+	$nodecounter = 'SELECT max(viewc.timestamp) AS viewc_timestamp, node.changed AS node_changed   
+		FROM node node 
+		LEFT JOIN nodeviewcount viewc ON node.nid = viewc.nid
+		WHERE node.nid = :nid AND viewc.uid = :uid';
 
 	$output = array();
 	$i = 0;
@@ -34,9 +39,12 @@ function unread_tickets($user){
 
 		foreach($history as $row){
 			if(!isset($row->history_timestamp) || $row->history_timestamp < $ticket->changed){
-				$output[$i]['nid'] = $ticket->nid;
-				$output[$i]['from'] = $ticket->uid;
-				$i++;
+				$result = db_query($nodecounter , array(':uid' => $user->uid , ':nid' => $ticket->nid))->fetchObject();
+				if(!isset($result->viewc_timestamp) || $result->viewc_timestamp < $result->node_changed){
+					$output[$i]['nid'] = $ticket->nid;
+					$output[$i]['from'] = $ticket->uid;
+					$i++;
+				}
 			}
 		}
 	}
@@ -135,7 +143,20 @@ function functions_menu() {
     'access arguments' => array('administer file access'),
 	'type' => MENU_LOCAL_TASK,
   );
+
   return $items;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function functions_theme() {
+  return array(
+    'functions_user_expiration' => array(
+      'render element' => 'form',
+      'file' => 'functions.theme.inc',	  
+    ),
+  );
 }
 
 function update_file_access(){
@@ -192,6 +213,90 @@ function update_file_access(){
 	mdump($resault ,true);
 }
 
+/**
+ * Implements hook_form_user_profile_form_alter().
+ */
+function functions_form_user_profile_form_alter(&$form, &$form_state) {
+  $account = $form_state['build_info']['args'][0];
+  if (isset($form_state['build_info']['args'][1])) {
+    $category = $form_state['build_info']['args'][1];
+  }
+  else {
+    // user_profile_form() has a default value for $category.
+    $category = 'account';
+  }
+  if (!user_access('administer users') || $category != 'account') {
+    return;
+  }
+  
+  $form['uc_roles']['expirations']['#theme'] = 'functions_user_expiration';
+  
+  // Create the expirations table.
+  $expirations = db_query("SELECT * FROM {uc_roles_expirations} WHERE uid = :uid", array(':uid' => $account->uid));
+  foreach ($expirations as $expiration) {
+    $form['uc_roles']['expirations']['table'][$expiration->rid]['cancel'] = array(
+		// '#title' => 'حذف '. _uc_roles_get_name($expiration->rid),
+        '#type' => 'checkbox',
+    );
+  }
+
+  $form['#validate'][] = 'functions_user_validate';
+  return $form;
+}
+
+function functions_user_validate($form, &$form_state){
+	
+}
+
+/**
+ * Implements hook_user_presave().
+ */
+function functions_user_presave(&$edit, $account, $category) {
+  if (!user_access('administer users') || $category != 'account') {
+    return;
+  }
+
+  // Grant a new role if a new temporary role is added.
+  if (isset($edit['new_role']) && $edit['new_role'] && $category == 'account') {
+	if($edit['new_role_add'] == 4){//honarjo role id
+		$type = 1; //شاگرد relationship id
+		//update the user 'field_collection' data
+		$expires = timetoexpire($order->uid);
+		if($expires['honarjo'] == 0){
+			add_collection($account , $account->field_favorite['und'][0]['value'] , 'l1' , '1');
+		}
+	}elseif($edit['new_role_add'] == 6){//vip role id
+		$type = 3; //vip relationship id
+	}
+
+	if(($relationship = user_relationships_request_relationship($account->uid, which_teacher_name($account->field_favorite['und'][0]['value']) , $type , true)) !== FALSE){
+		//message has been set in the function itself
+	} else{
+		drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 5 , '@val' => '' ,)), 'error');
+	}
+  }
+
+  // Check if any temporary role actions were taken.
+  if (isset($edit['table'])) {
+    foreach ((array)$edit['table'] as $rid => $value) {
+      // Remove this expiration and role.
+      if ($value['cancel']) {
+		if($rid == 4){//honarjo role id
+			$rtid = 1; //شاگرد relationship id
+		}elseif($rid == 6){//vip role id
+			$rtid = 3; //vip relationship id
+		}
+		db_delete('user_relationships')
+			->condition('requester_id', $account->uid)
+			->condition('rtid', $rtid)
+			->execute();
+
+        uc_roles_delete($account, $rid);
+      }
+    }
+  }
+
+}
 
 
 
