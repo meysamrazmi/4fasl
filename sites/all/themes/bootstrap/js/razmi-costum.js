@@ -122,6 +122,11 @@ $('.support-filters').click(function(){
 /*-----------------------------------------------------------------------------------------------------------*/
 $('div#edit-attributes-3 .form-item').each(function(){
 	$(this).addClass('col-lg-2 col-md-3 col-sm-4 col-xs-6 card-view');
+	var oldtitle = $(this).find('.oldtitle').text().split('+');
+	$(this).find('.oldtitle').text(oldtitle[0].replace(',', ''));
+	if(oldtitle[1] != "undefined"){
+		$(this).find('label').append('<span class="price">'+ oldtitle[1] +'</span>');
+	}
 });
 $('div#edit-attributes-3 .form-item input').change(function(){
 	if($(this).hasClass('form-radio')){

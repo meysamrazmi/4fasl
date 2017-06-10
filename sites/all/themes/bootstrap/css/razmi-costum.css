@@ -1764,6 +1764,7 @@ div#edit-attributes-3 .form-item .oldtitle {
   line-height: 40px;
   font-weight: bold;
   font-size: 17px;
+	position: relative;
 }
 .add-to-cart div#edit-actions {
   clear: both;
@@ -1786,20 +1787,28 @@ div#uc-option-image-selected-3 {
   border: 2px solid #444;
   border-radius: 2px;
   position: absolute !important;
-  right: 7px;
-  bottom: 13px;
+	right: -25px;
+	bottom: 5px;
 }
 .oldtitle:after {
   content: "\e013";
   font-family: Glyphicons Halflings;
   position: absolute;
-  right: 0;
+	right: -32px;
+	bottom: -4px;
   font-size: 0;
   margin: -2px 7px;
   color: #fff;
   transition: all 0.2s;
   width: 17px;
   text-align: center;
+}
+div#edit-attributes-3 .form-item .price {
+	display: block;
+	margin-right: auto;
+	text-align: left;
+	padding: 0px 10px 10px;
+	font-size: 15px;
 }
 .selected .oldtitle:after {
   font-size: 15px;
@@ -2006,6 +2015,7 @@ td.qty input {
 }
 .node-add-to-cart {
   /* font-size: 0; */
+	margin-left: 5px;
 }
 .node-add-to-cart:after {
   content: "ËÈÊ äÇã ÏÑ ÏæÑå";
@@ -2329,10 +2339,17 @@ h4.student-managing-title ~ h4 {
 .students-section.float {
   float: none;
   clear: both;
-  padding: 30px 0 0;
+  padding: 30px 0 30px;
 }
 .field-item > .students-section > .view-content.open {
   height: 100%;
+}
+.field-item > .students-section .pagination {
+	position: absolute;
+	bottom: 0;
+	left: 5px;
+	padding: 0;
+	width: inherit;
 }
 /*-------------*/
 .node-homework.node-teaser ul.list-inline {
@@ -4104,7 +4121,7 @@ div#main-saaz .field-name-field-image > * {
   display: none;
   box-shadow: 0 1px 6px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.12);
   background: #fff;
-  margin: 0px 103px 0 0;
+  margin: -30px 103px 0 0;
   padding: 10px;
   border-right: 5px solid #9837dc;
   border-left: 5px solid #9837dc;
@@ -4570,7 +4587,10 @@ margin-left: 15px;
   vertical-align: top;
   position: relative;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 20px;	
+/* opacity: 0; */
+	display: none;
+	transition: all 0.2s ease;
 }
 .price-label{
   margin-left:25px;
@@ -6330,7 +6350,9 @@ div#edit-attributes-3 label[for*='edit-attributes-3-23'] {
 	background: #f9f9f9;
 	border-top: 1px solid #eee;
 }
-
+.pagination > li > a, .pagination > li > span {
+	float: right;
+}
 
 
 
