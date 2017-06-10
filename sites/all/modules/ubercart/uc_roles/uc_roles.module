@@ -310,7 +310,7 @@ function uc_roles_user_presave(&$edit, $account, $category) {
     $edit['roles'][$edit['new_role_add']] = _uc_roles_get_name($edit['new_role_add']);
 
     // Reset the new role form.
-    $edit['new_role'] = $edit['new_role_add'] = $edit['new_role_add_qty'] = $edit['new_role_add_granularity'] = NULL;
+    // $edit['new_role'] = $edit['new_role_add'] = $edit['new_role_add_qty'] = $edit['new_role_add_granularity'] = NULL;
   }
 
   // Check if any temporary role actions were taken.
