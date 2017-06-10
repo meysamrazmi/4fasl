@@ -243,10 +243,64 @@ function which_teacher($value){
 		case 'نی':
 			return 2785;
 			break;
+		case 'گیتار الکتریک':
+			return 3079;
+			break;
 		case 'هارمونیکا':
 			return 1;
 			break;
 		case 'تئوری موسیقی':
+			return 1;
+			break;
+		default:
+			return false;
+	}
+}
+
+function which_teacher_name($value){
+	switch($value){
+		case 'tar':
+			return 164;
+			break;
+		case 'tonbak':
+			return 108;
+			break;
+		case 'santor':
+			// return 106; //پوربخت
+			return 1996; //کیان
+			break;
+		case 'setar':
+			return 111;
+			break;
+		case 'violin':
+			return 107;
+			break;
+		case 'piano':
+			return 30;
+			break;
+		case 'guitar':
+			return 64;
+			break;
+		case 'guitarflamenco':
+			return 109;
+			break;
+		case 'guitarpop':
+			return 110;
+			break;
+		case 'daf':
+			return 1011;
+			break;
+		default:
+		case 'ney':
+			return 2785;
+			break;
+		case 'guitarelectric':
+			return 3079;
+			break;
+		case 'harmonica':
+			return 1;
+			break;
+		case 'music':
 			return 1;
 			break;
 		default:
@@ -289,6 +343,9 @@ function which_instrument($value){
 		default:
 		case 'نی':
 			return 'ney';
+			break;
+		case 'گیتار الکتریک':
+			return 'guitarelectric';
 			break;
 		case 'هارمونیکا':
 			return 'harmonica';
@@ -337,6 +394,9 @@ function which_teacher_key($value){
 		case 23://'نی'
 			return 2785;
 			break;
+		case 24://گیتار الکتریک
+			return 3079;
+			break;
 		case 1: //'هارمونیکا':
 			return 1;
 			break;
@@ -383,6 +443,9 @@ function which_instrument_key($value){
 		default:
 		case 23://'نی'
 			return 'ney';
+			break;
+		case 24://گیتار الکتریک
+			return 'guitarelectric';
 			break;
 		case 1://'هارمونیکا':
 			return 1;
