@@ -345,7 +345,7 @@ function which_instrument($value){
 			return 'ney';
 			break;
 		case 'گیتار الکتریک':
-			return 'guitarelectric';
+			return 'guitarelectric ';
 			break;
 		case 'هارمونیکا':
 			return 'harmonica';
@@ -445,7 +445,7 @@ function which_instrument_key($value){
 			return 'ney';
 			break;
 		case 24://گیتار الکتریک
-			return 'guitarelectric';
+			return 'guitarelectric ';
 			break;
 		case 1://'هارمونیکا':
 			return 1;
