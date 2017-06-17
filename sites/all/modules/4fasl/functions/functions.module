@@ -302,24 +302,24 @@ function functions_user_presave(&$edit, $account, $category) {
  * Implementation of hook_node_access().
  */
 function functions_node_access($node, $op, $account){
+  global $user;
   $type = is_string($node) ? $node : $node->type;
-  mdump($account, true);
-  if ($type != 'homework' || user_has_role(3 , $account)) {
+  if ($type != 'homework' || user_has_role(3 , $user)) {
     // We are only interested in support_ticket nodes.
     return NODE_ACCESS_IGNORE;
   }
   switch ($op) {
     case 'view':
-	  if($account->uid == $node->uid){
+	  if($user->uid == $node->uid){
         //anyone can see their practices
 		$access = NODE_ACCESS_IGNORE;
 	  }
 	  //teacher role ID
-      else if (user_has_role(5 , $account)) {
+      else if (user_has_role(5 , $user)) {
 		$relation = db_select('user_relationships', 'ur')
 		->fields('ur', array())
-		->condition('requester_id', $account->uid,'=')
-		->condition('requestee_id', $node->uid,'=')
+		->condition('requestee_id', $user->uid,'=')
+		->condition('requester_id', $node->uid,'=')
 		->condition('rtid', array(1,3),'IN') //honarjoo and vip relationship type id
 		->execute()->fetchObject();
 		
