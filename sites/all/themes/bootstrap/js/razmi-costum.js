@@ -473,6 +473,23 @@ if ($('.tab-container').length){
 		// }, 10);
 	});
 }
+/*----------------------------------------------------------------مربوط به گالری-----------------------------------------------------------------*/
+if($('.page-category:not(.page-content)').length){
+	$('h1.page-header, head title').text($('.page-gallery .breadcrumb span:last-child').text());
+	$('section[id*="block-views-taxonomy-menu"] .views-row .field-content').each(function(){
+		if($(this).hasClass('tid-'+ window.location.href.split('/')[5])){
+			$(this).addClass('active');
+		}
+	});
+}else if($('.page-category.page-content').length){
+	$('h1.page-header').text('گالری چهارفصل');
+}else if($('.page-gallery.page-tags:not(.page-content)').length){
+	$('section[id*="block-views-taxonomy-menu"] .views-row .field-content').each(function(){
+		if($(this).hasClass('tid-'+ window.location.href.split('/')[5])){
+			$(this).addClass('active');
+		}
+	});
+}
 
 
 
