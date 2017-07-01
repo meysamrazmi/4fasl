@@ -147,6 +147,10 @@ function _uc_option_image_modify_attributes(&$element) {
           $oldtitle = $element['attributes'][$aid][$oid]['#title'];
           $extratitle = theme('uc_option_image_inline', array('values' => $values));
           $newtitle = $extratitle . "<span id='oldtitle_$oid' class='oldtitle'>$oldtitle</span>";
+		  
+		  $prices = db_query('SELECT opt.cost AS cost, opt.price AS price FROM uc_product_options opt WHERE (nid = :nid) AND (oid = :oid)', array(':nid' => $nid, ':oid' => $oid))->fetchobject();
+		  if($prices->cost > $prices->price)
+			$newtitle .= '<span class="old-price">'. number_format($prices->cost) .' تومان</span>';
           $element['attributes'][$aid][$oid]['#title'] = $newtitle;
         }
       }
