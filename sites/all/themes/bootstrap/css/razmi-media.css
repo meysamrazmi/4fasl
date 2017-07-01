@@ -119,8 +119,18 @@ div#edit-attributes-3 .form-item {
     -webkit-transition: all 0.4s ease;
 	/*nemidoonam in niyaz hast ya na ama oon varesho natoonetam bezaram chon 75% col-xs-9*/	
 }
-
-/*toooooye 1200px arze menuye user ziyad mishe ye dafe*/
+.user-profile.view-mode-full > div > .field-name-user-help {
+	margin: -25px 0 15px;
+	display: block;
+	position: relative;	
+}
+.user-profile.view-mode-full > div > .field-name-user-help a {
+	position: relative;
+	color: #673AB7;
+}
+.user-profile.view-mode-full > div > .field-name-user-help a:before{
+	color: #673AB7;
+}
 
 }
 @media (min-width: 768px){

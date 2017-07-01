@@ -314,8 +314,8 @@ a.user_register{
 }
 /*baraye baghyeye media ha ham age khoobe bezaresh */
 .tb-megamenu .nav.level-0 > li > a {
-    border-bottom: 1px solid #7B7878 !important;
-    font-size: 17px;
+	font-weight: normal;
+	line-height: 28px;
 }
 l.tb-megamenu-nav.nav.level-0.items-4 li {
     margin-right: 11px;

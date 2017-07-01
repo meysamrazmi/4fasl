@@ -5312,7 +5312,7 @@ td.views-empty:before {
   font-family: mat;
   font-size: 30px;
   vertical-align: middle;
-  margin: 0 -45px 0 10px;
+  /* margin: 0 -45px 0 10px; */
   color: #673AB7;
 }
 tbody > tr:last-child {
@@ -6307,7 +6307,13 @@ span.caret {
 .popup_onload div#cboxContent {
   max-width: 90vw;
   max-height: 100vh;
-  overflow: auto;
+  overflow: visible;
+}
+.popup_onload div#cboxContent * {
+	max-width: 100%;
+}
+.popup_onload div#cboxContent a:hover {
+	opacity: 1;
 }
 .popup_onload-processed div#cboxOverlay {
   z-index: 1000;
@@ -6393,9 +6399,43 @@ blockquote {
 	margin: 15px auto;
 	max-width: 80%;
 }
-
-
-
-
+.old-price {
+	padding: 0 10px;
+	display: block;
+	text-align: left;
+	color: #f00;
+	text-decoration: line-through;
+}
+.page-user.logged-in .main-container {
+	max-width: none;
+}
+.user-profile.view-mode-full > div > .field-name-user-help {
+	position: fixed ;
+	background: transparent ;
+	box-shadow: none ;
+	top: 0;
+	z-index: 500;
+	padding: 0;
+	display: inline-block;
+}
+.user-profile.view-mode-full > div > .field-name-user-help a:before {
+	content: "\f2d7";
+	font-family: mat;
+	font-size: 24px;
+	color: #fff;
+	position: absolute;
+	right: 5px;
+	top: 4px;
+}
+.user-profile.view-mode-full > div > .field-name-user-help a {
+	color: #fff;
+	padding: 6px 40px 6px 14px;
+	border-radius: 5px;
+	position: fixed;
+	top: 8px;
+}
+.admin-menu .user-profile.view-mode-full > div > .field-name-user-help a {
+	margin-top: 29px;
+}
 
 

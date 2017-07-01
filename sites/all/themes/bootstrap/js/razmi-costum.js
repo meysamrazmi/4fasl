@@ -606,7 +606,7 @@ Drupal.behaviors.myBehavior = {attach: function (context, settings) {
 			$(":file").filestyle({buttonText: "انتخاب فایل", buttonName: "btn-primary",placeholder: "فایلی انتخاب نشده"});
 		});
 	}
-	
+
 	
 	
 }};
