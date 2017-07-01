@@ -261,7 +261,7 @@ function functions_user_presave(&$edit, $account, $category) {
 	if($edit['new_role_add'] == 4){//honarjo role id
 		$type = 1; //شاگرد relationship id
 		//update the user 'field_collection' data
-		$expires = timetoexpire($order->uid);
+		$expires = timetoexpire($account->uid);
 		if($expires['honarjo'] == 0){
 			add_collection($account , $account->field_favorite['und'][0]['value'] , 'l1' , '1');
 		}
