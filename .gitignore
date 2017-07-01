@@ -28,12 +28,6 @@ index.php
 install.php
 update.php
 xmlrpc.php
-/includes
-/misc
-/modules
-/profiles
-/scripts
-/themes
 
 #ignore some file types
 *.zip
@@ -42,6 +36,3 @@ xmlrpc.php
 *.mp4
 *.webm
 *.mp3
-
-#exeption
-!includes/common.inc
