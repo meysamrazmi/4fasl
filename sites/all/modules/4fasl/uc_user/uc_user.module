@@ -246,8 +246,8 @@ function which_teacher($value){
 		case 'گیتار الکتریک':
 			return 3079;
 			break;
-		case 'هارمونیکا':
-			return 1;
+		case 'هارمونیکا (سازدهنی)':
+			return 3314;
 			break;
 		case 'تئوری موسیقی':
 			return 1;
@@ -298,7 +298,7 @@ function which_teacher_name($value){
 			return 3079;
 			break;
 		case 'harmonica':
-			return 1;
+			return 3314;
 			break;
 		case 'music':
 			return 1;
@@ -347,7 +347,7 @@ function which_instrument($value){
 		case 'گیتار الکتریک':
 			return 'guitarelectric ';
 			break;
-		case 'هارمونیکا':
+		case 'هارمونیکا (سازدهنی)':
 			return 'harmonica';
 			break;
 		case 'تئوری موسیقی':
@@ -397,8 +397,8 @@ function which_teacher_key($value){
 		case 24://گیتار الکتریک
 			return 3079;
 			break;
-		case 1: //'هارمونیکا':
-			return 1;
+		case 25: //'هارمونیکا':
+			return 3314;
 			break;
 		case 2://'تئوری موسیقی':
 			return 1;
@@ -447,8 +447,8 @@ function which_instrument_key($value){
 		case 24://گیتار الکتریک
 			return 'guitarelectric ';
 			break;
-		case 1://'هارمونیکا':
-			return 1;
+		case 25://'هارمونیکا':
+			return 'harmonica';
 			break;
 		case 2://'تئوری موسیقی':
 			return 1;
