@@ -1,6 +1,5 @@
 <?php
 require(dirname(__FILE__) . '/calendar_systems.helpers.inc');
-require(dirname(__FILE__) . '/calendar_systems.api.inc');
 
 /**
  * @file
@@ -86,37 +85,39 @@ function calendar_systems_patch() {
   $patches = array();
 
   $patches[] = array(
-    'title'       => t('Allows drupal format_date function to be hooked'),
-    'patch'       => 'core_format_date_hook.patch',
+    'title'       => t('Allows drupal format_date function to be altered by other modules'),
+    'patch'       => 'patch/core_format_date_alter.patch',
     'module'      => 'core',
-    'issue'       => '',
-    'description' => t('Allows drupal format_date function to be hooked'),
-    'patchdir'    => 'patch'
+    'issue'       => '1178342',
+    'description' => t('Allows drupal format_date function to be altered by other modules'),
+    'patchdir'    => ''
   );
 
   return $patches;
 }
 
 /**
- * Implementation of hook format_date_calendar_systems
- * Work around to prevent incompatibility with modules that already have
- * a function named module_name_format_date
+ * Implementation of format_date_alter hook/call
+ * Altering out of format_date function
  */
-function calendar_systems_format_date_calendar_systems($timestamp, $type = 'medium', $format = '', $timezone = NULL, $langcode = NULL) {
-  foreach (module_implements('format_date') AS $module) {
-    if ($module != 'date' && $module != 'token' && $module != 'reldate') {
-      $function = $module .'_format_date';
-      $r = $function($timestamp, $type, $format, $timezone, $langcode);
+function calendar_systems_format_date_alter(&$formatted_date, &$context) {
+  // Calendar systems specific code
+  $calendar_name = calendar_systems_get_calendar_system_name();
+  if ($calendar_name != 'default' && $calendar = calendar_systems_get_calendar_instance()) {
+    $calendar->setTimeZoneOffset($context['date_time']->getOffset());
+    $format = $calendar->timestampToStr($context['format'], $context['date_time']->getTimestamp() + $context['date_time']->getOffset());
+    $format = preg_replace('%[-+][0-9]{4}%', $context['date_time']->format('O'), $format);
+    // Pass the langcode to _format_date_callback().
+    _format_date_callback(NULL, $context['langcode']);
 
-      if ($r != FALSE) {
-        return $r;
-      }
-    }
+    // Translate the marked sequences.
+    $formatted_date = preg_replace_callback('/\xEF([AaeDlMTF]?)(.*?)\xFF/', '_format_date_callback', $format);
   }
 }
 
 /**
- * Implementation of hook format_date
+ * Simulating core format_date in case the patch wasn't applied
+ * Formats a date, using a date type or a custom date format string.
  *
  * @param $timestamp
  *   A UNIX timestamp to format.
@@ -134,7 +135,7 @@ function calendar_systems_format_date_calendar_systems($timestamp, $type = 'medi
  *   get interpreted as date format characters.
  * @param $timezone
  *   (optional) Time zone identifier, as described at
- *   http://php.net/manual/en/timezones.php Defaults to the time zone used to
+ *   http://php.net/manual/timezones.php Defaults to the time zone used to
  *   display the page.
  * @param $langcode
  *   (optional) Language code to translate to. Defaults to the language used to
@@ -144,9 +145,7 @@ function calendar_systems_format_date_calendar_systems($timestamp, $type = 'medi
  *   A translated date string in the requested format.
  */
 function calendar_systems_format_date($timestamp, $type = 'medium', $format = '', $timezone = NULL, $langcode = NULL) {
-  if (calendar_systems_get_calendar_system_name() == 'default') return NULL;
-
-  //Drupal format_date() code starts from here
+  if (_calendar_systems_is_patch_applied()) return format_date($timestamp, $type, $format, $timezone, $langcode);
   // Use the advanced drupal_static() pattern, since this is called very often.
   static $drupal_static_fast;
   if (!isset($drupal_static_fast)) {
@@ -197,7 +196,6 @@ function calendar_systems_format_date($timestamp, $type = 'medium', $format = ''
 
   // Create a DateTime object from the timestamp.
   $date_time = date_create('@' . $timestamp);
-
   // Set the time zone for the DateTime object.
   date_timezone_set($date_time, $timezones[$timezone]);
 
@@ -206,18 +204,30 @@ function calendar_systems_format_date($timestamp, $type = 'medium', $format = ''
   // input string.
   // Paired backslashes are isolated to prevent errors in read-ahead evaluation.
   // The read-ahead expression ensures that A matches, but not \A.
+  $original_format = $format;
   $format = preg_replace(array('/\\\\\\\\/', '/(?<!\\\\)([AaeDlMTF])/'), array("\xEF\\\\\\\\\xFF", "\xEF\\\\\$1\$1\xFF"), $format);
 
-  // Calendar systems specific code
-  $calendar = calendar_systems_get_calendar_instance();
-  $calendar->setTimeZoneOffset($date_time->getOffset());
-  $format = $calendar->timestampToStr($format, $date_time->getTimestamp() + $date_time->getOffset());
-  $format = preg_replace('%[-+][0-9]{4}%', $date_time->format('O'), $format);
+  // Call date_format().
+  $formatted_date = date_format($date_time, $format);
+
   // Pass the langcode to _format_date_callback().
   _format_date_callback(NULL, $langcode);
 
   // Translate the marked sequences.
-  return preg_replace_callback('/\xEF([AaeDlMTF]?)(.*?)\xFF/', '_format_date_callback', $format);
+  $formatted_date = preg_replace_callback('/\xEF([AaeDlMTF]?)(.*?)\xFF/', '_format_date_callback', $formatted_date);
+
+  // Allow modules to alter the result.
+  $context = array(
+    'date_time' => $date_time,
+    'timestamp' => $timestamp,
+    'type' => $type,
+    'format' => $original_format,
+    'timezone' => $timezone,
+    'langcode' => $langcode
+  );
+  drupal_alter('format_date', $formatted_date, $context);
+
+  return filter_xss_admin($formatted_date);
 }
 
 /**
@@ -240,11 +250,16 @@ function calendar_systems_module_implements_alter(&$implementations, $hook) {
 function calendar_systems_preprocess_node(&$variables) {
   if (!_calendar_systems_is_patch_applied()) {
     $calendar = calendar_systems_get_calendar_instance();
-    $format = variable_get('date_format_medium');
-    $variables['date'] = $calendar->smartGet($format, $variables['created']);
+    if ($calendar) {
+      $format = variable_get('date_format_medium');
+      $variables['date'] = $calendar->smartGet($format, $variables['created']);
 
-    if ($variables['display_submitted']) {
-      $variables['submitted'] = t('Submitted by !username on !datetime', array('!username' => $variables['name'], '!datetime' => $variables['date']));
+      if ($variables['display_submitted']) {
+        $variables['submitted'] = t('Submitted by !username on !datetime', array(
+            '!username' => $variables['name'],
+            '!datetime' => $variables['date']
+          ));
+      }
     }
   }
 }
@@ -256,11 +271,16 @@ function calendar_systems_preprocess_node(&$variables) {
 function calendar_systems_preprocess_comment(&$variables) {
   if (!_calendar_systems_is_patch_applied()) {
     $calendar = calendar_systems_get_calendar_instance();
-    $format = variable_get('date_format_medium');
+    if ($calendar) {
+      $format = variable_get('date_format_medium');
 
-    $variables['changed'] = $calendar->smartGet($variables['elements']['#comment']->created, $format);
-    $variables['created'] = $calendar->smartGet($variables['elements']['#comment']->changed, $format);
-    $variables['submitted'] = t('Submitted by !username on !datetime', array('!username' => $variables['author'], '!datetime' => $variables['created']));
+      $variables['changed'] = $calendar->smartGet($format, $variables['elements']['#comment']->created);
+      $variables['created'] = $calendar->smartGet($format, $variables['elements']['#comment']->changed);
+      $variables['submitted'] = t('Submitted by !username on !datetime', array(
+          '!username' => $variables['author'],
+          '!datetime' => $variables['created']
+        ));
+    }
   }
 }
 
@@ -276,36 +296,36 @@ function calendar_systems_form_alter(&$form, $form_state, $form_id) {
     if (@isset($form['scheduler_settings']['publish_on'])) {
       $form['scheduler_settings']['publish_on']['#element_validate'] = array_merge(array('calendar_systems_date_validate'), (array) @$form['author']['date']['#element_validate']);
       if (variable_get('calendar_systems_js_date_picker_core_text_date_fields')) {
-        $form['scheduler_settings']['publish_on']['#attributes']['class'][] = 'calendar_systems_js_date_picker_force_time';
-        calendar_systems_add_js_date_picker('.calendar_systems_js_date_picker_force_time');
+        $form['scheduler_settings']['publish_on']['#attributes']['class'][] = 'calendar_systems_js_date_picker';
+        calendar_systems_attach_js_date_picker($form['scheduler_settings']['publish_on'], 'Y-m-d', 'H:i:s');
       }
     }
     if (@isset($form['scheduler_settings']['unpublish_on'])) {
       $form['scheduler_settings']['unpublish_on']['#element_validate'] = array_merge(array('calendar_systems_date_validate'), (array) @$form['author']['date']['#element_validate']);
       if (variable_get('calendar_systems_js_date_picker_core_text_date_fields')) {
-        $form['scheduler_settings']['unpublish_on']['#attributes']['class'][] = 'calendar_systems_js_date_picker_force_time';
-        calendar_systems_add_js_date_picker('.calendar_systems_js_date_picker_force_time');
+        $form['scheduler_settings']['unpublish_on']['#attributes']['class'][] = 'calendar_systems_js_date_picker';
+        calendar_systems_attach_js_date_picker($form['scheduler_settings']['unpublish_on'], 'Y-m-d', 'H:i:s');
       }
     }
     if (isset($form['author']['date'])) {
       $form['author']['date']['#element_validate'] = array_merge(array('calendar_systems_date_validate'), (array) @$form['author']['date']['#element_validate']);
       if (variable_get('calendar_systems_js_date_picker_core_text_date_fields')) {
-        $form['author']['date']['#attributes']['class'][] = 'calendar_systems_js_date_picker_force_time';
-        calendar_systems_add_js_date_picker('.calendar_systems_js_date_picker_force_time');
+        $form['author']['date']['#attributes']['class'][] = 'calendar_systems_js_date_picker';
+        calendar_systems_attach_js_date_picker($form['author']['date'], 'Y-m-d', 'H:i:s');
       }
     }
     if (isset($form['translation']['created'])) {
       $form['translation']['created']['#element_validate'] = array_merge(array('calendar_systems_date_validate'), (array) @$form['author']['date']['#element_validate']);
       if (variable_get('calendar_systems_js_date_picker_core_text_date_fields')) {
-        $form['translation']['created']['#attributes']['class'][] = 'calendar_systems_js_date_picker_force_time';
-        calendar_systems_add_js_date_picker('.calendar_systems_js_date_picker_force_time');
+        $form['translation']['created']['#attributes']['class'][] = 'calendar_systems_js_date_picker';
+        calendar_systems_attach_js_date_picker($form['translation']['created'], 'Y-m-d', 'H:i:s');
       }
     }
     if (isset($form['admin']['date'])) {
       $form['admin']['date']['#element_validate'] = array_merge(array('calendar_systems_date_validate'), (array) @$form['admin']['date']['#element_validate']);
       if (variable_get('calendar_systems_js_date_picker_core_text_date_fields')) {
-        $form['admin']['date']['#attributes']['class'][] = 'calendar_systems_js_date_picker_force_time';
-        calendar_systems_add_js_date_picker('.calendar_systems_js_date_picker_force_time');
+        $form['admin']['date']['#attributes']['class'][] = 'calendar_systems_js_date_picker';
+        calendar_systems_attach_js_date_picker($form['admin']['date'], 'Y-m-d', 'H:i:s');
       }
     }
     if ($form_id == 'views_exposed_form') {
@@ -324,16 +344,16 @@ function calendar_systems_form_alter(&$form, $form_state, $form_id) {
       if (isset($form['scheduler_settings'])) {
         foreach (array('publish_on', 'unpublish_on') as $name) {
           if (isset($form['#node']->scheduler[$name]) && !empty($form['scheduler_settings'][$name]['#default_value'])) {
-            $form['scheduler_settings'][$name]['#default_value'] = $calendar->smartGet($form['#node']->scheduler[$name], 'Y-m-d H:i:s O');
+            $form['scheduler_settings'][$name]['#default_value'] = $calendar->smartGet('Y-m-d H:i:s O', $form['#node']->scheduler[$name]);
           }
           $form['scheduler_settings'][$name]['#description'] = t('Format: %date The date format is YYYY-MM-DD and time is H:i:s. Leave blank to disable scheduled.', array('%date' => $now));
         }
       }
-      if (isset($form['author']['date'])) {
+      if (isset($form['author']['date']) && isset($form_state['node'])) {
         $node = &$form_state['node'];
         $form['author']['date']['#description'] = t('Format: %time. The date format is YYYY-MM-DD and %timezone is the time zone offset from UTC. Leave blank to use the time of form submission.', array('%time' => !empty($node->date) ? $calendar->smartGet('Y-m-d H:i:s O', $node->date) : $calendar->smartGet('Y-m-d H:i:s O', $node->created), '%timezone' => !empty($node->date) ? $calendar->smartGet('O', $node->date) : $calendar->smartGet('O', $node->created)));
         if (!empty($form['author']['date']['#default_value'])) {
-          $form['author']['date']['#default_value'] = $calendar->smartGet($form['created']['#value'], 'Y-m-d H:i:s O');
+          $form['author']['date']['#default_value'] = $calendar->smartGet('Y-m-d H:i:s O', $form['created']['#value']);
         }
       }
     }
@@ -395,17 +415,8 @@ function _calendar_systems_views_exposed_form_validate($element, &$form_state) {
                 $is_empty = FALSE;
               }
             }
-            if (1 == 1) {
-              $form_state['view']->exposed_input[$filter_name][$index] = $value;
-              form_set_value($element, $form_state['view']->exposed_input, $form_state);
-            } else {
-              if (isset($element['#name'])) {
-                $field = $element['#name'];
-              } else {
-                $field = $element;
-              }
-              //form_set_error($element, t('You have to specify a valid date.'));
-            }
+
+            $form_state['view']->exposed_input[$filter_name][$index] = $value;
           }
         }
       }
@@ -509,7 +520,7 @@ function calendar_systems_date_validate(&$element, &$form_state) {
           //$field_value_second = &$element[$item_name]['date']['value'];
           $field_value_in_form_state = drupal_array_get_nested_value($form_state['values'], $value_path, $input_exists);
           $field_value_in_form_input = drupal_array_get_nested_value($form_state['input'], $value_path, $input_exists);
-		  $field_real_value = $field_value_in_form_input;
+          $field_real_value = $field_value_in_form_input;
           if (isset($element['#field']) && isset($element['#field']['#translatable'])) {
             $field_real_value_converted = _calendar_systems_date_convert($field_real_value, $date_format, $element['#calendar_system']);
           }
@@ -529,11 +540,11 @@ function calendar_systems_date_validate(&$element, &$form_state) {
           if (isset($field_value_second)) {
             $field_value_second = $field_real_value_converted;
           }
-          form_set_value($element, $field_real_value_converted, $form_state);
+          //form_set_value($element, $field_real_value_converted, $form_state);
 
           if (isset($element['#webform_component']) && $element['#type'] == 'date') {
-			$element['#value'] = $field_real_value_converted;
-			$element['#calendar_system'] = 'gregorian';
+            $element['#value'] = $field_real_value_converted;
+            $element['#calendar_system'] = 'gregorian';
             if (isset($element['year'])) {
               $_value_path = $value_path + array('year');
               $element['year']['#value'] = $field_real_value_converted['year'];
@@ -546,7 +557,7 @@ function calendar_systems_date_validate(&$element, &$form_state) {
               $_value_path = $value_path + array('day');
               $element['day']['#value'] = $field_real_value_converted['day'];
             }
-		  }
+          }
         } else {
           form_set_error($element['#name'], t('You have to specify a valid date.'));
         }
@@ -560,6 +571,7 @@ function calendar_systems_date_validate(&$element, &$form_state) {
         form_set_error($element['#name'], t('You have to specify a valid date.'));
       }
     }
+
 }
 
 
@@ -570,8 +582,64 @@ function calendar_systems_load_js_date_picker_library() {
   if (module_exists('jquery_calendar')) {
     //Use the default settings configurable by date pickers' provider drupal module
     jquery_calendar_add(
-      'picker, picker.ext, persian, islamic'
+      'picker, picker.ext, persian, islamic, thai'
     );
+  }
+}
+
+/**
+ * @param $element
+ * @param $date_format
+ * @param null $calendar_system
+ * @param null $language
+ */
+function calendar_systems_attach_js_date_picker(&$element, $date_format = NULL, $time_format = NULL, $calendar_system = NULL, $language = NULL) {
+  if (module_exists('jquery_calendar')) {
+    calendar_systems_load_js_date_picker_library();
+
+    $alignment = 'topLeft';
+
+    if (is_null($language)) {
+      $language = _calendar_systems_languages_active();
+    }
+    $languages = language_list();
+    if (isset($languages[$language])) {
+      if ($languages[$language]->direction) {
+        $alignment = 'topRight';
+      }
+    }
+    if (is_null($calendar_system)) {
+      $calendar_system = calendar_systems_get_calendar_system_name($language);
+    }
+    if ($calendar_system == 'default') {
+      $calendar_system = 'gregorian';
+    }
+    $calendar_system_name_map = array(
+      'arabic' => 'islamic',
+      'iranian' => 'persian',
+      'gregorian' => 'gregorian',
+      'thai' => 'thai'
+    );
+
+    if (is_null($date_format)) {
+      $date_format = 'yyyy-mm-dd';
+    }
+    $time = '';
+    if (!empty($time_format)) {
+      $time = calendar_systems_format_date(time(), 'custom', $time_format);
+    }
+    if (is_null($time_format)) {
+      $time_format = '';
+    }
+
+    $element['#attributes']['calendar_systems_date_popup'] = 'true';
+    $element['#attributes']['calendar_systems_system_name'] = $calendar_system_name_map[$calendar_system];
+    $element['#attributes']['calendar_systems_language'] = $language;
+    $element['#attributes']['calendar_systems_alignment'] = $alignment;
+    $element['#attributes']['calendar_systems_date_format'] = calendar_system_convert_date_format_from_php_to_js($date_format);
+    $element['#attributes']['calendar_systems_time_format'] = calendar_system_convert_date_format_from_php_to_js($time_format);
+    $element['#attributes']['calendar_systems_time'] = $time;
+    $element['#attached']['js'] = array(drupal_get_path('module', 'calendar_systems') . '/calendar_systems.js');
   }
 }
 
@@ -618,7 +686,7 @@ function calendar_systems_add_js_date_picker($css_class_id_type, $calendar_syste
 
     $time = '';
     if (!empty($time_format)) {
-      $time = calendar_systems_format_date_calendar_systems(time(), 'custom', $time_format);
+      $time = calendar_systems_format_date(time(), 'custom', $time_format);
     }
 
     $calendar_system = $calendar_system_name_map[$calendar_system];
@@ -692,7 +760,7 @@ function calendar_systems_preprocess_content_field(&$variables) {
 
       if (isset($variables['items'][$key]['value2'])) {
         $format = _calendar_systems_get_format($_format, $granularity);
-        $variables['items'][$key]['view'] = calendar_systems_format_date(strtotime($variables['items'][$key]['value']), 'custom', $format) . ' - ' . format_date(strtotime($variables['items'][$key]['value2']), 'custom', $format);
+        $variables['items'][$key]['view'] = calendar_systems_format_date(strtotime($variables['items'][$key]['value']), 'custom', $format) . ' - ' . calendar_systems_format_date(strtotime($variables['items'][$key]['value2']), 'custom', $format);
       }
       else {
         $format = _calendar_systems_get_format($_format, $granularity);
@@ -967,7 +1035,7 @@ function calendar_systems_date_popup_process_alter(&$element, &$form_state, $con
     $date_value = $element['#value']['date'];
 
     if (isset($element['date'])) {
-      $element['date']['#description'] = ' '. t('E.g., @date', array('@date' => calendar_systems_format_date_calendar_systems(time(), 'custom', date_popup_date_format($element))));
+      $element['date']['#description'] = ' '. t('E.g., @date', array('@date' => calendar_systems_format_date(time(), 'custom', date_popup_date_format($element))));
     }
 
     $value_path = $element['#parents'];
@@ -997,7 +1065,7 @@ function calendar_systems_date_popup_process_alter(&$element, &$form_state, $con
     if ($date_value) {
       $element['date']['#value'] = $date_value;
     }
-    calendar_systems_add_js_date_picker('.' . $class_name);
+    calendar_systems_attach_js_date_picker($element['date'], $date_format_considering_granularity);
   }
 }
 
@@ -1025,7 +1093,7 @@ function calendar_systems_date_text_process_alter(&$element, &$form_state, $cont
     $granularity = _calendar_systems_get_granularity_from_format($date_format);
 
     if (isset($element['date'])) {
-      $element['date']['#description'] = ' ' . t('Format: @date', array('@date' => calendar_systems_format_date_calendar_systems(time(), 'custom', $date_format)));
+      $element['date']['#description'] = ' ' . t('Format: @date', array('@date' => calendar_systems_format_date(time(), 'custom', $date_format)));
     }
     $value_path = $element['#parents'];
     $value_path[] = 'date';
@@ -1061,10 +1129,10 @@ function _calendar_systems_element_date_process(&$element, &$form_state) {
   $year_range = '-100:+100';
 
   if (isset($element['#webform_component']) && isset($element['#webform_component']['extra'])
-	 && isset($element['#webform_component']['extra']['start_date'])) {
-	 $start = str_replace(' years', '', $element['#webform_component']['extra']['start_date']);
-	 $end = str_replace(' years', '', $element['#webform_component']['extra']['end_date']);
-	 $year_range = "$start:$end";
+    && isset($element['#webform_component']['extra']['start_date'])) {
+    $start = str_replace(' years', '', $element['#webform_component']['extra']['start_date']);
+    $end = str_replace(' years', '', $element['#webform_component']['extra']['end_date']);
+    $year_range = "$start:$end";
   }
 
   if (!isset($element['#calendar_system'])) {
@@ -1098,8 +1166,8 @@ function _calendar_systems_element_date_process(&$element, &$form_state) {
         $element['#value'] = $date_array;
       }
     } else {
-		$date_array = $element['#value'];
-	}
+      $date_array = $element['#value'];
+    }
 
 
     if (isset($element['year'])) {

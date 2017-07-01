@@ -42,7 +42,7 @@ function calendar_systems_date_properties_menu() {
     'page arguments' => array('calendar_systems_date_properties_settings_form'),
     'access arguments' => array('administer calendar_systems_date_properties'),
     'file' => 'calendar_systems_date_properties.admin.inc',
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_LOCAL_TASK
   );
 
   return $items;
@@ -67,7 +67,7 @@ function calendar_systems_date_properties_entity_presave($entity, $type) {
   $entity_types = _calendar_systems_date_properties_entity_types();
   $entity_type_info = @$entity_types[$type];
 
-  if (@$entity_type_info['integrated']) {
+  if (isset($entity_type_info['integrated']) && $entity_type_info['integrated']) {
     $calendar_systems = _calendar_systems_date_properties_get_active_calendar_systems();
     foreach ($entity_type_info['selected_properties'] as $property_name => $property) {
       foreach ($calendar_systems as $calendar_system) {
@@ -95,7 +95,7 @@ function calendar_systems_date_properties_entity_presave($entity, $type) {
 function calendar_systems_date_properties_schema_alter(&$schema) {
   $entity_types = _calendar_systems_date_properties_entity_types();
   foreach ($entity_types as $entity_type => $entity_type_info) {
-    if ($entity_type_info['integrated']) {
+    if (isset($entity_type_info['integrated']) && $entity_type_info['integrated']) {
       //dsm($entity_type);
       //dsm($entity_type_info);
 
@@ -140,7 +140,7 @@ function calendar_systems_date_properties_module_implements_alter(&$implementati
 function calendar_systems_date_properties_entity_property_info_alter(&$info) {
   $entity_types = _calendar_systems_date_properties_entity_types();
   foreach ($entity_types as $entity_type => $entity_type_info) {
-    if (@$entity_type_info['integrated']) {
+    if (isset($entity_type_info['integrated']) && $entity_type_info['integrated']) {
       $properties = &$info[$entity_type]['properties'];
 
       foreach ($entity_type_info['properties'] as $property_name => $property) if (isset($entity_type_info['selected_properties'][$property_name])) {
@@ -174,34 +174,34 @@ function _calendar_systems_date_properties_entity_types() {
   //static $entity_types;
   $entity_types = NULL;
   if (is_null($entity_types)) {
-  $selected_bundles = variable_get('calendar_systems_date_properties_entity_bundles_settings');
-  $bundles = field_info_bundles();
-  $entity_types = array();
-  foreach ($bundles as $entity_type => $bundles) {
-    $entity_type_info = entity_get_info($entity_type);
-    $entity_types[$entity_type] = $entity_type_info;
-    $entity_types[$entity_type]['bundles'] = $bundles;
-    $integrated = FALSE;
-    $selected_properties = array();
-    foreach ($bundles as $bundle => $bundle_info) {
-      $entity_types[$entity_type]['bundles'][$bundle]['integrated'] = FALSE;
-      if (isset($selected_bundles[$entity_type.'.'.$bundle]) && !empty($bundle_info))
-        if ($selected_bundles[$entity_type.'.'.$bundle]['enabled'] == TRUE) {
-          $entity_types[$entity_type]['bundles'][$bundle]['integrated'] = TRUE;
-          $integrated = TRUE;
-          foreach ($selected_bundles[$entity_type.'.'.$bundle]['properties'] as $property_name => $property) {
-            if ($property == 1) {
-              $selected_properties[$property_name] = $property_name;
+    $selected_bundles = variable_get('calendar_systems_date_properties_entity_bundles_settings');
+    $bundles = field_info_bundles();return array();
+    $entity_types = array();
+    foreach ($bundles as $entity_type => $_bundles) {
+      $entity_type_info = entity_get_info($entity_type);
+      $entity_types[$entity_type] = $entity_type_info;
+      $entity_types[$entity_type]['bundles'] = $_bundles;
+      $integrated = FALSE;
+      $selected_properties = array();
+      if (!empty($_bundles)) foreach ($_bundles as $bundle => $bundle_info) {
+        $entity_types[$entity_type]['bundles'][$bundle]['integrated'] = FALSE;
+        if (isset($selected_bundles[$entity_type.'.'.$bundle]) && !empty($bundle_info))
+          if ($selected_bundles[$entity_type.'.'.$bundle]['enabled'] == TRUE) {
+            $entity_types[$entity_type]['bundles'][$bundle]['integrated'] = TRUE;
+            $integrated = TRUE;
+            foreach ($selected_bundles[$entity_type.'.'.$bundle]['properties'] as $property_name => $property) {
+              if ($property == 1) {
+                $selected_properties[$property_name] = $property_name;
+              }
             }
           }
-        }
+      }
+      $properties = entity_get_property_info($entity_type);
+      $entity_types[$entity_type]['properties'] = $properties['properties'];
+      $entity_types[$entity_type]['integrated'] = $integrated;
+      $entity_types[$entity_type]['selected_properties'] = $selected_properties;
+      //if ($integrated) { dsm($entity_type);dsm($entity_types[$entity_type]);dsm(debug_backtrace()); }
     }
-    $properties = entity_get_property_info($entity_type);
-    $entity_types[$entity_type]['properties'] = $properties['properties'];
-    $entity_types[$entity_type]['integrated'] = $integrated;
-    $entity_types[$entity_type]['selected_properties'] = $selected_properties;
-    //if ($integrated) { dsm($entity_type);dsm($entity_types[$entity_type]);dsm(debug_backtrace()); }
-  }
   }
   return $entity_types;
 }
@@ -214,6 +214,7 @@ function _calendar_systems_date_properties_entity_types() {
 function _calendar_systems_date_properties_schema_apply_change($remove = FALSE) {
   $entity_types = _calendar_systems_date_properties_entity_types();
   foreach ($entity_types as $entity_type => $entity_type_info) {
+    if (isset($entity_type_info['integrated']) && $entity_type_info['integrated'])
     foreach ($entity_type_info['properties'] as $property_name => $property)  {
       $calendar_systems = _calendar_systems_date_properties_get_active_calendar_systems();
       foreach ($calendar_systems as $calendar_system) {
@@ -241,18 +242,24 @@ function _calendar_systems_date_properties_schema_apply_change($remove = FALSE) 
  *
  */
 function _calendar_systems_date_properties_get_active_calendar_systems() {
-  $profiles = _calendar_systems_profiles();
-  $calendar_systems = array();
-  foreach ($profiles as $profile) if ($profile->calendar_system != 'gregorian') {
-    $calendar_systems[$profile->calendar_system] = array(
-      'name' => $profile->calendar_system,
-      'label' => $profile->calendar_system,
-      'parts' => array(
-        'year' => array('label' => 'Year'),
-        'month' => array('label' => 'Month'),
-        'day' => array('label' => 'Day')
-       )
-    );
+  static $calendar_systems;
+  if (!$calendar_systems) {
+    if (!function_exists('_calendar_systems_profiles')) {
+      module_load_include('inc', 'calendar_systems', 'calendar_systems.helpers');
+    }
+    $profiles = _calendar_systems_profiles();
+    $calendar_systems = array();
+    foreach ($profiles as $profile) if ($profile->calendar_system != 'gregorian') {
+      $calendar_systems[$profile->calendar_system] = array(
+        'name' => $profile->calendar_system,
+        'label' => $profile->calendar_system,
+        'parts' => array(
+          'year' => array('label' => 'Year'),
+          'month' => array('label' => 'Month'),
+          'day' => array('label' => 'Day')
+         )
+      );
+    }
   }
   return $calendar_systems;
 }

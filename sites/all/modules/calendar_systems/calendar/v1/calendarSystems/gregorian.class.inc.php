@@ -77,11 +77,11 @@ class cmfcCalendarV1Gregorian extends cmfcCalendarV1 implements cmfcCalendarV1Pl
     
     
     function timestampToStr($format,$timestamp=null) {
-		parent::timestampToStr($format,$timestamp=null);
+		return parent::timestampToStr($format,$timestamp=null);
 	}
     
     function strToTimestamp($string) {
-		parent::strToTimestamp($string);
+		return parent::strToTimestamp($string);
 	}
     
     function timestampToInfoArray($timestamp=null) {
@@ -259,14 +259,13 @@ class cmfcCalendarV1Gregorian extends cmfcCalendarV1 implements cmfcCalendarV1Pl
      * Get list of translatable strings
      */
     function getStrings() {
-        return array();
         $stringGroups = array(
-            'monthsName' => $this->_monthsName,
-            'monthsShortName' => $this->_monthsShortName,
-            'weeksName' => $this->_weeksName,
-            'weeksShortName' => $this->_weeksShortName,
-            'meridiemsName' => $this->_meridiemsName,
-            'meridiemsShortName' => $this->_meridiemsShortName
+            'monthsName' => array('en'=>$this->_monthsName),
+            'monthsShortName' => array('en'=>$this->_monthsShortName),
+            'weeksName' => array('en'=>$this->_weeksName),
+            'weeksShortName' => array('en'=>$this->_weeksShortName),
+            'meridiemsName' => array('en'=>$this->_meridiemsName),
+            'meridiemsShortName' => array('en'=>$this->_meridiemsShortName)
         );
         return $stringGroups;
     }
@@ -276,7 +275,7 @@ class cmfcCalendarV1Gregorian extends cmfcCalendarV1 implements cmfcCalendarV1Pl
     * This is the simplified versino by Sina Salek
     */
     public function date($format,$maket=null) {
-	  parent::phpDate($format,$maket=null);
+	  return parent::phpDate($format,$maket=null);
 	}
 
     public function strtotime($value) {
@@ -299,7 +298,7 @@ class cmfcCalendarV1Gregorian extends cmfcCalendarV1 implements cmfcCalendarV1Pl
     * @desc accept array,timestamp and string as input datetime in jalali or gregorian format
     */
     public function smartGet($type,$value="now") {
-		parent::smartGet($type,$value);
+		return parent::smartGet($type,$value);
 	}
 
     public function makeTime($hour="",$minute="",$second="",$jmonth="",$jday="",$jyear="") {

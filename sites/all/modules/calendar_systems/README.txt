@@ -17,24 +17,15 @@
 
   - Install and enable the module as usual: http://drupal.org/node/70151
 
-  - Add the following code right after "$timezones = &$drupal_static_fast['timezones'];" in "/includes/common.inc" file
-    or apply the patch located in patches/ in module's directory. if you don't know how to apply patches, there is a
-    good guide here: http://drupal.org/patch/apply
-
-  // Calendar Systems module new hook (The actual hook is hook_format_date this one is only a workaround to 
-  // prevent incompatibility with modules that already have a function called module_name_format_date)
-  foreach (module_implements('format_date_calendar_systems') AS $module) {
-    $function = $module .'_format_date_calendar_systems';
-    $r = $function($timestamp, $type, $format, $timezone, $langcode);
-    
-    if ($r != FALSE) {
-      return $r;
-    }
-  }
+  - Apply the patch that comes with the module on "/includes/common.inc" file
+    You can find the patch in module's folder at patch/core_format_date_alter.patch
+	If you don't know how to apply a patch, follow the instruction here : http://drupal.org/patch/apply
 
   - Goto "admin/config/regionals/calendar-systems" and configure your profiles.
   - Optionally you can download and install JQuery Calendar API (http://drupal.org/project/jquery_calendar) module to add date popup support
-    Will be automatically actived for popup date fields
+    Will be automatically activated for popup date fields
+	
+	Very Important : **** CLEAR DRUPAL CACHE **** Or it won't work. How ? https://www.drupal.org/documentation/clearing-rebuilding-cache	
   
 === API ===
 
