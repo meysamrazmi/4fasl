@@ -42,3 +42,6 @@ xmlrpc.php
 *.mp4
 *.webm
 *.mp3
+
+#exeption
+!includes/common.inc
