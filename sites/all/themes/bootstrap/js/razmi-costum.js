@@ -491,12 +491,21 @@ if($('.page-category:not(.page-content)').length){
 	});
 }
 
+$('.node-course .mediaelement-video').parents('.field-name-access').after('<div class="field video-help"><a href="#">مشکل در مشاهده ویدیو؟</a><p>در صورتیکه هنگام مشاهده و یا دانلود فیلم با مشکل مواجه شدید موارد زیر را بررسی کنید:<br>1 - احتمال پایین بودن سرعت اینترنت (با توجه به کیفیت و حجم بالای ویدیوهای آموزشی، در صورتیکه فیلم پخش و یا دانلود شد اما در اواسط اجرا قطع شد به احتمال زیاد مشکل از پایین بودن سرعت اینترنت شماست)<br>2 - حافظه ی پنهان مرورگر (cache)(در صورتی که همچنان با پیغام خطا مواجه شدید حافظه ی پنهان مرورگر خود را پاک کنید و مجدد اقدام به مشاهده و یا دانلود ویدیو کنید)<br></p></div>');
+	$('.field.video-help a').click(function(e){
+		e.preventDefault()
+		$(this).next().slideToggle();
+	});
 
 
-
-
-
-
+if($('.view-site-sections.view-display-id-block_2').length){
+	$('.view-site-sections.view-display-id-block_2 .mejs-poster').html($('.view-site-sections.view-display-id-block_2 .views-field-field-film-image a').html()).css({'display':'block'});
+	$('.views-field-field-film-image').remove();
+}
+if($('#saaz-film').length){
+	$('#saaz-film .mejs-poster').html($('#saaz-film .field-name-field-film-image .field-item').html()).css({'display':'block'});
+	$('#saaz-film .field-name-field-film-image').remove();
+}
 
 
 
@@ -606,7 +615,11 @@ Drupal.behaviors.myBehavior = {attach: function (context, settings) {
 			$(":file").filestyle({buttonText: "انتخاب فایل", buttonName: "btn-primary",placeholder: "فایلی انتخاب نشده"});
 		});
 	}
-
+	
+	$('.field.video-help a').click(function(e){
+		e.preventDefault()
+		$(this).next().slideToggle();
+	});
 	
 	
 }};
