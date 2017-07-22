@@ -453,24 +453,14 @@ if($('.field-name-relatives .view-empty').length){
 if ($('.tab-container').length){
 	$('.tab-content').css({'width': ($('.tab-content > div').length * 100) + '%'})
 	$('ul.tab-nav li:first-child , .tab-content > div:first-child').addClass('active');
-	$('.active-bar').css({'width': $('ul.tab-nav li.active').width() , 'left' : $('ul.tab-nav li.active').position().left });
+	$('.active-bar').css({'width': ($('ul.tab-nav li.active').width()+20) , 'left' : $('ul.tab-nav li.active').position().left });
 	$('ul.tab-nav li').click(function(e){
-		$('.active-bar').css({'width' : $(this).width() , 'left' : $(this).position().left });
+		$('.active-bar').css({'width' : $(this).width() + 20 , 'left' : $(this).position().left });
 		$('.tab-content .active, ul.tab-nav li').removeClass('active');
 		var hoverr = $(this).parents('.movies-tab').find('.tab-content').children('div').eq($(this).index());
 		hoverr.addClass('active');
 		$(this).addClass('active');
 		$('.tab-content').css({'margin-right' : ($(this).index() * -100) + '%'});
-
-		// setTimeout(function(){
-			// hoverr.addClass('action');
-			// setTimeout(function(){
-				// hoverr.removeClass('action');
-				// setTimeout(function(){
-					// hoverr.removeClass('started');
-				// }, 200);
-			// }, 1000);
-		// }, 10);
 	});
 }
 /*----------------------------------------------------------------مربوط به گالری-----------------------------------------------------------------*/
