@@ -143,6 +143,15 @@ function functions_menu() {
     'access arguments' => array('administer file access'),
 	'type' => MENU_LOCAL_TASK,
   );
+  $items['admin/4fasl-setting'] = array(
+    'title' => 'تنظیمات دوره های 4 فصل',
+    'description' => 'در اینجا میتوانید قسمت های مختلف سایت و دوره ها را به یکدیگر متصل کرد و نیازی به تغییر در کد نباشد.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('site_setting'),
+    'access arguments' => array('administer modules'),
+    'file' => 'functions.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
 
   return $items;
 }
@@ -334,3 +343,17 @@ function functions_node_access($node, $op, $account){
   }  
 }
 
+
+function instrument_info($condition = '', $value = '', $fileds = array()){
+	$q = db_select('site_settings', 's')->fields('s', $fileds);
+	if($condition != '') $q = $q->condition($condition, $value, '=');
+	$q = $q->execute()->fetchObject();
+	
+	if (is_object($q)){ 
+		if(isset($fileds[0]) && !isset($fileds[1])){
+			return $q->$fileds[0];
+		}else {
+			return $q;
+		}
+	}
+}

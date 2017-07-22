@@ -340,7 +340,6 @@ function which_instrument($value){
 		case 'دف':
 			return 'daf';
 			break;
-		default:
 		case 'نی':
 			return 'ney';
 			break;
@@ -440,7 +439,6 @@ function which_instrument_key($value){
 		case 19://'دف'
 			return 'daf';
 			break;
-		default:
 		case 23://'نی'
 			return 'ney';
 			break;
@@ -456,5 +454,62 @@ function which_instrument_key($value){
 		default:
 			return false;
 	}
+}
+
+
+/**
+ * Implements hook_menu().
+ */
+function uc_user_menu() {
+  $items['node_reference_4fasl/autocomplete'] = array(
+    'page callback' => 'node_reference_autocomplete_4fasl',
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+function student_node_refrence_form($form, &$form_state, $uid) {
+	if (!is_array($form)) {
+		$form = array();
+	}
+	$form['refrenced_node'] = array(
+		'#type' => 'entityreference', 
+		'#required' => true,
+		'#title' => 'تیتر محتوا',
+		'#era_entity_type' => 'node',
+        '#era_query_settings' => array(
+            'limit' => 10,
+            'property_conditions' => array(
+              // 'entity property', 'filter value', 'operator'.
+              array('type', 'course', '='),
+            ),
+/*             'field_conditions' => array(
+              // 'field name', 'column', 'value', 'op', 'delta', 'language'.
+              array('nid', 'title'),
+            ),	 */		
+		),
+	);
+	$form['uid'] = array(
+		'#type' => 'hidden',
+		'#value' => $uid,
+	);
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('approve'),
+	);
+	return $form;
+}
+
+
+
+function student_node_refrence_form_submit($form, &$form_state) {
+	$node = node_load($form_state['values']['refrenced_node']['entity_id']);
+	$user = user_load($form_state['values']['uid']);
+
+	if(isset($user->field_node_refrence['und'][0]['nid'])){
+		$field_node_refrence = $user->field_node_refrence;
+	}
+	$field_node_refrence['und'][]['nid'] =  $form_state['values']['refrenced_node']['entity_id'];
+	$user_new = user_save($user, array('field_node_refrence' => $field_node_refrence));
 }
 
