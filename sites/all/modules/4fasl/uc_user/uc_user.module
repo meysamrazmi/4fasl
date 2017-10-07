@@ -12,9 +12,8 @@ function uc_user_uc_order($op, $order, $status) {
 			
 				if ($product->nid == 139){// for renew registration
 					$expires = timetoexpire($order->uid);
-					
 					if(isset($product->data['attributes']['roles'])){
-						foreach ($product->data['attributes']['roles'] as $key=> $value) {
+						foreach ($product->data['attributes']['roles'] as $key => $value) {
 							switch($key){
 								case 20: //honarjo option ID
 									$rid = 4;
@@ -39,8 +38,8 @@ function uc_user_uc_order($op, $order, $status) {
 						}
 					}
 				}
-				
-				if(isset($product->data['attributes']['instrument'])){
+				// mdump($product, true);
+				if(isset($product->data['attributes']['instrument']) && $product->nid != 1086){
 					foreach ($product->data['attributes']['instrument'] as $key=> $value) {
 
 						if ($product->nid == 35){ // registration in a course
@@ -72,6 +71,46 @@ function uc_user_uc_order($op, $order, $status) {
 						}					
 					}
 				}
+				
+				if($product->nid == 1086 && isset($product->data['attributes']['instrument']) ){ // registration in a course
+					foreach ($product->data['attributes']['instrument'] as $key=> $value) {
+
+						if(which_instrument_key($key) != false){
+							//update the user 'field_collection' data
+							add_collection($order_user , which_instrument_key($key) , 'l1' , '1');
+							//update the user favorite instrument
+							$field_favorite['und'][0]['value'] =  which_instrument_key($key);
+							$order_user = user_save($order_user, array('field_favorite' => $field_favorite));
+						} else{
+							drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 4 , '@val' => $value ,)), 'error');
+						}
+						
+						if(isset($product->data['attributes']['teacher']) && key($product->data['attributes']['teacher']) ){
+							$teacher_uid = which_teacher_by_TeacherOptionId(key($product->data['attributes']['teacher']));
+							if($teacher_uid == false){
+								continue; //skip the rest
+							}
+						} else{
+							drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 6 , '@val' => $value ,)), 'error');
+							continue; //skip the rest
+						}	
+
+						$type = 1; //for student relationship type for default
+						$role = 4;
+						$approved = true ;
+						if(isset($product->data['attributes']['level'][21]) ){ //vip registration
+							$type = 3; //for vip relationship type
+							$role = 6;
+						}
+						
+				        uc_roles_grant($order_user, $role, time() + (28 * 24 * 60 * 60));
+
+						$relationship = user_relationships_request_relationship($order->uid, $teacher_uid , $type , $approved);
+						if($relationship === FALSE){
+							drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 5 , '@val' => $value ,)), 'error');
+						}
+					}
+				}
             }  
         }
       }
@@ -83,6 +122,7 @@ function uc_user_forms($form_id, $args) {
   $users = entity_load('user');
   foreach(array_keys($users) as $uid){
 	$forms['student_confirmation_form_'. $uid]['callback'] = 'student_confirmation_form';  
+	$forms['student_node_refrence_form_'. $uid]['callback'] = 'student_node_refrence_form';  
   }
   return $forms;
 }
@@ -456,6 +496,54 @@ function which_instrument_key($value){
 	}
 }
 
+/*
+ * returns uid of teachers by option ids of attribute 5
+ */
+function which_teacher_by_TeacherOptionId($value){
+	switch($value){
+		case 30: //'تار'
+			return 164;
+			break;
+		case 29://'تنبک'
+			return 108;
+			break;
+		case 32://'سنتور'
+			return 1996; //کیان
+			break;
+		case 31://'سه تار'
+			return 111;
+			break;
+		case 28://'ویولن'
+			return 107;
+			break;
+		case 33://'پیانو'
+			return 30;
+			break;
+		case 38://'گیتار کلاسیک'	
+			return 64;
+			break;
+		case 35://'گیتار فلامنکو'
+			return 109;
+			break;
+		case 36:// 'گیتار پاپ'
+			return 110;
+			break;
+		case 26://'دف'
+			return 1011;
+			break;
+		case 34://'نی'
+			return 2785;
+			break;
+		case 37://گیتار الکتریک
+			return 3079;
+			break;
+		case 27: //'هارمونیکا':
+			return 3314;
+			break;
+		default:
+			return false;
+	}
+}
 
 /**
  * Implements hook_menu().
@@ -500,16 +588,27 @@ function student_node_refrence_form($form, &$form_state, $uid) {
 	return $form;
 }
 
-
-
 function student_node_refrence_form_submit($form, &$form_state) {
 	$node = node_load($form_state['values']['refrenced_node']['entity_id']);
 	$user = user_load($form_state['values']['uid']);
-
+	$index = 0;
 	if(isset($user->field_node_refrence['und'][0]['nid'])){
 		$field_node_refrence = $user->field_node_refrence;
+		$index = sizeof($user->field_node_refrence['und']);
 	}
-	$field_node_refrence['und'][]['nid'] =  $form_state['values']['refrenced_node']['entity_id'];
-	$user_new = user_save($user, array('field_node_refrence' => $field_node_refrence));
+	$field_node_refrence['und'][$index]['nid'] =  $node->nid;
+	$user->field_node_refrence = $field_node_refrence;
+	if(user_save($user, array('field_node_refrence' => $field_node_refrence)) ){
+		//adding access to view file
+		if(isset($node->field_course_film['und'][0]) && function_exists('file_access_set_file_access')){
+			file_access_set_file_access($node->field_course_film['und'][0]['fid'] , $user->uid , NULL , 1 /*FILE_ACCESS_USER*/);
+		}else{
+			drupal_set_message('خطایی در دسترسی فیلم های ارسالی به هنرجو رخ داده است. لطفا با مدیریت تماس بگیرید.','error');
+		}
+		drupal_set_message('فیلم مورد نظر به کاربر ارسال شد');
+
+	}else{
+		drupal_set_message("خطایی رخ داده است.", 'error');
+	}
 }
 
