@@ -448,6 +448,43 @@ if($('#saaz-film').length){
 	$('#saaz-film .field-name-field-film-image').remove();
 }
 
+$('video').each(function(){
+	var src = $(this).attr('src')
+	var item = $(this)
+	if(src.slice(-3) == 'mp3' || src.slice(-3) == 'ogg' || src.slice(-3) == 'm4a'){
+		item.parents('.mediaelement-video').addClass('mp3')
+	}
+})
+if($('.mediaelement-video.mp3').length){
+		var src = $('.mediaelement-video.mp3 video').attr('src')
+		$.getScript('//cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/1.4.0/wavesurfer.min.js', function(){
+			$('.mediaelement-video.mp3').prepend('<div class="wavyplayer"><div id="waveform"></div class="wavyplayer"><button id="playy" value="play/pause" class="btn btn-default">play/pause</button></div>')
+			$('.mediaelement-video.mp3 .mejs-container').remove()
+			var wavesurfer = WaveSurfer.create({
+			    container: '#waveform',
+				backend : 'MediaElement',
+				responsive: true,
+				progressColor: '#9575CD',
+				waveColor: '#ddd'
+			});
+			wavesurfer.load(src);
+			$('#playy').click(function(){
+            	wavesurfer.playPause()
+				$(this).toggleClass('paused')
+			})
+			wavesurfer.on('finish', function () {
+				$('#playy').removeClass('paused')
+			});
+		});
+}
+
+$('#block-webform-client-block-1663 .field-name-field-tozihaat').click(function(){
+	$(this).parents('#block-webform-client-block-1663').toggleClass('open')
+$(this).parents('#block-webform-client-block-1663').find('form').slideToggle()
+})
+
+
+
 
 
 
