@@ -120,47 +120,6 @@ $('.support-filters').click(function(){
 	$(this).parent().toggleClass('open');
 });
 /*-----------------------------------------------------------------------------------------------------------*/
-$('div#edit-attributes-3 .form-item').each(function(){
-	$(this).addClass('col-lg-2 col-md-3 col-sm-4 col-xs-6 card-view');
-	var oldtitle = $(this).find('.oldtitle').text().split('+');
-	$(this).find('.oldtitle').text(oldtitle[0].replace(',', ''));
-	if(oldtitle[1] != "undefined"){
-		$(this).find('label').append('<span class="price">'+ oldtitle[1] +'</span>');
-	}
-});
-$('div#edit-attributes-3 .form-item input').change(function(){
-	if($(this).hasClass('form-radio')){
-		if($(this).is( ":checked" )){
-			$('.form-item.selected').removeClass('selected');
-			$(this).parent().parent().addClass('selected');
-		}
-	}else{
-		if($(this).is( ":checked" )){
-			$(this).parent().parent().addClass('selected');
-		}else{
-			$(this).parent().parent().removeClass('selected');
-		}
-	}
-});
-
-$('div#edit-submitted-instrument input').change(function(){
-	if($(this).is( ":checked" )){
-		$('.selected').removeClass('selected');
-		$(this).parent().parent().addClass('selected');
-		$(this).parent().parent().parent().addClass('selected');
-	}
-});
-// $('div#edit-attributes-3 .form-item input').change(function(){
-	// if($('#edit-attributes-3-23').is( ":checked")){
-		// $('#edit-attributes-6-22').prop('checked' , true);
-		// $('.uc-product-35 .uc-price').text('60,000تومان');
-	// }else{
-		// $('#edit-attributes-6-22').prop('checked' , false);
-		// $('.uc-product-35 .uc-price').text('80,000تومان');
-	// }
-// });
-// $("div#edit-attributes-3 label[for*='edit-attributes-3-23']").prepend('<i>تخفیف ویژه</i>');
-/*-----------------------------------------------------------------------------------------------------------*/
 if($('#cart-form-pane').length){
 	$('body').addClass('cart-form');
 }
@@ -323,15 +282,7 @@ $('html').click(function(event){
 	}
 });
 /*-----------------------------------------------------------------------------------------------------------*/
-$('#edit-attributes-4 label').append('<span class="register-rules"><a href="/node/145" target="_blank">شرایط و قوانین</a> سایت را می پذیرم.<span>');
-$('#edit-attributes-4 input').change(function(){
-	if($(this).is( ":checked" )){
-		$(this).parents('.attribute-4').addClass('rule-checked');
-		$(this).parents('.attribute-4').parent().parent().addClass('rule-checked');
-	}else{
-		$('.rule-checked').removeClass('rule-checked');
-	}
-});
+
 /*-----------------------------------------------------------------------------------------------------------*/
 $('.field-name-field-film-image img')
 if($('.page-gallery .mejs-poster').length){
@@ -610,7 +561,6 @@ Drupal.behaviors.myBehavior = {attach: function (context, settings) {
 		e.preventDefault()
 		$(this).next().slideToggle();
 	});
-	
 	
 }};
 

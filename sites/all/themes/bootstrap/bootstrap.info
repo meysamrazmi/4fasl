@@ -11,6 +11,7 @@ scripts[] = js/bootstrap.min.js
 stylesheets[all][] = css/razmi-costum.css
 stylesheets[all][] = css/marjan.css
 scripts[] = js/razmi-costum.js
+scripts[] = js/razmi.js
 scripts[] = js/typed.js
 stylesheets[all][] = css/razmi-media.css
 stylesheets[all][] = css/editor.css
