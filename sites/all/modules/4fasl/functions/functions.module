@@ -163,7 +163,7 @@ function functions_theme() {
   return array(
     'functions_user_expiration' => array(
       'render element' => 'form',
-      'file' => 'functions.theme.inc',	  
+      'file' => 'functions.theme.inc',
     ),
   );
 }
@@ -215,9 +215,23 @@ function update_file_access(){
 				}
 			}
 		}
-	
-	
 	}
+	
+	//adding accesses to files based on node_refrence field
+	$results = db_query("SELECT entity_id as uid, field_node_refrence_nid as nid FROM field_data_field_node_refrence");	
+	foreach($results as $result){
+		$uid = $result->uid;
+		$node = node_load($result->nid);
+
+		if(isset($node->field_course_film['und'][0])){
+			if(file_access_set_file_access($node->field_course_film['und'][0]['fid'] , $uid , NULL , FILE_ACCESS_USER)){
+				$success[] = 'uid: '. $uid . ' | nid: '. $node->nid . ' | fid: '. $node->field_course_film['und'][0]['fid'] . '<br>';
+			}else{
+				$fails[] = 'uid: '. $uid . ' | nid: '. $node->nid . ' | fid: '. $node->field_course_film['und'][0]['fid'] . '<br>';
+			}
+		}
+	}	
+	
 	$resault = array('success' => $success, 'fail' => $fails);
 	mdump($resault ,true);
 }
