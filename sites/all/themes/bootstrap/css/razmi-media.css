@@ -1,61 +1,4 @@
-@media (max-width: 979px){
-.tb-megamenu .nav-collapse {
-  width: 300px;
-  top: 40px;
-  left: -300px;
-  overflow: overlay !important;
-  position: fixed;
-  height: 100% !important;
-  transition: all 0.3s;
-}
-.tb-megamenu .nav-collapse.collapse.in {
-  height: 100% !important;
-  left: 0;
-  max-height: 100vh !important;
-  max-height: calc(100vh - 50px) !important;
-  overflow: overlay !important;
-}
-.tb-megamenu .nav-collapse .dropdown-menu div.dropdown-menu {
-  display: none !important;
-}
-.tb-megamenu .mega-nav > li:first-child > a, 
-.tb-megamenu .dropdown-menu .mega-nav > li:first-child > a, 
-.tb-megamenu .mega-nav > li a, 
-.tb-megamenu .dropdown-menu .mega-nav > li a {
-  border-color: transparent;
-  margin: 0;
-}
-.tb-megamenu.style-blue .nav > li > a {
-  color: #00aeee;
-  border-bottom: 1px solid #aaa !important;
-  padding-right: 25px;
-}
-.tb-megamenu.style-blue .nav > li > a:before {
-  content: "\e235";
-  right: 0;
-  font-family: Glyphicons Halflings;
-  position: absolute;
-  margin: 0 5px;
-}
-.collapse .tb-megamenu.style-blue .nav li.dropdown.active > .dropdown-toggle, 
-.collapse .tb-megamenu.style-blue .nav li.dropdown.open.active > .dropdown-toggle {
-  text-shadow: none;
-  color: #fff;
-}
-div#edit-attributes-3 .form-item {
-  /*width: 20%;*/
-}
-
-
-
-
-
-
-
-}
 @media (max-width: 991px){
-/*this is me honey*/
-
 #block-panels-mini-right-side h2.block-title {
 	display:block;
 }
@@ -120,9 +63,10 @@ div#edit-attributes-3 .form-item {
 	/*nemidoonam in niyaz hast ya na ama oon varesho natoonetam bezaram chon 75% col-xs-9*/	
 }
 .user-profile.view-mode-full > div > .field-name-user-help {
-	margin: -25px 0 15px;
+	margin: -25px 0 50px;
 	display: block;
-	position: relative;	
+	position: relative;
+	z-index: 1;
 }
 .user-profile.view-mode-full > div > .field-name-user-help a {
 	position: relative;
@@ -131,6 +75,97 @@ div#edit-attributes-3 .form-item {
 .user-profile.view-mode-full > div > .field-name-user-help a:before{
 	color: #673AB7;
 }
+#block-system-main-menu {
+    height: 100vh;
+    position: fixed;
+    left: -260px;
+    width: 260px;
+	background: #fff;
+}
+#block-system-main-menu.opened {
+    left: 0;
+}
+#block-system-main-menu .block-title {
+    display: block;
+    margin: 0;
+    font-size: 0;
+    width: 50px;
+    height: 50px;
+    margin-right: -70px;
+    position: absolute;
+    cursor: pointer;
+}
+#block-system-main-menu.opened .block-title {
+    margin-right: -50px;
+}
+#block-system-main-menu.opened .block-title:before {
+    content: "\f156";
+    background: rgba(255, 255, 255, 0.2);
+}
+#block-system-main-menu .menu.nav {
+    flex-direction: column;
+    height: calc(100% - 116px);
+    z-index: 1;
+    position: relative;
+    background: #fff;
+    overflow: overlay;
+}
+#block-system-main-menu .menu.nav > li a, #block-system-main-menu .menu.nav > li >span {
+    color: #555;
+	display: block;
+    background: #fff;
+}
+#block-system-main-menu .menu.nav > li a:hover, #block-system-main-menu .menu.nav > li >span:hover {
+    background: #eee;
+}
+#block-system-main-menu .dropdown-menu {
+    position: relative;
+    background: #eee;
+    width: 100%;
+    float: none;
+    box-shadow: inset 2px 3px 5px rgba(0, 0, 0, .175);
+}
+#block-system-main-menu .dropdown-menu a {
+    background: transparent !important;
+    border: none !important;
+    line-height: 50px !important;
+    text-indent: 20px;
+}
+#block-system-main-menu .dropdown-menu a:hover {
+    background: rgba(0, 0, 0, 0.1) !important;
+}
+#block-system-main-menu .caret {
+	border: none;
+    width: 30px;
+    height: 20px;
+    margin: 15px 0 0;
+    float: left;
+    line-height: 20px;
+    text-align: center;
+}
+#block-system-main-menu .caret:before {
+    content: "\f140";
+    font-family: mat;
+    font-size: 24px;
+}
+#block-system-main-menu .open .caret:before {
+    content: "\f143";
+}
+#menuoverlay {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    right: 0;
+    background: rgba(0,0,0,0.5);
+    transition: all 0.3s ease;
+    -webkit-transition: all 0.3s ease;
+}
+#block-system-main-menu.opened .logo {
+    display: block;
+}
+
+
 
 }
 @media (min-width: 768px){
@@ -478,19 +513,13 @@ aside#right-side {
 
 
 }
-@media screen and (min-width: 1200px){
+@media (min-width: 1200px){
 .page-user #navbar {
   padding-right: 15px;
   padding-left: 15px;
 }
 .page-node #navbar {
   height: 350px;
-}
-.tb-megamenu .nav.level-0 > li > a {
-  border-bottom: 0px solid !important;
-  font-size: 15px;
-  font-weight: normal;
-  line-height: 28px;
 }
 div#views_slideshow_cycle_teaser_section_main_slideshow-block, div#views_slideshow_cycle_teaser_section_main_slideshow-block>div {
   min-height: 500px;
@@ -511,9 +540,17 @@ div#views_slideshow_cycle_teaser_section_main_slideshow-block, div#views_slidesh
   max-width: 1100px;
   margin: auto;
 }
+#block-system-main-menu .menu.nav > li a, 
+#block-system-main-menu .menu.nav > li >span {
+    font-size: 14px;
+    padding: 0 15px;
+}
 
-
-
+}
+@media (max-width: 1200px){
+#block-system-main-menu:not(.opened) .menu.nav li:first-child {
+    display: none;
+}
 
 
 
@@ -648,9 +685,6 @@ div#views_slideshow_cycle_teaser_section_main_slideshow-block, div#views_slidesh
 
 }
 @media (max-width: 600px){
-.navbar-header {
-  display: none;
-}
 .bg-scroll .hsContent {
   padding: 80px 6% 100px 6%;
 }
@@ -732,6 +766,41 @@ div#edit-attributes-5 .form-item > label {
 .shopping-stepper {
     overflow: auto;
 }
+.view-faq.view-display-id-block_2 {
+    flex-direction: column;
+}
+.view-faq.view-display-id-block_2 > * {
+    width: 100%;
+}
+.view-faq #edit-category-wrapper {
+    padding: 0;
+}
+.view-faq #edit-category-wrapper .bef-select-as-links > .form-item {
+    display: flex;
+    justify-content: space-between;
+	overflow-x: auto;
+}
+.view-faq #edit-category-wrapper .bef-select-as-links > .form-item > div {
+    width: 100%;
+    text-align: center;
+}
+.view-faq #edit-category-wrapper a {
+    border-width: 0px 0px 1px 0px;
+    white-space: nowrap;
+}
+.view-faq #edit-category-wrapper .form-type-bef-link.active a {
+	border-bottom: 3px solid #6f03d2;
+    color: #6f03d2;
+    font-weight: 500;
+    border-right: none;
+    border-top: 0;
+    padding-bottom: 14px;
+}
+.navbar-header {
+  display: none;
+}
+
+
 
 }
 @media (max-width: 500px){
@@ -760,7 +829,8 @@ fieldset#payment-pane div#line-items-div table {
 .shopping-stepper ~ p {
     text-align: center;
     margin: 20px auto 0;
-    width: 340px;
+    width: 440px;
+	max-width: 90%;
     padding: 15px;
     font-size: 18px;
     background: #fbfbfb;

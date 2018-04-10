@@ -279,15 +279,16 @@ background-color: #36134e;
   }
 }
 .get_started{
-  padding: 7px 15px;
-  margin-right: 9%;
-  display: none;
-  margin-top: 2%;
-  background-color: #9E2850;
-  background: linear-gradient(to bottom left, #4976f5 ,#8828da);
-  border-radius: 4px;
-  box-shadow: rgba(0, 0, 0, 0.156863) 0px 3px 10px, rgba(0, 0, 0, 0.227451) 0px 3px 10px;
-  color: white;
+	padding: 7px 15px;
+    background-color: #9E2850;
+    background: linear-gradient(to bottom left, #4976f5 ,#8828da);
+    border-radius: 4px;
+    box-shadow: rgba(0, 0, 0, 0.156863) 0px 3px 10px, rgba(0, 0, 0, 0.227451) 0px 3px 10px;
+    color: white;
+    margin-left: 0;
+    margin-top: 5px;
+    float: none !important;
+    display: inline-block;
 }
 a.get_started:hover{
 	color: white !important;
@@ -324,23 +325,39 @@ l.tb-megamenu-nav.nav.level-0.items-4 li {
 	margin-bottom: 20px;
 	font-size: 17px !important;
 }
+#login-message span {
+    font-size: 15px;
+    display: block;
+    margin-top: 20px;
+}
 .toboggan-unified #login-links a.lt-active,
 .toboggan-unified #login-links a.lt-active:hover {
-    background-color: #E4E3DF;
-    border: 1px rgba(51, 51, 51, 0.29) solid;
-    color: black;
-    font-size: 18px;
-    margin-left: 8px;
+	background-color: #fafafa;
+    cursor: default;
+    border-bottom: 3px solid #c5c;
+    border-width: 0 0 3px 0;
+    opacity: 1 !important;
 }
 .toboggan-unified{
 	margin:50px 30px;
 }
 .toboggan-unified #login-links a{
-	color: black;
-    border: 1px rgba(51, 51, 51, 0.29) solid;
-    font-size: 18px;
-	margin-left: 8px;
+    background-color: #fafafa;
+    color: #555;
+    display: inline-block;
+    font-size: 17px;
+    line-height: 35px;
+    font-weight: bold !important;
+    padding: 0 10px;
+    width: 200px;
+    transition: all 0.2s ease 0s;
+    border-bottom: 3px solid #ddd;
+    border-width: 0 0 3px 0;
 }
+.toboggan-unified #login-links a:hover {
+    background: #eee;
+}
+#register-form,
 form#user-pass,
 #login-form{
 	display: block;
@@ -348,23 +365,12 @@ form#user-pass,
     background-color: #fff;
     box-shadow: 0 1px 6px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.12);
     max-width: 410px;
-  width: 96%;
+	width: 96%;
     margin: auto;
-    margin-top: 23px;
 }
 body.page-user-password form#user-pass{
   position: relative;
   margin-top: 140px;
-}
-#register-form{
-	display: block;
-    padding: 10px;
-    background-color: #fff;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.12);
-    width: 96%;
-	max-width: 410px;
-    margin: auto;
-    margin-top: 23px;
 }
 form#user-login .form-item{
 	margin-bottom: 30px;
@@ -454,7 +460,7 @@ form#user-login {
     margin-bottom: 17px;
 }
 .node-type-course .group-left .field-label{
-    border-bottom: 1.5px solid #D81B60;
+    border-bottom: 1.5px solid #673AB7;
     padding: 8px 5px 5px 5px;
     margin: 0px 11px;
 }

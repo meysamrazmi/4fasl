@@ -13,9 +13,27 @@ $(document).ready(function () {
 			$('body').addClass("fixedmenu");
         } else {
             nav.removeClass("topfix");
-			$('body').removeClass("fixedmenu");
+			$('body').removeClass("fixedmenu"); 
         }
     });
+	
+	$('#block-system-main-menu').append('<div id="menuoverlay" style="display: none;opacity: 0;"></div>');
+	$('#block-system-main-menu .block-title').after('<div class="logo"><a href="/"><img src="/sites/default/files/logo1.png"></a></div>');
+		$('#block-system-main-menu .block-title').click(function(){
+		if($(this).parent().hasClass('opened')){
+			$('#menuoverlay').css({'opacity' : '0'});
+			setTimeout(function(){$('#menuoverlay').css({'display':'none'});}, 800);
+		}else{
+			$('#menuoverlay').css({'display':'block'});
+			setTimeout(function(){$('#menuoverlay').css({'opacity' : '1'});}, 10);
+		} 
+		$(this).parent().toggleClass('opened');
+	});
+	$('#menuoverlay').click(function(){
+		$('#menuoverlay').css({'opacity' : '0'});
+		setTimeout(function(){$('#menuoverlay').css({'display':'none'});}, 800);
+		$('#block-system-main-menu').removeClass('opened');
+	});
 /*-----------------------------------------------------------------------------------------------------------*/
 if ($('.our-work').length){
 	var totop = $('.our-work').offset().top;
@@ -128,6 +146,7 @@ if($('.page-user-login, .page-user-register , .page-user-password , .page-user-r
 	$('.main-container , footer.footer').removeClass('col-xs-12');
 	$('.main-container , footer.footer').removeClass('col-md-9');
 	$('body').removeClass('right-sides');
+	$('a#register-link').text('عضویت در سایت');
 	//$('.page-user.right-sides header#navbar, .page-user.right-sides footer.footer, .page-user.right-sides .main-container').css({'float':'none'});	
 }
 /*-----------------------------------------------------------------------------------------------------------*/
@@ -241,7 +260,10 @@ $('.view-courses-list.student-pic .views-field-picture img').click(function(e){
 		}
 	}
 });
-	
+
+if($('.node-homework-form').length){
+	$('.node-homework-form').parent().append('<div class="description rules"><div><p>رعایت حجاب اسلامی در فیلم های ارسالی توسط هنرجویان الزامی است.</p><p>لطفا جهت برقراری نظم بیشتر، تمامی تمرینات مورد نظر را در قالب یک ویدیو ارسال کنید.</p><p>در روزهای مشخص شده در هفته، استاد فیلم های ارسالی شما را ملاحظه کرده و به رفع اشکال شما ارائه ی نکات تکمیلی می پردازد. لذا به جهت برخورداری از نظم بیشتر، تا قبل از روز رفع اشکال، تمرینات خود را ارسال بفرمایید.</p><p>از قسمت ویرایش می توانید اقدام به حذف ویدیو و قرار دادن ویدیوی جدید کنید.</p><p>در صورتی که نیاز به راهنمایی بیشتر دارید، در بخش پشتیبانی سوال خود را مطرح کنید. کارشناسان ما در اسرع وقت به شما پاسخ خواهند داد.</p></div><div class="title"><img src="/sites/all/themes/bootstrap/images/law-book.svg"><span>شرایط و قوانین ارسال تمرین</span></div></div>');
+}
 $('.node-homework.node-teaser .field-name-title').click(function(){
 	if($(this).parent().hasClass('open')){
 		$(this).parent().removeClass('open');
@@ -293,13 +315,6 @@ if($('.page-gallery .mejs-poster').length){
 	}
 }
 /*-----------------------------------------------------------------------------------------------------------*/
-$('.tb-megamenu .btn-navbar').click(function(){
-	if(!$(this).parent().children('.nav-collapse').hasClass('in')){
-		$(this).parent().addClass('tb-opened');
-	}else{
-		$(this).parent().removeClass('tb-opened');
-	}
-});
 $('section#block-menu-menu-gallery .block-title').click(function(){
 	$(this).parent().toggleClass('open');
 });
@@ -338,7 +353,6 @@ $('#cart-pane legend span').text('ثبت نام:');
 $('#uc-product-add-to-cart-form-35 .node-add-to-cart').html('<span class="icon glyphicon glyphicon-plus" aria-hidden="true"></span>ثبت نام در دوره');
 $('#uc-product-add-to-cart-form-139 .node-add-to-cart').html('<span class="icon glyphicon glyphicon-plus" aria-hidden="true"></span>تمدید دوره');
 $('.product-info.display-price').prepend('<span class="price-label">هزینه دوره:</span>');
-if($('.form-managed-file').find('.file-resup-wrapper').length){$('.form-managed-file').addClass('has-resumeable')}
 
 $('.mejs-overlay-button').click(function(){
 	$(this).parents('#saaz-film').find('.field-name-field-film-image').remove();
@@ -432,7 +446,7 @@ if($('.page-category:not(.page-content)').length){
 	});
 }
 
-$('.node-course .mediaelement-video').parents('.field-name-access').after('<div class="field video-help"><a href="#">مشکل در مشاهده ویدیو؟</a><p>در صورتیکه هنگام مشاهده و یا دانلود فیلم با مشکل مواجه شدید موارد زیر را بررسی کنید:<br>1 - احتمال پایین بودن سرعت اینترنت (با توجه به کیفیت و حجم بالای ویدیوهای آموزشی، در صورتیکه فیلم پخش و یا دانلود شد اما در اواسط اجرا قطع شد به احتمال زیاد مشکل از پایین بودن سرعت اینترنت شماست)<br>2 - حافظه ی پنهان مرورگر (cache)(در صورتی که همچنان با پیغام خطا مواجه شدید حافظه ی پنهان مرورگر خود را پاک کنید و مجدد اقدام به مشاهده و یا دانلود ویدیو کنید)<br></p></div>');
+$('.node-course .mediaelement-video').parents('.field-name-access').after('<div class="field video-help"><a href="#">مشکل در مشاهده ویدیو؟</a><p>در صورتیکه هنگام مشاهده و یا دانلود فیلم با مشکل مواجه شدید موارد زیر را بررسی کنید:<br>1 - احتمال پایین بودن سرعت اینترنت (با توجه به کیفیت و حجم بالای ویدیوهای آموزشی، در صورتیکه فیلم پخش و یا دانلود شد اما در اواسط اجرا قطع شد به احتمال زیاد مشکل از پایین بودن سرعت اینترنت شماست)<br>2 - جهت دانلود ویدیو، ترجیحا از نرم افزارهای مدیریت دانلود (Download Manager) استفاده نکنید. برای دانلود، روی لینک دانلود کلیک راست کرده و گزینه ی save link یا download link را بزنید.<br></p></div>');
 	$('.field.video-help a').click(function(e){
 		e.preventDefault()
 		$(this).next().slideToggle();
@@ -483,9 +497,31 @@ $('#block-webform-client-block-1663 .field-name-field-tozihaat').click(function(
 $(this).parents('#block-webform-client-block-1663').find('form').slideToggle()
 })
 
+/*-----------------------------------------------------------------------------------------------------------*/
+if($('.page-cart').length){
+	if($('.page-checkout').length){
+		if($('.page-review').length){
+			$('div#uc_Progressbar .bullet:nth-child(3)').addClass('current');
+			$('div#uc_Progressbar .bullet:nth-child(1) , div#uc_Progressbar .bullet:nth-child(2)').addClass('done');
+		}else {
+			$('div#uc_Progressbar .bullet:nth-child(2)').addClass('current');
+			$('div#uc_Progressbar .bullet:nth-child(1)').addClass('done');
+		}
+	}else {
+		$('div#uc_Progressbar .bullet:nth-child(1)').addClass('current');
+	}
+}
+/*-----------------------------------------------------------------------------------------------------------*/
+if($('.no-permission').length){
+	$('.group-left .field-name-field-attachment .field-items').html($('.no-permission').parent().html());
+	$('.group-left .field-name-field-attachment .no-permission').removeClass('no-video').find('p').text('شما به این قسمت دسترسی ندارید');
+}
 
 
-
+//for setting default value for faq
+if($('.page-faq').length){
+	$('.form-item-edit-category-57 a').click();
+}
 
 
 });
@@ -599,6 +635,12 @@ Drupal.behaviors.myBehavior = {attach: function (context, settings) {
 		$(this).next().slideToggle();
 	});
 	
+	if($('.form-managed-file').find('.file-resup-wrapper').length){$('.form-managed-file').addClass('has-resumeable')}
+	
+	if($('.page-faq').length){
+		var selected = $('.view-faq #edit-category-wrapper select [selected="selected"]').attr('value')
+		$('.view-faq #edit-category-wrapper .form-item-edit-category-'+ selected).addClass('active')
+	}
 }};
 
 jQuery.fn.outerHTML = function() {return jQuery('<div />').append(this.eq(0).clone()).html();};
