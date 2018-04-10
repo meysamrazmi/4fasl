@@ -1597,7 +1597,7 @@ function redirect_field_attach_form($entity_type, $entity, &$form, &$form_state,
   // We don't have to put our include in $form_state['build_info']['files']
   // since the build array will already be cached.
   module_load_include('inc', 'redirect', 'redirect.admin');
-  $redirects = redirect_load_multiple(FALSE, array('redirect' => $uri['path']));
+  $redirects = redirect_load_multiple(array(), array('redirect' => $uri['path']));
   $header = array('source', 'status', 'status_code', 'language', 'count', 'access', 'operations');
   $form['redirect'] += redirect_list_table($redirects, $header);
 }
