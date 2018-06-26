@@ -33,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 				<span class="seperator"></span>
 				<p class="ostad">استاد : <span>'. $ostad->field_naame['und'][0]['value'] .'</span></p>
 				<span class="seperator"></span>
-				<p class="modat" style="font-family: fanum; text-align:center;margin-top: -10px;">مدت زمان : <span>12 هفته</span></p>
+				<p class="modat" style="font-family: fanum; text-align:center;margin-top: -10px;">مدت زمان : <span>4 هفته</span></p>
 			</div>';
 		//print '<div class="bought"><span>تعداد بلیط خریداری شده</span><span>'. $bought .'</span></div>';
 		drupal_add_js(array('product_attributes' => $product_attributes, 'bought_product' => $bought), 'setting');
@@ -63,7 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     hide($content['links']);
     hide($content['field_tags']);
 	
-	print '<div class="description rules"><div><p>ثبت نام در دوره های آموزشی حضوری بصورت ترمی بوده و 12 هفته اعتبار دارد و مدت زمان هر جلسه نیم ساعت می باشد.</p><p>پس از انتخاب روز و ساعت کلاس، شما باید هر هفته در همان زمان انتخاب شده در آموزشگاه حضور یابید.</p><p>غیبت از کلاس باعث سوخت شدن جلسه شما می شود. البته در مواقعی که نتوانید در کلاس حضور یابید (بعلت بیماری و یا مسافرت و ...) می توانید جلسه را بصورت مجازی شرکت کنید. بدین منظور حتما یک روز قبل از کلاس باید هماهنگی های لازم را با آموزشگاه به عمل آورید.</p></div></div>';
+	print '<div class="description rules"><div><p>ثبت نام در دوره های آموزشی حضوری بصورت ماهیانه بوده و 4 هفته اعتبار دارد و مدت زمان هر جلسه نیم ساعت می باشد.</p><p>پس از انتخاب روز و ساعت کلاس، شما باید هر هفته در همان زمان انتخاب شده در آموزشگاه حضور یابید.</p><p>غیبت از کلاس باعث سوخت شدن جلسه شما می شود. البته در مواقعی که نتوانید در کلاس حضور یابید (بعلت بیماری و یا مسافرت و ...) می توانید جلسه را بصورت مجازی شرکت کنید. بدین منظور حتما یک روز قبل از کلاس باید هماهنگی های لازم را با آموزشگاه به عمل آورید.</p></div></div>';
 	
 	//$result = db_query('call classes_timing()')->fetchAll(); //stored procedure didnt worked with parameters
 	//todo : check if we can use parameters in where clause in sql stored procedure
@@ -132,6 +132,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 				<button type="submit" name="submit" value="Submit" class="btn btn-success">تایید و ارسال</button>';
 		}
 		$output .= '</form>';
+		
+		if($ostad_uid == 7262){
+			$output = '<p class="hozouri">این کلاس به صورت گروهی برگزار می شود. برای شرکت در این کلاس با دفتر آموزشگاه با شماره های 44044497 - 44043963 تماس بگیرید.</p>' ;
+		}
 		
 		print $output;
 	}
@@ -241,6 +245,15 @@ td.day-name {
 		margin: 5px;
 		padding: 15px 5px;
 	}
+}
+.modal-content .hozouri ~ p {
+    display: none;
+}
+
+.modal-content .hozouri {
+    margin: -40px 15px 15px;
+    z-index: 5;
+    position: relative;
 }
   </style>
   <script>

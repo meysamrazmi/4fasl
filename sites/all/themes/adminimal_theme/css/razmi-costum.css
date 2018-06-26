@@ -672,9 +672,18 @@ select#edit-ship-to-select-address {
 td.views-field.views-field-name span {
   color: #F44336;
 }
+span.file {
+    unicode-bidi: embed;
+}
 
-
-
+a.btn.btn-primary {
+    color: #fff !important;
+    background: #0074BD;
+    transition: all, 0.3s;
+}
+a.btn.btn-primary:hover {
+    background: #004c99;
+}
 
 
 

@@ -57,27 +57,32 @@ if($('body.one-sides').length){
 }
 // $('.user-profile.view-mode-full .field-name-user-practices').html('<div class="add-practice">افزودن</div>' + $('.user-profile.view-mode-full .field-name-user-practices').html());
 
-if($('.field-name-add-practice').length){
+if($('.field-name-add-practice, #block-formblock-homework').length){
 	$('.add-practice:not(.disabeld) , #mini-panel-right_side .user-practice a:not(.disabeld)').click(function(e){
 		e.preventDefault();
-		$('.field-name-add-practice #edit-title').val($(this).attr('title-text'));
-		$('.field-name-add-practice #edit-field-nid-und-0-value').val($(this).attr('nid'));
-		$('.field-name-add-practice').slideToggle(400);
-		$('.field-name-add-practice, .add-practice:not(.disabeld)').toggleClass('open');
-		if($('.field-name-add-practice').hasClass('open')){
+		var el = $('.field-name-add-practice, #block-formblock-homework');
+		el.find('[id*="edit-title"]').val($(this).attr('title-text'));
+		el.find('[id*="edit-field-nid-und-0-value"]').val($(this).attr('nid'));
+		el.slideToggle(400).toggleClass('open');
+		$('.add-practice:not(.disabeld)').toggleClass('open');
+		if(el.hasClass('open')){
 			$('html, body').animate({
-				scrollTop: ($('.field-name-add-practice').offset().top - 0)
+				scrollTop: ($('#block-formblock-homework').offset().top - 0)
 			}, 1000);
 		}
 		if($('body').hasClass('vip-en')){
-			$('#edit-field-vip-und').prop('checked', true);
+			$('[id*="edit-field-vip-und"]').prop('checked', true);
 		}else{
-			$('#edit-field-vip-und').prop('checked', false);
+			$('[id*="edit-field-vip-und"]').prop('checked', false);
 		}
 	});
 	$('.add-practice.disabeld , #mini-panel-right_side .user-practice a.disabeld').click(function(e){
 		e.preventDefault();
 	});
+	$('.change-role').click(function(){
+		$('.field-name-add-practice, #block-formblock-homework').slideUp(400).removeClass('open');
+		$('.add-practice:not(.disabeld)').removeClass('open');
+	})
 }
 /*---------------*/
 // if($('.user-profile')){
@@ -181,43 +186,13 @@ $('#cboxOverlay').click(function(){
 });
 /*-----------------------------------------------------------------------------------------------------------*/
 
-$('.main-slide .views-field-title').append( '<div class="changetext"></div>' );
-
-$(function(){
-        $(".main-slide .views-field-title .changetext").typed({
-            strings: [" صدای چه سازی تو خونت بپیچه ؟","چه سازی رو بنوازی ؟"],
-            // Optionally use an HTML element to grab strings from (must wrap each string in a <p>)
-            stringsElement: null,
-            // typing speed
-            typeSpeed: 70,
-            // time before typing starts
-            startDelay: 200,
-            // backspacing speed
-            backSpeed: 0,
-            // time before backspacing
-            backDelay: 200,
-            // loop
-            loop: false,
-            // false = infinite
-            loopCount: 3,
-            // show cursor
-            showCursor: true,
-            // character for cursor
-            cursorChar: "|",
-            // attribute to type (null == text)
-            attr: null,
-            // either html or text
-            contentType: 'html',
-            // call when done callback function
-            callback: function() {},
-            // starting callback function before each string
-            preStringTyped: function() {},
-            //callback for every typed string
-            onStringTyped: function() {},
-            // callback for reset
-            resetCallback: function() {}
-        });
-    });
+$('div#edit-submitted-instrument input').change(function(){
+	if($(this).is( ":checked" )){
+		$('.selected').removeClass('selected');
+		$(this).parent().parent().addClass('selected');
+		$(this).parent().parent().parent().addClass('selected');
+	}
+});
 
 /*-----------------------------------------------------------------------------------------------------------*/
 $('.students-section .attachment-after').prepend('<div class="add-level">+</div>');
@@ -524,6 +499,16 @@ if($('.page-faq').length){
 }
 
 
+if($('.node-type-course').length && $('.no-video').length){
+	if($('h1.page-header').text().indexOf("جلسه") != -1 && $('h1.page-header').text().indexOf("اول") != -1 ){
+		$('.node-course .group-header').html('<a class="first-session-prompt" href="/user/register?destination='+ window.location.href.substr(21) +'">جلسات اول هر دوره را می توانید به صورت رایگان پس از عضویت در سایت مشاهده کنید</a>')
+	}
+}
+
+
+
+
+
 });
 
 /*-----------------*/
@@ -624,7 +609,7 @@ Drupal.behaviors.myBehavior = {attach: function (context, settings) {
 		}
 	});
 /*-----------------*/	
-	if($('div#edit-support-ticket-upload .file-widget, div#edit-field-hw-video .file-widget , #user-profile-form input#edit-picture-upload').length){
+	if($('div[id*="edit-support-ticket-upload"] .file-widget, div[id*="edit-field-hw-video"] .file-widget , #user-profile-form input#edit-picture-upload').length){
 		$.getScript('/sites/all/themes/bootstrap/js/bootstrap-filestyle.min.js', function(){
 			$(":file").filestyle({buttonText: "انتخاب فایل", buttonName: "btn-primary",placeholder: "فایلی انتخاب نشده"});
 		});

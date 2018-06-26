@@ -813,6 +813,7 @@ section#block-views-projects-block-5 h2,
   margin: 0 10px 20px;
   background: #fff;
   box-shadow: rgba(0, 0, 0, 0.117647) 0px 1px 6px, rgba(0, 0, 0, 0.117647) 0px 1px 4px;
+  width: calc(25% - 20px);	
 }
 .relative .view-content {
   display: flex;
@@ -937,7 +938,6 @@ form#user-login {
 }
 .form-item-pass .form-type-password {
   padding: 0;
-  margin: 10px 0 !important;
 }
 .password-help {
   background: #fbfbfb;
@@ -1033,9 +1033,6 @@ form#user-login {
 .thumbnail a > img {
   margin: auto;
 }
-.relative .views-row:nth-child(2n +1) {
-  clear: right;
-} 
 .our-work span {
   font-size: 25px;
   margin-bottom: 10px;
@@ -1144,7 +1141,8 @@ div#userpoints_list_wrapper > div,
 .page-user-edit #edit-picture legend,
 .page-user-edit #edit-field-instrument,
 .page-user-edit #edit-field-tea-bio,
-.page-user-edit #edit-field-attachment,
+.page-user-edit [id*="edit-field-attachment"],
+#block-formblock-homework [id*="edit-field-attachment"] .panel-heading,
 .page-user-edit #user-profile-form #edit-timezone {
     display: none;
 }
@@ -1251,23 +1249,23 @@ h2.block-title {
   font-size: 25px;
 }
 .form-managed-file .form-item label,
-div#edit-support-ticket-upload label,
-div#edit-field-hw-video label {
+div[id*="edit-support-ticket-upload"] label,
+div[id*="edit-field-hw-video"] label {
   font-size: 13px;
   margin: 0;
 }
-div#edit-support-ticket-upload label {
+div[id*="edit-support-ticket-upload"] label {
   display: none;
 }
-#edit-support-ticket-upload .panel-body {
+[id*="edit-support-ticket-upload"] .panel-body {
   border: none !important;
 }
 .node-homework-form div#edit-body, 
-div#edit-field-hw-video {
+div[id*="edit-field-hw-video"] {
   /* margin: 1%; */
 }
-#edit-support-ticket-upload-und legend.panel-heading, 
-#edit-field-hw-video-und legend.panel-heading {
+[id*="edit-support-ticket-upload-und"] legend.panel-heading, 
+[id*="edit-field-hw-video-und"] legend.panel-heading {
   padding: 5px 20px;
   margin: 0 -1px;
   background: transparent !important;
@@ -1275,23 +1273,23 @@ div#edit-field-hw-video {
   border: none;
   font-size: 17px;
 }
-#edit-support-ticket-upload-und legend span, #edit-support-ticket-upload-und legend {
+[id*="edit-support-ticket-upload"]-und legend span, [id*="edit-support-ticket-upload"]-und legend {
   font-size: 13px !important;
   font-weight: bold;
   padding: 0 !important;
   margin-bottom: -15px !important;
 }
-#edit-support-ticket-upload-und,
-#edit-field-hw-video-und {
+[id*="edit-support-ticket-upload-und"],
+[id*="edit-field-hw-video-und"] {
   border: none;
   box-shadow: none;
   margin-bottom: 0;
 }
-div#edit-support-ticket-upload {
+div[id*="edit-support-ticket-upload"] {
   margin-bottom: 0;
 }
-#edit-support-ticket-upload-und .panel-body,
-#edit-field-hw-video-und .panel-body {
+[id*="edit-support-ticket-upload-und"] .panel-body,
+[id*="edit-field-hw-video-und"] .panel-body {
   padding: 5px 15px;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -1303,24 +1301,24 @@ div#edit-support-ticket-upload {
 .file-resup-wrapper .drop {
   width: 75%;
 }
-div#edit-support-ticket-upload .file-widget ,
-div#edit-field-hw-video .file-widget {
+div[id*="edit-support-ticket-upload"] .file-widget ,
+div[id*="edit-field-hw-video"] .file-widget {
   display: block;
   margin: 10px 0;
 }
-div#edit-support-ticket-upload a.button.upload span,
-div#edit-field-hw-video a.button.upload span,
-div#edit-support-ticket-upload a.button.browse span,
-div#edit-field-hw-video a.button.browse span,
+div[id*="edit-support-ticket-upload"] a.button.upload span,
+div[id*="edit-field-hw-video"] a.button.upload span,
+div[id*="edit-support-ticket-upload"] a.button.browse span,
+div[id*="edit-field-hw-video"] a.button.browse span,
 .file-resup-wrapper .browse span,
 .file-resup-wrapper .upload span {
   display: table-cell;
   vertical-align: middle;
 }
-div#edit-support-ticket-upload a.button.upload,
-div#edit-support-ticket-upload a.button.browse,
-div#edit-field-hw-video a.button.upload,
-div#edit-field-hw-video a.button.browse ,
+div[id*="edit-support-ticket-upload"] a.button.upload,
+div[id*="edit-support-ticket-upload"] a.button.browse,
+div[id*="edit-field-hw-video"] a.button.upload,
+div[id*="edit-field-hw-video"] a.button.browse ,
 .file-resup-wrapper .browse,
 .file-resup-wrapper .upload {
   float: right;
@@ -1335,10 +1333,10 @@ div#edit-field-hw-video a.button.browse ,
   padding: 0 5px;
 }
 .file-resup-wrapper a.button:after, 
-div#edit-support-ticket-upload a.button.upload:after, 
-div#edit-support-ticket-upload a.button.browse:after ,
-div#edit-field-hw-video a.button.upload:after, 
-div#edit-field-hw-video a.button.browse:after {
+div[id*="edit-support-ticket-upload"] a.button.upload:after, 
+div[id*="edit-support-ticket-upload"] a.button.browse:after ,
+div[id*="edit-field-hw-video"] a.button.upload:after, 
+div[id*="edit-field-hw-video"] a.button.browse:after {
     display: none;
 }
 .progress-wrapper {
@@ -1356,18 +1354,18 @@ div#edit-field-hw-video a.button.browse:after {
 .progress-wrapper .message {
   width: 220px;
 }
-div#edit-support-ticket-upload .form-managed-file .checkbox,
-div#edit-support-ticket-upload .form-managed-file .insert ,
-div#edit-field-hw-video .form-managed-file .checkbox,
-div#edit-field-hw-video .form-managed-file .insert {
+div[id*="edit-support-ticket-upload"] .form-managed-file .checkbox,
+div[id*="edit-support-ticket-upload"] .form-managed-file .insert ,
+div[id*="edit-field-hw-video"] .form-managed-file .checkbox,
+div[id*="edit-field-hw-video"] .form-managed-file .insert {
     display: none;
 }
 .form-managed-file .form-item {
   margin-bottom: 5px;
 }
 .form-managed-file input.form-text,
-div#edit-support-ticket-upload .form-managed-file .form-type-textfield input ,
-div#edit-field-hw-video .form-managed-file .form-type-textfield input {
+div[id*="edit-support-ticket-upload"] .form-managed-file .form-type-textfield input ,
+div[id*="edit-field-hw-video"] .form-managed-file .form-type-textfield input {
     max-width: 250px;
     display: inline-block;
     margin: 10px 20px 0;
@@ -2727,9 +2725,6 @@ div#register-form .form-actions {
   text-align: left;
   margin: 15px 15px 0;
 }
-form#user-login, #user-register-form {
-  margin: 50px 0 50px 0 !important;
-}
 #mini-panel-right_side .pane-block-2 .user_naghsh{
 	margin-top: 0;
 }
@@ -3113,12 +3108,12 @@ input#edit-submitted-video-upload {
   z-index: 1;
   margin: 20px;
 }
-div#edit-support-ticket-upload .form-type-managed-file ,
-div#edit-field-hw-video .form-type-managed-file {
+div[id*="edit-support-ticket-upload"] .form-type-managed-file ,
+div[id*="edit-field-hw-video"] .form-type-managed-file {
   position: relative;
 }
-div#edit-support-ticket-upload .form-type-managed-file:before ,
-div#edit-field-hw-video .form-type-managed-file:before {
+div[id*="edit-support-ticket-upload"] .form-type-managed-file:before ,
+div[id*="edit-field-hw-video"] .form-type-managed-file:before {
   /* content: "\CC\D3\CA\CC\E6"; */
   position: absolute;
   width: 100px;
@@ -3132,8 +3127,8 @@ div#edit-field-hw-video .form-type-managed-file:before {
   z-index: 3;
 }
 .form-file,
-div#edit-support-ticket-upload .form-control.form-file ,
-div#edit-field-hw-video .form-control.form-file {
+div[id*="edit-support-ticket-upload"] .form-control.form-file ,
+div[id*="edit-field-hw-video"] .form-control.form-file {
   display: block !important;
   border: 1px solid #aaa;
   background-color: #FFF;
@@ -3932,6 +3927,15 @@ span[id*='views_slideshow_controls_text_next_user-block_1'] a:before {
 .box.electric {
   background: rgba(0, 150, 136, 0.7);
 }
+.box.avaz-irani {
+    background: #17af69;
+}
+.box.avaz-pop {
+    background: #c904cc;
+}
+.box.tanboor {
+    background: #473ed0;
+}
 .box.soon p {
   font-size: 13px;
   border: 1px solid #f00;
@@ -3944,6 +3948,9 @@ span[id*='views_slideshow_controls_text_next_user-block_1'] a:before {
   background: #eee;
   border-top: 1px solid #ddd;
 }
+.box.tanboor .icon {
+    background-position: 0px -470px;
+}
 .front-box .box .icon {
   background-image: url(/sites/all/themes/bootstrap/images/instrument.png);
   width: 150px;
@@ -3951,6 +3958,12 @@ span[id*='views_slideshow_controls_text_next_user-block_1'] a:before {
   height: 70%;
   background-size: 600px;
   margin: auto;
+}
+.box.avaz-pop .icon {
+    background-position: -130px -470px;
+}
+.box.avaz-irani .icon {
+    background-position: -270px -465px;
 }
 .box.guit .icon { 
   background-position: -430px -30px;
@@ -4251,21 +4264,21 @@ span.jwmain {
   max-width: 780px;
   /* margin: auto; */
 }
-form#comment-form input#edit-support-ticket-upload-und-0-upload ,
-form#comment-form input#edit-field-hw-video-und-0-upload {
+form#comment-form input[id*="edit-support-ticket-upload-und-0-upload"] ,
+form#comment-form input[id*="edit-field-hw-video-und-0-upload"] {
   display: inline-block !important;
   width: calc(100% - 130px);
   float: right;
 }
 form#comment-form button.btn,
-form#comment-form div#edit-support-ticket-upload .form-managed-file button.btn ,
-form#comment-form div#edit-field-hw-video .form-managed-file button.btn {
+form#comment-form div[id*="edit-support-ticket-upload"] .form-managed-file button.btn ,
+form#comment-form div[id*="edit-field-hw-video"] .form-managed-file button.btn {
   margin: 10px 0;
   height: 34px;
   vertical-align: baseline;
   display: inline-block !important;
 }
-div#edit-support-ticket-upload .form-type-managed-file:before {
+div[id*="edit-support-ticket-upload"] .form-type-managed-file:before {
   top: 10px;
 }	
 form#uc-cart-view-form {
@@ -4894,11 +4907,11 @@ fieldset#edit-support .panel-body {
   padding: 15px;
   box-shadow: rgba(0, 0, 0, 0.117647) 0px 1px 6px, rgba(0, 0, 0, 0.117647) 0px 1px 4px;
 }
-#edit-support-ticket-upload-und {
+[id*="edit-support-ticket-upload"]-und {
   margin-bottom: 0 !important;
 }
 .node-type-support-ticket .comment-form #edit-support , 
-.node-type-support-ticket .comment-form div#edit-support-ticket-upload{
+.node-type-support-ticket .comment-form div[id*="edit-support-ticket-upload"]{
 	display: none;
 }
 .node-type-support-ticket .comment:before {
@@ -5147,10 +5160,10 @@ body.page-node-142 .main-container .region-content{
   font-size: 11px;
   margin-right: 15px;
 }
-.role-authenticated-user:not(.role-administrator) div#edit-field-vip,
-.role-authenticated-user:not(.role-administrator) div#edit-field-nid,
-.role-authenticated-user:not(.role-administrator) div#edit-field-nid,
-.role-authenticated-user:not(.role-administrator) div#edit-field-vip {
+.role-authenticated-user:not(.role-administrator) div[id*="edit-field-vip"],
+.role-authenticated-user:not(.role-administrator) div[id*="edit-field-nid"],
+.role-authenticated-user:not(.role-administrator) div[id*="edit-field-nid"],
+.role-authenticated-user:not(.role-administrator) div[id*="edit-field-vip"] {
   display: none;
 }
 .form-item-panes-coupon-code label {
@@ -6075,6 +6088,10 @@ h4.notification-title {
   margin: 1%;
   box-shadow: 0 2px 2px #edeef0;
   height: 279px;
+  max-width: 300px;
+}
+.tags .view-content {
+    overflow: hidden;
 }
 .tags .views-row .views-field-title, .tags .views-row .views-field-body {
   padding: 5px 15px;
@@ -6179,6 +6196,9 @@ section#block-menu-menu-gallery {
   left: 0;
   top: 0px;
   z-index: 101;
+}
+section#block-menu-menu-gallery.open li {
+    background: #fff;
 }
 section#block-menu-menu-gallery .block-title {
   font-size: 0;
@@ -7206,6 +7226,7 @@ label:hover .course-link {
 #block-system-main-menu .menu.nav {
     padding: 0;
     display: flex;
+	flex-direction: row-reverse;
 }
 
 #block-system-main-menu .block-title {
@@ -7230,7 +7251,9 @@ label:hover .course-link {
     display: inline-block;
 }
 
-#block-system-main-menu .menu.nav > li a:hover, #block-system-main-menu .menu.nav > li >span:hover {
+#block-system-main-menu .menu.nav > li a:hover, 
+#block-system-main-menu .menu.nav > li a:focus, 
+#block-system-main-menu .menu.nav > li >span:hover {
     background: rgba(0, 0, 0, 0.49);
 }
 
@@ -7330,10 +7353,64 @@ html, body {
     overflow: scroll !important;
     overflow: auto !important;
     overflow: overlay !important;
+    height: initial !important;	
 }
-
-
-
-
-
+.shopping-stepper ~ p {
+    text-align: center;
+    margin: 20px auto 0;
+    width: 440px;
+	max-width: 90%;
+    padding: 15px;
+    font-size: 18px;
+    background: #fbfbfb;
+    border: solid #F44336;
+    border-width: 0 5px;
+    box-shadow: 0 1px 8px 0px rgba(0, 0, 0, 0.16), 0 2px 10px 0px rgba(0, 0, 0, 0.06);
+}
+.pagination {
+    padding: 0;
+}
+.first-session-prompt {
+    background: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.12);
+    background: linear-gradient(to bottom left, #49f5e5 ,#9420f7), url(http://civil808.com/sites/all/themes/sara/images/bg-moshaver2.jpg?ver=1.0.3);
+    background-blend-mode: multiply;
+    color: #fff !important;
+    /* border: solid #F44336; */
+    border-width: 0 5px;
+    text-align: center;
+    font-size: 17px;
+	display: block;
+}
+.page-users .logo {
+    display: none;
+}
+.hozouri {
+    background: #fff;
+    color: #555 !important;
+    border: solid #F44336;
+    border-width: 0 3px;
+    padding: 15px;
+    text-align: center;
+	margin: 20px 0;
+    font-size: 15px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.12);
+}
+.form-item-attributes-5.disabled label{
+    opacity: 0.7;
+}
+.form-item-attributes-5.disabled:before {
+    content: "برای این دوره فقط می توانید به صورت VIP ثبت نام کنید. با ثبت نام در دوره vip در هر سطحی که باشید، آموزش آواز توسط استاد برای شما صورت میپذیرد";
+    position: absolute;
+    background: #fff;
+	box-shadow: 0 1px 6px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.12);
+    border: solid #F44336;
+    border-width: 0 2px;
+    padding: 5px 15px;
+    margin: 5px;
+	z-index: 1;
+}
 

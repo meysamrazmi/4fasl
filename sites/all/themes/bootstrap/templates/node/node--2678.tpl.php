@@ -111,7 +111,7 @@ h1.page-header {
     width: 100%;
     max-width: none;
     background: #f9f9f9;
-    padding-top: 150px;
+    padding-top: 50px;
     margin-top: -200px !important;
     margin-bottom: -2px;
 }
