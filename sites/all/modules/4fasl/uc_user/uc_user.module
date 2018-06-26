@@ -111,6 +111,10 @@ function uc_user_uc_order($op, $order, $status) {
 						}
 					}
 				}
+				
+				if ($product->nid == 2597){// for enrollment registration
+					drupal_goto('enrollment/time-selection');
+				}
             }  
         }
       }
@@ -119,10 +123,11 @@ function uc_user_uc_order($op, $order, $status) {
 
 function uc_user_forms($form_id, $args) {
   $forms = array();
-  $users = entity_load('user');
-  foreach(array_keys($users) as $uid){
-	$forms['student_confirmation_form_'. $uid]['callback'] = 'student_confirmation_form';  
-	$forms['student_node_refrence_form_'. $uid]['callback'] = 'student_node_refrence_form';  
+//  $users = entity_load('user');
+  $users = db_query("SELECT uid from users where uid != 0")->fetchAll();
+  foreach($users as $user){
+	$forms['student_confirmation_form_'. $user->uid]['callback'] = 'student_confirmation_form';  
+	$forms['student_node_refrence_form_'. $user->uid]['callback'] = 'student_node_refrence_form';  
   }
   return $forms;
 }
@@ -247,6 +252,7 @@ function add_collection($user, $instrument , $level , $session) {
 }
 
 function which_teacher($value){
+	return instrument_info('persian_name', $value, array('ostad_uid'), 'online');
 	switch($value){
 		case 'تار':
 			return 164;
@@ -292,12 +298,29 @@ function which_teacher($value){
 		case 'تئوری موسیقی':
 			return 1;
 			break;
+		case 'تنبور':
+			return 7259;
+			break;
+		case 'موسیقی کودک':
+			return 7262;
+			break;
+		case 'آواز پاپ':
+			return 7260;
+			break;
+		case 'فلوت':
+			return 7263;
+			break;
+		case 'آواز ایرانی':
+			return 7313;
+			break;
+
 		default:
 			return false;
 	}
 }
 
 function which_teacher_name($value){
+	return instrument_info('name', $value, array('ostad_uid'), 'online');
 	switch($value){
 		case 'tar':
 			return 164;
@@ -343,12 +366,29 @@ function which_teacher_name($value){
 		case 'music':
 			return 1;
 			break;
+		case 'tanbor'://'تنبور':
+			return 7259;
+			break;
+		case 'orf'://'موسیقی کودک':
+			return 7262;
+			break;
+		case 'avazpop'://'آواز پاپ':
+			return 7260;
+			break;
+		case 'flut'://'فلوت':
+			return 7263;
+			break;
+		case 'avazirani'://'آواز ایرانی':
+			return 7313;
+			break;
+
 		default:
 			return false;
 	}
 }
 
 function which_instrument($value){
+	return instrument_info('persian_name', $value, array('name'), 'online');
 	switch($value){
 		case 'تار':
 			return 'tar';
@@ -392,12 +432,29 @@ function which_instrument($value){
 		case 'تئوری موسیقی':
 			return 'music';
 			break;
+		case 'تنبور':
+			return 'tanbor';
+			break;
+		case 'موسیقی کودک':
+			return 'orf';
+			break;
+		case 'آواز پاپ':
+			return 'avazpop';
+			break;
+		case 'فلوت':
+			return 'flut';
+			break;
+		case 'آواز ایرانی':
+			return 'avazirani';
+			break;
+		
 		default:
 			return false;
 	}
 }
 
 function which_teacher_key($value){
+	return instrument_info('oid', $value, array('ostad_uid'), 'online');
 	switch($value){
 		case 13: //'تار'
 			return 164;
@@ -442,12 +499,29 @@ function which_teacher_key($value){
 		case 2://'تئوری موسیقی':
 			return 1;
 			break;
+		case 47://'تنبور':
+			return 7259;
+			break;
+		case 46://'موسیقی کودک':
+			return 7262;
+			break;
+		case 44://'آواز پاپ':
+			return 7260;
+			break;
+		case 45://'فلوت':
+			return 7263;
+			break;
+		case 48://'آواز ایرانی':
+			return 7313;
+			break;
+
 		default:
 			return false;
 	}
 }
 
 function which_instrument_key($value){
+	return instrument_info('oid', $value, array('name'), 'online');
 	switch($value){
 		case 13: //'تار'
 			return 'tar';
@@ -491,6 +565,22 @@ function which_instrument_key($value){
 		case 2://'تئوری موسیقی':
 			return 1;
 			break;
+		case 47://'تنبور':
+			return 'tanbor';
+			break;
+		case 46://'موسیقی کودک':
+			return 'orf';
+			break;
+		case 44://'آواز پاپ':
+			return 'avazpop';
+			break;
+		case 45://'فلوت':
+			return 'flut';
+			break;
+		case 48://'آواز ایرانی':
+			return 'avazirani';
+			break;
+		
 		default:
 			return false;
 	}
@@ -500,49 +590,7 @@ function which_instrument_key($value){
  * returns uid of teachers by option ids of attribute 5
  */
 function which_teacher_by_TeacherOptionId($value){
-	switch($value){
-		case 30: //'تار'
-			return 164;
-			break;
-		case 29://'تنبک'
-			return 108;
-			break;
-		case 32://'سنتور'
-			return 1996; //کیان
-			break;
-		case 31://'سه تار'
-			return 111;
-			break;
-		case 28://'ویولن'
-			return 107;
-			break;
-		case 33://'پیانو'
-			return 30;
-			break;
-		case 38://'گیتار کلاسیک'	
-			return 64;
-			break;
-		case 35://'گیتار فلامنکو'
-			return 109;
-			break;
-		case 36:// 'گیتار پاپ'
-			return 110;
-			break;
-		case 26://'دف'
-			return 1011;
-			break;
-		case 34://'نی'
-			return 2785;
-			break;
-		case 37://گیتار الکتریک
-			return 3079;
-			break;
-		case 27: //'هارمونیکا':
-			return 3314;
-			break;
-		default:
-			return false;
-	}
+	return instrument_info('Teacher_OptionId', $value, array('ostad_uid'), 'online');
 }
 
 /**
@@ -560,6 +608,11 @@ function student_node_refrence_form($form, &$form_state, $uid) {
 	if (!is_array($form)) {
 		$form = array();
 	}
+	$era_query_settings = array(array('type', 'course', '='));
+	global $user;
+	if(!isset($user->roles[3])){ //admin role id
+		$era_query_settings[] = array('uid', $user->uid, '=');
+	}
 	$form['refrenced_node'] = array(
 		'#type' => 'entityreference', 
 		'#required' => true,
@@ -567,13 +620,9 @@ function student_node_refrence_form($form, &$form_state, $uid) {
 		'#era_entity_type' => 'node',
         '#era_query_settings' => array(
             'limit' => 10,
-            'property_conditions' => array(
-              // 'entity property', 'filter value', 'operator'.
-              array('type', 'course', '='),
-            ),
-/*             'field_conditions' => array(
-              // 'field name', 'column', 'value', 'op', 'delta', 'language'.
-              array('nid', 'title'),
+            'property_conditions' => $era_query_settings,
+/*          'field_conditions' => array(
+				array('nid', 'title'),
             ),	 */		
 		),
 	);

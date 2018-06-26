@@ -69,7 +69,10 @@ function student_films($uid , $detail = false){
     ON field_stu.field_siteinfo_stu_value = instrument.entity_id
     AND field_stu.field_siteinfo_stu_value = _level.entity_id
     AND field_stu.field_siteinfo_stu_value = _session.entity_id
-    WHERE field_stu.entity_type = 'user' AND field_stu.entity_id = :uid";
+    WHERE field_stu.entity_type = 'user' AND field_stu.entity_id = :uid 
+	AND instrument.entity_type = 'field_collection_item' 
+	AND _level.entity_type = 'field_collection_item' 
+	AND _session.entity_type = 'field_collection_item'";
 	
 	$nid_q = "SELECT field_stu.entity_id AS nid
     FROM field_data_field_siteinfo_stu field_stu
@@ -79,11 +82,13 @@ function student_films($uid , $detail = false){
     ON field_stu.field_siteinfo_stu_value = instrument.entity_id
     AND field_stu.field_siteinfo_stu_value = _level.entity_id
     AND field_stu.field_siteinfo_stu_value = _session.entity_id
-    WHERE field_stu.entity_type = 'node' AND instrument.field_instrument_value = :instrument AND _level.field_levelnumber_value = :level AND _session.field_sessionnumber_value = :session";
+    WHERE field_stu.entity_type = 'node' 
+	AND instrument.field_instrument_value = :instrument 
+	AND _level.field_levelnumber_value = :level 
+	AND _session.field_sessionnumber_value = :session";
 	
 	$output = array();
 	$rows = db_query($user_q , array(':uid' => $uid))->fetchAll();
-
 	if($detail){
 		foreach($rows as $row){
 			$result = db_query($nid_q , array(':instrument' => $row->instrument , ':level' => $row->level , ':session' => $row->session))->fetchAll();
@@ -144,10 +149,60 @@ function functions_menu() {
 	'type' => MENU_LOCAL_TASK,
   );
   $items['admin/4fasl-setting'] = array(
-    'title' => 'تنظیمات دوره های 4 فصل',
+    'title' => 'تنظیمات دوره ها',
     'description' => 'در اینجا میتوانید قسمت های مختلف سایت و دوره ها را به یکدیگر متصل کرد و نیازی به تغییر در کد نباشد.',
+    'page callback' => 'site_setting',
+    //'page arguments' => array('site_setting'),
+    'access arguments' => array('administer modules'),
+    'file' => 'functions.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['admin/4fasl-setting/add'] = array(
+    'title' => 'افزودن تنظیمات دوره ها',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('site_setting'),
+    'page arguments' => array('add_site_setting'),
+    'access arguments' => array('administer modules'),
+    'file' => 'functions.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['admin/4fasl-setting/%/edit'] = array(
+    'title' => 'ویرایش تنظیمات دوره ها',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('edit_site_setting', 2),
+    'access arguments' => array('administer modules'),
+    'file' => 'functions.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['admin/4fasl-setting/get'] = array(
+    'page callback' => 'get_site_setting',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/4fasl-setting/get/%'] = array(
+    'page callback' => 'get_site_setting',
+    'page arguments' => array(3),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['time-selection/%'] = array(
+    'page callback' => 'time_selection',
+    'type' => MENU_CALLBACK,
+	'page arguments' => array(1),
+    'access arguments' => array('access content'),
+	//'delivery callback' => 'custom_ajax_callback',
+  );
+  $items['admin/people/relationships/%user_relationships/edit'] = array(
+    'title' => 'ویرایش روابط کاربران',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('edit_relationship', 3),
+    'access arguments' => array('administer modules'),
+    'file' => 'functions.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['admin/people/relationships/add'] = array(
+    'title' => 'افزودن روابط کاربران',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('add_relationship'),
     'access arguments' => array('administer modules'),
     'file' => 'functions.admin.inc',
     'type' => MENU_NORMAL_ITEM,
@@ -358,9 +413,11 @@ function functions_node_access($node, $op, $account){
 }
 
 
-function instrument_info($condition = '', $value = '', $fileds = array()){
+function instrument_info($condition = '', $value = '', $fileds = array(), $type = 'both'){
 	$q = db_select('site_settings', 's')->fields('s', $fileds);
 	if($condition != '') $q = $q->condition($condition, $value, '=');
+	$q = ($type == 'both')? $q : $q->condition('type', array($type, 'both'), 'IN');	
+	$q = $q->orderBy('type', 'ASC');
 	$q = $q->execute()->fetchObject();
 	
 	if (is_object($q)){ 
@@ -370,4 +427,281 @@ function instrument_info($condition = '', $value = '', $fileds = array()){
 			return $q;
 		}
 	}
+}
+
+/*
+ * example: 
+ 	$new_array = array_map(function ($v) {
+		return parse($v, "...", 3);
+	}, $orginal_array);
+ */
+function parse($v, $r, $max_d = 1, $d = 0) {
+  if (is_array($v) || is_object($v)) {
+    if ($d >= $max_d) {
+      return $r;
+    } else {
+      $d++;
+      return array_map(function ($v) use ($max_d, $r,  $d) {
+        return parse($v, $r, $max_d, $d);
+      }, $v);   
+    }
+  } else {
+    return $v;
+  }
+}
+	
+function time_selection($ostad_uid){ 
+	$query = "SELECT 
+					f.delta as delta,
+					days.field_days_value as days, 
+					times.field_time_value as times, 
+					en.field_enable_value as enabled, 
+					stu.field_user_uid as stu
+					
+					FROM `field_data_field_classes_timing` f
+					
+					LEFT JOIN field_data_field_enable en ON en.entity_id = f.field_classes_timing_value and en.bundle = 'field_classes_timing'
+					LEFT JOIN field_data_field_time times  ON times.entity_id = f.field_classes_timing_value and times.bundle = 'field_classes_timing'
+					LEFT JOIN field_data_field_days days ON days.entity_id = f.field_classes_timing_value and days.bundle = 'field_classes_timing'
+					LEFT JOIN field_data_field_user stu ON stu.entity_id = f.field_classes_timing_value and stu.bundle = 'field_classes_timing'
+					
+					WHERE f.entity_type = 'user' and f.entity_id = :uid
+					ORDER BY delta";
+	$result = db_query($query, array(':uid' => $ostad_uid))->fetchAll();
+
+		$timing = array();
+		foreach($result as $row){
+			$timing[$row->days][] = $row;
+		}
+		$output = '
+		<form id="time-selection" method="post" action="/enrollment/time-selection" accept-charset="UTF-8">
+		<table class="classes-timing">
+			<tbody>
+		';
+		foreach($timing as $day_key => $day){
+			$output .= '<tr>';
+			$output .= '<td class="day-name">'. translate_days($day_key) .'</td>';
+			$odd = true;
+			foreach($day as $time){
+				$output .= ($odd)? '<td>' : '';
+				$output .= '<label class="'. (is_null($time->stu)? 'empty ' : 'busy ') . (($time->enabled == 1)? 'enabled ' : 'disabled ') .'">'; 
+				//$output .= '<input type="radio" name="time_select" value="select_'. $day_key .'_'. $time->times .'" '. (!is_null($time->stu) || ($time->enabled == 0)? 'disabled' : '') .' required>';
+				$output .= translate_hours($time->times);
+				$output .= '</label>';
+				$output .= ($odd)? '':'</td>' ;
+	
+				$odd = ($odd)? false : true;
+			}
+			$output .= '</tr>';
+		}
+		$output .= '
+			</tbody>
+		</table>';
+		// if($bought > 0){
+			// $output .= '<input id="ostad-id" type="hidden" name="ostad_uid" value="'. $ostad_uid .'">
+				// <button type="submit" name="submit" value="Submit" class="btn btn-success">تایید و ارسال</button>';
+		// }
+		$output .= '</form>';
+		
+	if($ostad_uid == 7262){
+		$output = '<p class="hozouri">این کلاس به صورت گروهی برگزار می شود. برای شرکت در این کلاس با دفتر آموزشگاه با شماره های 44044497 - 44043963 تماس بگیرید.</p>' ;
+	}
+
+	$data = array('timing' => $output);
+
+	drupal_json_output($data);
+	drupal_exit();
+	return $data;
+}
+
+function translate_days($value){
+	switch($value){
+		case 0:
+			return 'شنبه';
+			break;
+		case 1:
+			return 'یکشنبه';
+			break;
+		case 2:
+			return 'دوشنبه';
+			break;
+		case 3:
+			return 'سه شنبه';
+			break;
+		case 4:
+			return 'چهارشنبه';
+			break;
+		case 5:
+			return 'پنجشنبه';
+			break;
+		case 6:
+			return 'جمعه';
+			break;
+		default:
+			return false;
+	}
+}
+
+function translate_hours($value){
+	switch($value){
+		case '1000':
+			return '10';
+			break;
+		case '1030':
+			return '10:30';
+			break;
+		case '1100':
+			return '11';
+			break;
+		case '1130':
+			return '11:30';
+			break;
+		case '1200':
+			return '12';
+			break;
+		case '1230':
+			return '12:30';
+			break;
+		case '1300':
+			return '13';
+			break;
+		case '1330':
+			return '13:30';
+			break;
+		case '1400':
+			return '14';
+			break;
+		case '1430':
+			return '14:30';
+			break;
+		case '1500':
+			return '15';
+			break;
+		case '1530':
+			return '15:30';
+			break;
+		case '1600':
+			return '16';
+			break;
+		case '1630':
+			return '16:30';
+			break;
+		case '1700':
+			return '17';
+			break;
+		case '1730':
+			return '17:30';
+			break;
+		case '1800':
+			return '18';
+			break;
+		case '1830':
+			return '18:30';
+			break;
+		case '1900':
+			return '19';
+			break;
+		case '1930':
+			return '19:30';
+			break;
+		case '2000':
+			return '20';
+			break;
+		case '2030':
+			return '20:30';
+			break;
+		default:
+			return '';
+	}
+}
+
+function test_input($data) {
+  $data = trim($data);
+  $data = stripslashes($data);
+  $data = htmlspecialchars($data);
+  return $data;
+}
+
+function custom_ajax_callback($page_callback_result) {
+   // Only render content and validates return
+  $content = is_string($page_callback_result) ? $page_callback_result :   drupal_render($page_callback_result);
+  $html = '' . drupal_get_css() . drupal_get_js() . '' . $content . '';
+  print $html;
+  drupal_page_footer(); 
+}
+
+function translate_teachers_att_id($att_id){
+	return instrument_info('Teacher_OptionId',$att_id,array('ostad_uid'));
+	switch($att_id){
+		case 30: //'تار'
+			return 164;
+			break;
+		case 29://'تنبک'
+			return 108;
+			break;
+		case 32://'سنتور'
+			// return 106; //پوربخت
+			return 1996; //کیان
+			break;
+		case 31://'سه تار'
+			return 111;
+			break;
+		case 28://'ویولن'
+			return 107;
+			break;
+		case 33://'پیانو'
+			return 30;
+			break;
+		case 38://'گیتار کلاسیک'	
+			return 64;
+			break;
+		case 35://'گیتار فلامنکو'
+			return 109;
+			break;
+		case 36:// 'گیتار پاپ'
+			return 110;
+			break;
+		case 42:// 'آواز پاپ'
+			return 7260;
+			break;
+		case 34:// 'نی'
+			return 2785;
+			break;
+		case 37://گیتار الکتریک
+			return 3079;
+			break;
+		case 27: //'هارمونیکا':
+			return 3314;
+			break;
+		case 39://مسیح کریمی
+			return 7259;
+			break;
+		case 40://سرور رضازاده
+			return 7261;
+			break;
+		case 41://پوریا عطاکویی
+			return 7262;
+			break;
+		case 43://'تئوری موسیقی':
+			return 7263;
+			break;
+		case 49://صادق شیخ زاده:
+			return 7313;
+			break;
+
+		default:
+			return false;
+	}
+}
+
+function get_site_setting($type = 'both', $fileds = array()){
+	$q = db_select('site_settings', 's')->fields('s', $fileds);
+	$q = ($type == 'both')? $q : $q->condition('type', array($type, 'both'), 'IN');
+	$result = $q->execute()->fetchAll();
+	
+	$data = array('timing' => $result);
+
+	drupal_json_output($result);
+	drupal_exit();
+	return $result;
 }

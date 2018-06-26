@@ -234,6 +234,7 @@ function support_menu() {
     'page callback' => 'support_admin_menu_block_page',
     'access arguments' => array('administer support'),
     'file' => 'support.admin.inc',
+    'type' => MENU_LOCAL_TASK,
   );
 
   $items['admin/support/clients/list'] = array(
