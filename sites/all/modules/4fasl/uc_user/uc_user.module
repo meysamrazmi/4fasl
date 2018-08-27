@@ -39,54 +39,23 @@ function uc_user_uc_order($op, $order, $status) {
 					}
 				}
 				// mdump($product, true);
-				if(isset($product->data['attributes']['instrument']) && $product->nid != 1086){
-					foreach ($product->data['attributes']['instrument'] as $key=> $value) {
-
-						if ($product->nid == 35){ // registration in a course
-							if(which_instrument_key($key) != false){
-								//update the user 'field_collection' data
-								add_collection($order_user , which_instrument_key($key) , 'l1' , '1');
-								//update the user favorite instrument
-								$field_favorite['und'][0]['value'] =  which_instrument_key($key);
-								$order_user = user_save($order_user, array('field_favorite' => $field_favorite));
-							} else{
-								drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 4 , '@val' => $value ,)), 'error');
-							}
-						}
-						
-						if(which_teacher_key($key) != false){
-							$type = 1; //for student relationship type for default
-							$approved = true ;
-							if($product->nid == 142){ //vip registration
-								$type = 3; //for vip relationship type
-							}
-
-							if(($relationship = user_relationships_request_relationship($order->uid, which_teacher_key($key) , $type , $approved)) !== FALSE){
-								//message has been set in the function itself
-							} else{
-								drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 5 , '@val' => $value ,)), 'error');
-							}
-						} else{
-							drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 6 , '@val' => $value ,)), 'error');
-						}					
-					}
-				}
 				
-				if($product->nid == 1086 && isset($product->data['attributes']['instrument']) ){ // registration in a course
+				if($product->nid == 1086 ){ // registration in online courses
 					foreach ($product->data['attributes']['instrument'] as $key=> $value) {
 
-						if(which_instrument_key($key) != false){
-							//update the user 'field_collection' data
-							add_collection($order_user , which_instrument_key($key) , 'l1' , '1');
-							//update the user favorite instrument
-							$field_favorite['und'][0]['value'] =  which_instrument_key($key);
+						if(instrument_info('oid', $key, array('name'), 'online') != false){
+
+							add_collection($order_user , instrument_info('oid', $key, array('name'), 'online') , 'l1' , '1');
+							
+							$field_favorite['und'][0]['value'] =  instrument_info('oid', $key, array('name'), 'online');
 							$order_user = user_save($order_user, array('field_favorite' => $field_favorite));
 						} else{
 							drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 4 , '@val' => $value ,)), 'error');
 						}
 						
 						if(isset($product->data['attributes']['teacher']) && key($product->data['attributes']['teacher']) ){
-							$teacher_uid = which_teacher_by_TeacherOptionId(key($product->data['attributes']['teacher']));
+							$teacher_oid = key($product->data['attributes']['teacher']);
+							$teacher_uid = instrument_info('Teacher_OptionId', $teacher_oid, array('ostad_uid'), 'online');
 							if($teacher_uid == false){
 								continue; //skip the rest
 							}
@@ -112,7 +81,7 @@ function uc_user_uc_order($op, $order, $status) {
 					}
 				}
 				
-				if ($product->nid == 2597){// for enrollment registration
+				if ($product->nid == 2597){// for offline registration
 					drupal_goto('enrollment/time-selection');
 				}
             }  

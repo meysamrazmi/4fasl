@@ -486,10 +486,11 @@ function file_access_form_node_form_alter(&$form, &$form_state, $form_id) {
       if (!isset($private_files[$field_name]) || !in_array($field_name, $private_fields)) {
         continue;
       }
+	  global $user;
       $section = 'file_access-' . $field_name;
       $form[$section] = array(
         '#type' => 'fieldset',
-        '#access' => user_access('set file access'),
+        '#access' => isset($user->roles[3]), //user_access('set file access'),
         '#tree' => TRUE,
         '#title' => t('File access'),
         '#collapsible' => TRUE,

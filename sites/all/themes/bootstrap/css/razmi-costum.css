@@ -1608,25 +1608,21 @@ td.field_collection_item_operations {
   background-repeat: no-repeat;
 }
 .add-practice:before, .add-practice:after {
-  content: "_";
-  font-family: fa;
-  position: absolute;
-  font-size: 35px;
-  text-align: center;
-  width: 50px;
-  line-height: 12px;
-  transition: all 0.1s;
+    content: "\f415";
+    font-family: mat;
+    position: absolute;
+    font-size: 24px;
+    text-align: center;
+    width: 50px;
+    line-height: 50px;
+    transition: all 0.1s;
+}
+.add-practice.open:not(.disabeld):before {
+    transform: rotate(-90deg);
+    opacity: 0;
 }
 .add-practice:after {
-  transform: rotate(90deg);
-  text-align: center;
-  left: 18px;
-  top: 19px;
-}
-.add-practice.open:not(.disabeld):after {
-  transform: rotate(0);
-  left: 0px;
-  top: 0;
+    content: "\f374";
 }
 #block-formblock-support-ticket,
 .field-name-add-practice,
@@ -1999,21 +1995,19 @@ div#order-pane-line_items {
 }
 div#userpoints_list_wrapper {
   display: flex ;
-  /*flex-direction: row-reverse;*/
+    flex-direction: column;
 }
 div#userpoints_list_wrapper > div:nth-child(2) {
-  width: 20%;
-  padding: 0;
+    width: 300px;
+	padding: 0;
 }
 div#userpoints_list_wrapper > div:nth-child(1) {
-  width: 78%;
-  margin: 1%;
+    padding: 0;
+	box-shadow: 0 1px 6px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.12);
 }
 table.userpoints-myuserpoints-total {
   min-width: 190px;
-  min-width: inherit;
-  width: 100%;
-  display: block;
+    margin: 0;
 }
 table.userpoints-myuserpoints-total > *, 
 table.userpoints-myuserpoints-total tr {
@@ -2031,10 +2025,6 @@ table.userpoints-myuserpoints-total td:nth-child(1) {
   width: 70%;
 }
 table.userpoints-myuserpoints-total thead {
-  background: #D81B60;
-  color: #fff;
-  display: block;
-  width: 100%;
 }
 table.userpoints-myuserpoints-total th {
   border-bottom: none !important;
@@ -7413,4 +7403,115 @@ html, body {
     margin: 5px;
 	z-index: 1;
 }
+.me-cannotplay {
+    width: 100% !important;
+    height: 100% !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.me-cannotplay a {
+    width: 300px;
+    text-align: center;
+    background: #fff;
+    height: 100px;
+    display: flex;
+	flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: solid #F44336;
+    border-width: 0 5px;
+    border-radius: 3px;
+    color: #555;
+    font-size: 16px;
+}
+.me-cannotplay a:before {
+    content: "\f162";
+    font-family: mat;
+    font-size: 34px;
+    color: #2196F3;
+}
+form#user-charge {
+	max-width: 600px;
+	margin: 150px auto 0;
+	padding: 15px;
+	background-color: #fff;
+	box-shadow: 0 1px 6px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.12);
+	border-bottom: 2px solid #673AB7;
+	position: relative;
+}
+form#user-charge:before {
+	content: "\f19b";
+	font-family: mat;
+	font-weight: normal;
+	display: block;
+	font-size: 110px;
+	color: #666;
+	position: absolute;
+	top: -140px;
+	right: calc(50% - 55px);
+}
+.avail-points {
+	background: #f5f5f5;
+	border: solid #6d0;
+	padding: 10px 15px;
+	width: 370px;
+	margin: 35px auto 20px;
+	border-width: 0 5px;
+	text-align: center;
+	line-height: 35px;
+}
+form#user-charge .form-item-price {
+	display: inline-block;
+	width: 65%;
+	margin-top: 15px;
+}
+form#user-charge button#edit-submit {
+	float: none;
+	display: inline-block;
+	height: 37px;
+	vertical-align: top;
+	margin: 41px -5px 0 0;
+	z-index: 2;
+	position: relative;
+	border-radius: 2px 0 0 2px;
+	line-height: 20px;
+	box-shadow: rgba(0,0,0,0.117647) -3px 1px 6px, rgba(0,0,0,0.117647) 0 1px 4px;
+	border: 0;
+	outline: 0;
+	color: #fff !important;
+	background-color: #4caf50;
+}
+form#user-charge .form-item-price input, 
+form#user-charge .form-item-price input:focus {
+	width: 100%;
+	box-sizing: border-box;
+	height: 35px;
+	border: 0;
+	box-shadow: 0 0 10px -3px rgba(0,0,0,0.5);
+	box-shadow: rgba(0,0,0,0.117647) 0 1px 6px,rgba(0,0,0,0.117647) 0 1px 4px !important;
+}
+div#smile {
+	width: 100%;
+	position: relative;
+	right: 0;
+	z-index: 1;
+	background: #fffafa;
+	text-align: center;
+	padding: 20px 50px;
+	border: solid #ffc107;
+	border-width: 0 5px;
+}
+#smile canvas {
+	position: absolute;
+	width: 100%;
+	z-index: 3;
+	display: block;
+	top: 0;
+	right: 0;
+	height: 100%;
+}
+
+
+
 

@@ -175,7 +175,7 @@ function edit_site_setting($form, $form_state, $id){
 		'#format' => 'full_html',
 		'#title' => t('Teacher Intro'),
 		'#default_value' => $result->Teacher_Intro,
-		'#description' => '<div style="line-height: 0;margin: 20px 0;background: #f5f5f5;padding: 15px 10px 5px;">'. isset($ostad->field_tea_bio['und'][0]['value'])? $ostad->field_tea_bio['und'][0]['value'] : '' .'</div>'
+		'#description' => '<div style="line-height: 0;margin: 20px 0;background: #f5f5f5;padding: 15px 10px 5px;">'. isset($ostad->field_tea_bio['und'][0]['value'])? $ostad->field_tea_bio['und'][0]['value'] : '' .'</div>',
 	);
 	$form['aid'] = array(
 		'#type' => 'textfield',
@@ -202,7 +202,7 @@ function add_site_setting_submit($form, &$form_state){
 			'name' => 					$form_state['values']['name'],
 			'ostad_uid' => 			$form_state['values']['ostad_uid'],
 			'Teacher_OptionId' => 	$form_state['values']['Teacher_OptionId'],
-			'Teacher_Intro' => 		$form_state['values']['Teacher_Intro'],
+			'Teacher_Intro' => 		$form_state['values']['Teacher_Intro']['value'],
 			))
 		->execute();
 	$form_state['redirect'] = 'admin/4fasl-setting';
@@ -218,7 +218,7 @@ function edit_site_setting_submit($form, &$form_state){
 			'name' => 					$form_state['values']['name'],
 			'ostad_uid' => 			$form_state['values']['ostad_uid'],
 			'Teacher_OptionId' => 	$form_state['values']['Teacher_OptionId'],
-			'Teacher_Intro' => 		$form_state['values']['Teacher_Intro'],
+			'Teacher_Intro' => 		$form_state['values']['Teacher_Intro']['value'],
 			))
 		->condition('id', $form_state['values']['id'])
 		->execute();

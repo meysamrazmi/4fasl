@@ -684,6 +684,11 @@ a.btn.btn-primary {
 a.btn.btn-primary:hover {
     background: #004c99;
 }
+.view-admin-views-user .feed-icon {
+    position: absolute;
+    top: 0;
+    left: 30px;
+}
 
 
 

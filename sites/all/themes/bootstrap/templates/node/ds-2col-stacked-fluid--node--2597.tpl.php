@@ -415,6 +415,9 @@ var SelectingTeacher = function(){
 };
 
 var TeachersItems = function(key){
+	//به صورت پیش فرض تو تنظیمات دروپال یکی از آیتم ها انتخاب شده که به این صورت برش میدارم
+	$('.attribute-7').find('.form-item input').attr( "checked" , false)
+	
 	$item = $('#edit-attributes-7 .form-item input#edit-attributes-7-' + key.Teacher_OptionId).closest('.form-item')
 	$item.css({'display':'block'}).addClass('acrive').append('<div class="teacher-intro">' + key.Teacher_Intro + '<p style="margin-top: 15px;"><button type="button" class="btn btn-info" data-toggle="modal" data-target=".ostad-timing" ostad="'+ key.ostad_uid +'">مشاهده برنامه زمانی استاد</button></p></div>');
 }

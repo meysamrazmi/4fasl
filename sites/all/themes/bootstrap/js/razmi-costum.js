@@ -75,6 +75,11 @@ if($('.field-name-add-practice, #block-formblock-homework').length){
 		}else{
 			$('[id*="edit-field-vip-und"]').prop('checked', false);
 		}
+		if($('.offline-practices').length){
+			$('[id*="edit-field-enable-und"]').prop('checked', true);
+		}else{
+			$('[id*="edit-field-enable-und"]').prop('checked', false);
+		}
 	});
 	$('.add-practice.disabeld , #mini-panel-right_side .user-practice a.disabeld').click(function(e){
 		e.preventDefault();

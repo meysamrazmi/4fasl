@@ -111,7 +111,7 @@ function student_films($uid , $detail = false){
 function timetoexpire($uid){
 	$q = db_select('uc_roles_expirations', 'r');
 	$rows = $q->fields('r', array())->condition('r.uid', $uid)->execute()->fetchAll();
-	$timetoexpire = 0;
+	$timetoexpire = $offline = 0;
 	$timetoexpire_vip = 0;
 	foreach ($rows as $r) {
 		if($r->rid == 4){ //honarjo role id
@@ -120,9 +120,12 @@ function timetoexpire($uid){
 		}else if($r->rid == 6){//vip role id
 			$timetoexpire_vip = $r->expiration - time() ;
 			$timetoexpire_vip = $timetoexpire_vip / (24*60*60) ;
+		}else if($r->rid == 9){//offline role id
+			$offline = $r->expiration - time() ;
+			$offline = $offline / (24*60*60) ;
 		}
 	}
-	return array('honarjo'=> $timetoexpire , 'vip'=> $timetoexpire_vip);
+	return array('honarjo'=> $timetoexpire , 'vip'=> $timetoexpire_vip, 'offline'=> $offline);
 }
 
 function mdump($var , $die = false){
@@ -207,7 +210,22 @@ function functions_menu() {
     'file' => 'functions.admin.inc',
     'type' => MENU_NORMAL_ITEM,
   );
-
+	$items['user/%/money/charge'] = array(
+		'title' => 'شارژ حساب کاربری',
+		'page callback' => 'drupal_get_form',
+		'access arguments' => array('edit own main profile'),
+		'page arguments' => array('user_charge', 1),
+		'description' => t('Accounting Charge'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+	$items['bankcallback/%'] = array(
+		'title' => 'Accounting bank callback',
+		'page callback' => 'bankcallback',
+		'access arguments' => array('access content'),
+		'page arguments' => array(1),
+		'description' => t('Accounting bank callback'),
+		'type' => MENU_CALLBACK,
+	);		
   return $items;
 }
 
@@ -336,8 +354,10 @@ function functions_user_presave(&$edit, $account, $category) {
 
   // Grant a new role if a new temporary role is added.
   if (isset($edit['new_role']) && $edit['new_role'] && $category == 'account') {
+	$type = 1; //شاگرد relationship id
+
 	if($edit['new_role_add'] == 4){//honarjo role id
-		$type = 1; //شاگرد relationship id
+
 		//update the user 'field_collection' data
 		$expires = timetoexpire($account->uid);
 		if($expires['honarjo'] == 0){
@@ -347,9 +367,8 @@ function functions_user_presave(&$edit, $account, $category) {
 		$type = 3; //vip relationship id
 	}
 
-	if(($relationship = user_relationships_request_relationship($account->uid, which_teacher_name($account->field_favorite['und'][0]['value']) , $type , true)) !== FALSE){
-		//message has been set in the function itself
-	} else{
+	$relationship = user_relationships_request_relationship($account->uid, which_teacher_name($account->field_favorite['und'][0]['value']) , $type , true);
+	if($relationship === FALSE){
 		drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 5 , '@val' => '' ,)), 'error');
 	}
   }
@@ -364,10 +383,11 @@ function functions_user_presave(&$edit, $account, $category) {
 		}elseif($rid == 6){//vip role id
 			$rtid = 3; //vip relationship id
 		}
-		db_delete('user_relationships')
-			->condition('requester_id', $account->uid)
-			->condition('rtid', $rtid)
-			->execute();
+		if(isset($rtid))
+			db_delete('user_relationships')
+				->condition('requester_id', $account->uid)
+				->condition('rtid', $rtid)
+				->execute();
 
         uc_roles_delete($account, $rid);
       }
@@ -503,7 +523,7 @@ function time_selection($ostad_uid){
 		// }
 		$output .= '</form>';
 		
-	if($ostad_uid == 7262){
+	if($ostad_uid == 7262 || $ostad_uid == 1011){
 		$output = '<p class="hozouri">این کلاس به صورت گروهی برگزار می شود. برای شرکت در این کلاس با دفتر آموزشگاه با شماره های 44044497 - 44043963 تماس بگیرید.</p>' ;
 	}
 
@@ -703,5 +723,213 @@ function get_site_setting($type = 'both', $fileds = array()){
 
 	drupal_json_output($result);
 	drupal_exit();
+	return $result;
+}
+
+
+/**
+ * menu callbak handler for user_charge
+ */
+function user_charge($form, &$form_state, $uid) {
+	$form['text'] = array(
+		'#markup' => t('charge_your_account_hint'),
+		);
+	$form['your_charge'] = array(
+		'#prefix' => '<div>',
+		'#suffix' => '</div>',
+		'#markup' => '<div class="avail-points">'. t('Your current point is <strong>!point</strong>', array('!point' => formatMoney(userpoints_get_current_points($uid, 'all')))) . '</div>',
+		);
+	$form['uid'] = array(
+		'#type' => 'hidden',
+		'#value' => $uid,
+		);
+	$form['price'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Charge amount'),
+		'#required' => TRUE,
+		'#attributes' => array('placeholder' => t('Charge amount in toman')),
+		);
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => 'شارژ اعتبار حساب',
+		);
+		/*
+		*	برای تخفیفات گروهی برای 20 درصد شارژ هدیه
+		*
+	$form['festival'] = array(
+		'#markup' => '<div id="smile">
+			<canvas>
+			</canvas>
+			<div class="festival">تخفیف 20 درصد به مناسبت جشنواره عید تا عید</div>
+			<div class="last-price">مبلغ نهایی شارژ: <span></span> تومان</div>
+			</div>',
+		);*/
+
+	return $form;
+}
+
+/**
+ * validate handler for user_charge
+ */
+function user_charge_validate($form, &$form_state) {
+	if($form_state['values']['price'] < 1000 && $form_state['values']['uid'] != 1) {
+		form_set_error('price', 'میزان شارژ می بایست بیشتر از ۱۰۰۰ تومان باشد.');
+	}
+}
+
+/**
+ * Summit handler for user_charge
+ */
+function user_charge_submit($form, &$form_state) {
+	$uid = $form_state['values']['uid'];
+	global $base_url;
+	$price = intval($form_state['values']['price']);
+	$resnumber = time();
+	$description = 'شارژ حساب کاربری';
+
+	$result = zarinpal_send($price, $uid , $description , $resnumber, $base_url."/bankcallback/". $resnumber ,'charge', 'charge' );	
+}
+
+function bankcallback($resnumber) {
+	$event = get_bank_event($resnumber);
+	if(!$event){
+		global $user;
+		drupal_set_message('متاسفانه عملیات بانکی ناموفق  پایان یافته است.', 'error');
+		drupal_goto('/user/'. $user->uid .'/money/charge');		
+	}
+	$price = $event->value;
+	$result = zarinpal_receive($resnumber, $price);
+
+	update_bank_event($resnumber, $result['message'], $result['refnumber']);
+	if($result['message'] == 'success') {
+		drupal_set_message('حساب کاربری شما شارژ شد.', 'status');
+		$params = array(
+		  'uid' => $event->user,
+		  'points' => ($price * 1), /* ($price * 1.2) شارژ اضافه برای جشنواره*/
+		  'operation' => 'از طریق بانک شارژ شده',
+		);
+		userpoints_userpointsapi($params);
+		drupal_goto('/user/'. $event->user);
+	} 
+	else {
+		drupal_set_message('متاسفانه عملیات بانکی ناموفق  پایان یافته است.', 'error');
+		drupal_goto('/user/'. $event->user .'/money/charge');
+	}
+}
+
+function zarinpal_send($Amount , $uid , $Description , $resnumber  , $CallbackURL , $type , $type_description){
+	$user = user_load($uid);
+	$Email = $user->mail;
+	$Mobile = isset($user->field_text_mobile['und'][0]['value'])? $user->field_text_mobile['und'][0]['value'] : "";
+	
+	$api = variable_get('uc_zarinpal_MerchantID', '');
+	
+	$client = new SoapClient('https://ir.zarinpal.com/pg/services/WebGate/wsdl', array('encoding' => 'UTF-8'));
+	$result = $client->PaymentRequest(
+		array(
+			'MerchantID' 	=> $api,
+			'Amount' 	=> $Amount,
+			'Description' 	=> $Description,
+			'Email' 	=> $Email,
+			'Mobile' 	=> $Mobile,
+			'CallbackURL' 	=> $CallbackURL
+		)
+	);
+
+	if($result->Status == 100){
+		add_bank_event($Amount, $type , $type_description , $uid, array('id' => $resnumber) );
+		Header('Location: https://www.zarinpal.com/pg/StartPay/'. $result->Authority);
+		die();
+	} else {
+		drupal_set_message(t('لطفا با پشتیبانی تماس بگیرید. کد خطا: %code' , array('%code' => $result->Status)), 'error');
+		drupal_goto($CallbackURL);
+	}
+}
+
+function zarinpal_receive($resnumber , $Amount){
+	if(isset($_GET['Status']) && $_GET['Status'] == 'OK'){
+		$Authority = $_GET['Authority'];
+		$Status = $_GET['Status'];
+
+		$api = variable_get('uc_zarinpal_MerchantID', '');
+		$client = new SoapClient('https://ir.zarinpal.com/pg/services/WebGate/wsdl', array('encoding' => 'UTF-8'));
+		$result = $client->PaymentVerification(
+			array(
+				'MerchantID'	 => $api,
+				'Authority' 	 => $Authority,
+				'Amount'	 => $Amount
+			)
+		);
+
+		$Status = $result->Status ;
+		$Refnumber = $result->RefID;
+
+		if($Status == 100)// Your Peyment Code Only This Event
+		{
+			return array(
+				'message'=>'success',
+				'resnumber' => $resnumber,
+				'refnumber' => $Refnumber,
+				'price' => $Amount);
+		}else{
+			return array(
+				'message'=> 'fail(' . $Status . ')',
+				'resnumber' => -1,
+				'refnumber' => -1,
+				'price' => -1);
+		}
+	}else{
+		return array(
+				'message'=>'fail',
+				'resnumber' => -1,
+				'refnumber' => -1,
+				'price' => -1);
+	}
+}
+
+function formatMoney($number, $fractional=false) { 
+    if ($fractional) { 
+        $number = sprintf('%.2f', $number); 
+    } 
+    while (true) { 
+        $replaced = preg_replace('/(-?\d+)(\d\d\d)/', '$1,$2', $number); 
+        if ($replaced != $number) { 
+            $number = $replaced; 
+        } else { 
+            break; 
+        } 
+    } 
+    return $number; 
+}
+
+function add_bank_event($price, $name, $text, $user = 0, $attr = array() ) {
+	$query = "INSERT INTO {bank_events} (id, user, name, value, text, date, status) VALUES (:id, :user, :name, :value, :text, :date, :status)";
+	
+	$queryParams = array(
+		':id' => isset($attr['id'])? $attr['id'] : NULL,
+		':user' => $user,
+		':name' => $name,
+		':text' => $text,
+		':value' => $price,
+		':status' => isset($attr['status'])?$attr['status']:'pending',
+		':date' => time()
+	);
+	$result = db_query($query, $queryParams, array('return' => Database::RETURN_INSERT_ID));
+	return $result;
+}
+
+function get_bank_event($resnumber) {
+	return db_select('bank_events', 'b')->fields('b', array()) ->condition('id', $resnumber)->execute()->fetch();
+}
+
+function update_bank_event($id, $status, $refnum) {
+	$query = "UPDATE {bank_events} SET status = :status , date = :date, refference = :refference WHERE id = :id";
+	$queryParams = array(
+		':id' => $id,
+		':status' => $status,
+		':date' => time(),
+		':refference' => $refnum
+		);
+	$result = db_query($query, $queryParams);
 	return $result;
 }

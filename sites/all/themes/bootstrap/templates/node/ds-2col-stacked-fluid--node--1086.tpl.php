@@ -82,7 +82,7 @@ $('div#edit-attributes-3 .form-item').each(function(){
 	$(this).find('label').append('<p class="course-link"><a href="/'+ translate_optionsId[$(this).find('input').attr('value')].name +'" target="_blank">معرفی دوره</a></p>');
 });  
 $('div#edit-attributes-7 .form-item').each(function(){
-	$(this).addClass('col-lg-2 col-md-3 col-sm-4 col-xs-6 card-view');
+	$(this).addClass('col-lg-2 col-md-3 col-sm-4 col-xs-6 card-view').css({'display':'none'});
 });
 $('div#edit-attributes-3 .form-item input, div#edit-attributes-7 .form-item input, div#edit-attributes-5 .form-item input').change(function(){
 	if($(this).hasClass('form-radio')){
@@ -206,27 +206,31 @@ var SelectingTeacher = function(){
 			selected.push(parseInt($(this).attr('id').substr(18)));
 		}
 	});
-	var key ;
+	$('#edit-attributes-7 .acrive').css({'display':'none'}).removeClass('acrive')
+	$('#edit-attributes-7 .teacher-intro').remove();
 	Object.keys(translate_options).map(function(objectKey) {
 		var value = translate_options[objectKey];
 		if(value.oid == selected[0]){
-			key = value;
-			if(!$('.attribute-7 .teacher-intro').length)
-				$('.attribute-7 > .form-item-attributes-7').append('<div class="col-lg-10 col-md-9 col-sm-8 col-xs-6 teacher-intro"></div>');
-			return ;
+			TeachersItems(value)
 		}
 	});
-	$('#edit-attributes-7 .form-item').each(function(){
-		if($(this).find('input').attr('id') == ('edit-attributes-7-'+ key.Teacher_OptionId)){
-			$(this).css({'display':'block'}).addClass('acrive');
-			$(this).find('input').prop('checked', true);
-			$(this).find('label').addClass('selected');
-			$('.attribute-7 .teacher-intro').html(key.Teacher_Intro);
-		}else{
-			$(this).css({'display':'none'}).removeClass('acrive');
-		}
-	});
+	if($('#edit-attributes-7 .acrive').length == 1){
+		$('#edit-attributes-7 .acrive').find('input').prop('checked', true);
+		$('#edit-attributes-7 .acrive').find('label').addClass('selected');
+	}
 };
+
+var TeachersItems = function(key){
+	//به صورت پیش فرض تو تنظیمات دروپال یکی از آیتم ها انتخاب شده که به این صورت برش میدارم
+	$('.attribute-7').find('.form-item input').attr( "checked" , false)
+	
+	$item = $('#edit-attributes-7 .form-item input#edit-attributes-7-' + key.Teacher_OptionId).closest('.form-item')
+	$item.css({'display':'block'}).addClass('acrive').append('<div class="teacher-intro">' + key.Teacher_Intro + '</div>');
+	
+	if(key.Teacher_OptionId == 56){//فرهاد صفری
+		$item.find('.teacher-intro').prepend('<div class="alert alert-info just-vip" role="alert">ثبت نام در کلاسهای مجازی استاد فرهاد صفری منوط به آشنایی قبلی هنرجو با نوازندگی تنبک بوده و فقط به صورت VIP می باشد. جهت تایید برای شرکت در کلاس آقای صفری میتوانید در بخش تعیین سطح نمونه ای از نوازندگی خود را ارسال کنید.</div>')
+	}
+}
 
 var TypeSelection = function(){
 	var selected = [];
@@ -251,8 +255,21 @@ var TypeSelection = function(){
 $('#edit-submit-1086.node-add-to-cart').click(function(e){
 	$('.add-to-cart .alert').remove();
 	var flag = false;
-	$('.attribute-7').find('.form-item').each(function(){
-		if($(this).find('input').is( ":checked" )){
+	$('.attribute-7').find('.form-item input').each(function(){
+		if($(this).is( ":checked" )){
+
+			if($(this).is('#edit-attributes-7-56')){//انتخاب شدن فرهاد صفری
+				if(!flag) alert('سطح انتخابی شما به VIP تغییر خواهد کرد') //نمیدونم چرا ولی این تیکه کد دوبار اجرا میشد و برای همین مجبور شدن از flag استفاده کنم
+				$('#edit-attributes-5-20') // تیک مقدماتی رو برمیداریم
+					.attr("disabled", true)
+					.prop('checked', false)
+					.closest('.form-item-attributes-5')
+						.addClass('disabled')
+						.removeClass('selected');
+				//تیک vipرو میزنیم
+				$('#edit-attributes-5-21').prop('checked', true).closest('.form-item-attributes-5').addClass('selected');
+			}
+
 			flag = true;
 		}
 	});
@@ -262,8 +279,6 @@ $('#edit-submit-1086.node-add-to-cart').click(function(e){
 		$('html, body').animate({scrollTop: 200}, 200);
 	}
 });
-
-
 
 $('#edit-attributes-4 label').append('<span class="register-rules">شرایط و قوانین سایت را می پذیرم.<span>');
 $('#edit-attributes-4 input').change(function(){
@@ -280,3 +295,24 @@ $('#edit-attributes-4 input').change(function(){
 }(jQuery));
 
 </script>
+<style>
+div#edit-attributes-7 .form-item .teacher-intro {
+    width: calc(100% - 200px);
+    padding: 15px 50px 0 15px;
+    box-sizing: border-box;
+    box-shadow: none;
+    background: transparent;
+    margin: 0;
+    border: none;
+}
+#edit-attributes-7 .form-item {
+    width: 100%;
+}
+div#edit-attributes-7 .form-item > label {
+    width: 200px;
+    float: right;
+}
+.just-vip {
+    margin: -15px 0 15px!important;
+}
+</style>

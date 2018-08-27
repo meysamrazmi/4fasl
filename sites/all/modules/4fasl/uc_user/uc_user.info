@@ -4,7 +4,6 @@ dependencies[] = uc_order
 dependencies[] = uc_cart
 dependencies[] = uc_payment
 dependencies[] = user_relationships
-dependencies[] = userpoints
 
 core = 7.x
 php = 5.x 
