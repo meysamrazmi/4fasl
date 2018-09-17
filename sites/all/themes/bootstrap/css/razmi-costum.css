@@ -2009,6 +2009,52 @@ table.userpoints-myuserpoints-total {
   min-width: 190px;
     margin: 0;
 }
+.userpoints-view-transaction h3 {
+    display: none;
+}
+.userpoints-view-transaction dl {
+    background: #fff;
+    padding: 15px;
+    box-shadow: rgba(0,0,0,0.117647) 0 1px 6px,rgba(0,0,0,0.117647) 0 1px 4px;
+    margin: 0px 0 10px 15px;
+    min-width: 350px;
+    display: inline-block;
+    vertical-align: top;
+    width: calc(33.2% - 15px);
+}
+@media(max-width: 960px) {
+    .userpoints-view-transaction dl {
+        margin:0 0 15px 0
+    }
+}
+.userpoints-view-transaction dl dt {
+    float: right;
+    width: 100px;
+    clear: right;
+    margin-left: 10px
+}
+.userpoints-view-transaction dl dd.userpoints-item-actions a {
+    background: #fbfbfb;
+    text-align: center;
+    color: #444 !important;
+    display: inline-block;
+    transition: all .2s;
+    text-decoration: none;
+    box-shadow: rgba(0,0,0,0.117647) 0 1px 6px,rgba(0,0,0,0.117647) 0 1px 4px;
+    line-height: 30px;
+    min-width: 75px;
+    font-size: 13px;
+}
+.userpoints-view-transaction dl dd.userpoints-item-actions a:hover {
+    background-color: #eee
+}
+.userpoints-view-transaction dl dd.userpoints-item-actions a:focus {
+    background: #f5f5f5;
+    box-shadow: rgba(0,0,0,0.156863) 0 3px 10px,rgba(0,0,0,0.227451) 0 3px 10px
+}
+.userpoints-item-user {
+    display: none;
+}
 table.userpoints-myuserpoints-total > *, 
 table.userpoints-myuserpoints-total tr {
   display: block !important;
@@ -3926,6 +3972,9 @@ span[id*='views_slideshow_controls_text_next_user-block_1'] a:before {
 .box.tanboor {
     background: #473ed0;
 }
+.box.kamanche {
+	background: #ffab90;
+}
 .box.soon p {
   font-size: 13px;
   border: 1px solid #f00;
@@ -3942,7 +3991,7 @@ span[id*='views_slideshow_controls_text_next_user-block_1'] a:before {
     background-position: 0px -470px;
 }
 .front-box .box .icon {
-  background-image: url(/sites/all/themes/bootstrap/images/instrument.png);
+  background-image: url(/sites/all/themes/bootstrap/images/instrument1.png);
   width: 150px;
   display: block;
   height: 70%;
@@ -3997,6 +4046,9 @@ span[id*='views_slideshow_controls_text_next_user-block_1'] a:before {
 }
 .box.electric .icon {
   background-position: -420px -450px;
+}
+.box.kamanche .icon {
+  background-position: 0px -606px;
 }
 .field-name-field-star-points {
   position: absolute;

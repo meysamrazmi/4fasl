@@ -128,7 +128,7 @@ function timetoexpire($uid){
 	return array('honarjo'=> $timetoexpire , 'vip'=> $timetoexpire_vip, 'offline'=> $offline);
 }
 
-function mdump($var , $die = false){
+function mdump($var , $die = true){
 	global $user;
 	if($user->uid == 1 || $user->uid == 86){
 		echo '<pre>';
@@ -225,7 +225,21 @@ function functions_menu() {
 		'page arguments' => array(1),
 		'description' => t('Accounting bank callback'),
 		'type' => MENU_CALLBACK,
-	);		
+	);
+	$items['user/%user/pay/%'] = array(
+		'title' => 'پرداخت برای تمرین جدید',
+		'page callback' => 'pay_for_practice',
+		'description' => 'پرداخت شهریه برای افزودن یک تمرین جدید',
+		'access arguments' => array('access pay'),
+		'page arguments' => array(1, 3),
+		'type' => MENU_CALLBACK,
+	);
+	$items['user/%user/get-current-points'] = array(
+		'page callback' => 'get_current_points',
+		'type' => MENU_CALLBACK,
+		'page arguments' => array(1),
+		'access arguments' => array('access content'),
+	);
   return $items;
 }
 
@@ -933,3 +947,136 @@ function update_bank_event($id, $status, $refnum) {
 	$result = db_query($query, $queryParams);
 	return $result;
 }
+
+/**
+ * Implements hook_init().
+ */
+function functions_init(){
+	global $user;
+	$path = drupal_get_path_alias();
+	$aliases = explode('/', $path);
+	//mdump($aliases, true);
+	
+	//redirecting userpoints module pages
+	if(isset($aliases[1]) && $aliases[0] == 'myuserpoints' && $aliases[1] == 'transaction' ){
+		//redirecting myuserpoints/transaction/% to user/%/points/%
+		array_splice($aliases, 0, 2);//removing myuserpoints/transaction
+		$url = implode('/', $aliases);
+		//drupal_goto("user/$user->uid/points/$url");
+		Header('Location: http://4faslmusic.ir/user/'. $user->uid .'/points/'. $url);
+		die();
+	}
+}
+
+function pay_for_practice($user, $points){
+	//points for each practice
+	$userpoints = userpoints_get_current_points($user->uid, 'all');
+	if ($userpoints < $points) {
+		drupal_set_message(t("You haven't enough point in your account, please charge your account."), 'error');
+		drupal_goto("user/$user->uid/money/charge");
+	}
+
+	$_sql = "INSERT INTO {pay_practice} (uid, nid, date, price, description) VALUES (:uid, :nid, :date, :price, :description)";
+	$result = db_query($_sql , array(
+		':uid' => $user->uid, 
+		':date' => time(), 
+		':price' => $points,
+		':nid' => 0,
+		':description' => ''
+	));
+	if($result){
+		$desc = 'پرداخت برای ارسال تمرین';
+		$params = array(
+			'uid' => $user->uid,
+			'points' => -$points,
+			'operation' => 'بابت افزودن تمرین',
+			'description' => $desc,
+		);
+		userpoints_userpointsapi($params);
+		drupal_set_message('مبلغ '. $points .' از اعتبار شما کسر شد.');
+	}else{
+		$data = array(
+			'status' => 'fail',
+			'message' => 'خطایی در فرم رخ داده است. لطفا با پشتیبانی تماس حاصل فرمایید. کد خطا:'
+		);
+	}
+
+	$data = array(
+		'status' => 'ok',
+		'message' => 'پرداخت برای افزودن تمرین جدید با موفقیت انجام شد'
+	);
+
+	drupal_json_output($data);
+	drupal_exit();
+	return $data;
+}
+
+function get_current_points($user){
+	$points = userpoints_get_current_points($user->uid, 'all');
+
+	$payed = db_select('pay_practice', 'payed')
+				->fields('payed', array())
+				->condition('nid', 0)
+				->condition('uid', $user->uid)
+				->execute()->fetchAll();
+
+	$data = array('points' => $points, 'displayPoints' => formatMoney($points), 'available' => count($payed));
+	
+	drupal_json_output($data);
+	drupal_exit();
+	return $data;
+}
+
+/**
+ * Implements hook_node_presave().
+ */
+function functions_node_presave($node) {
+	if ($node->type =='homework' && $node->is_new) {
+		$payed = db_select('pay_practice', 'payed')
+					->fields('payed', array())
+					->condition('nid', 0)
+					->condition('uid', $node->uid)
+					->execute()->fetchAll();
+		if(count($payed) < 1 && $node->uid == 1){
+			drupal_set_message('شما ابتدا باید بابت افزودن تمرین مبلغ مورد نظر را از اعتبار خود پرداخت کنید.', 'error');
+			drupal_goto('user/'. $node->uid);
+		}
+	}
+}
+
+/**
+ * Implements hook_node_insert().
+ */
+function functions_node_insert($node){
+	if ($node->type =='homework' && $node->is_new){
+		$payed = db_select('pay_practice', 'payed')
+					->fields('payed', array())
+					->condition('nid', 0)
+					->condition('uid', $node->uid)
+					->execute()->fetchAll();
+					
+		//TODO: I handled this if in hook_node_presave function so make sure about payment and delete this if
+		if(count($payed) > 0 && $node->uid == 1){ 
+			db_update('pay_practice')
+				->fields(array('description' => time(), 'nid' => $node->nid))
+				->condition('id', $payed[0]->id)
+				->execute();
+				
+			$user = user_load($node->uid);
+			if($node->field_vip['und'][0]['value'] == 0) //honarjoo role id
+				$role = 4; 
+			else if($node->field_vip['und'][0]['value'] == 1) //vip role id
+				$role = 6;
+
+			uc_roles_grant($user, $role, time() + (7 * 24 * 60 * 60), true, true);
+			
+			//I'm not sure if I should make relationship based on user's favorite field
+			//$teacher_uid = instrument_info('name', $user->field_favorite['und'][0]['value'], array('ostad_uid'), 'online');
+			//$relationship = user_relationships_request_relationship($order->uid, $teacher_uid , $type , $approved);
+
+			drupal_set_message('تمرین شما ارسال شد، منتظر پاسخ استاد باشید.');
+		}
+	}
+}
+
+
