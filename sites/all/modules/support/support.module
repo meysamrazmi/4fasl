@@ -3331,7 +3331,7 @@ function support_page_form($form, &$form_state, $client = NULL, $state = NULL) {
     $form['id'][$ticket->nid] = array('#markup' => l($ticket->nid, "node/$ticket->nid", array('attributes' => array('class' => array('ticket-id')))));
     $form['title'][$ticket->nid] = array('#markup' => l(_support_truncate($ticket->title), "node/$ticket->nid", array('attributes' => array('class' => array('ticket-title')))));
     $form['updated'][$ticket->nid] = array('#markup' => format_date($ticket->last_updated, 'short', array('attributes' => array('class' => array('ticket-updated')))));
-    $form['reported'][$ticket->nid] = array('#markup' => l(_support_truncate($account->name, 24), "user/$account->uid", array('attributes' => array('class' => array('ticket-reported')))));
+    $form['reported'][$ticket->nid] = array('#markup' => l(_support_truncate($account->field_naame['und'][0]['value'], 24), "user/$account->uid", array('attributes' => array('class' => array('ticket-reported')))));
     // Assigned to
     if ((user_access('edit multiple tickets') && user_access('can assign tickets to any user')) || user_access('administer support')) {
       $node = node_load($ticket->nid);

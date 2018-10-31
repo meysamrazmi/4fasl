@@ -72,12 +72,22 @@ function uc_user_uc_order($op, $order, $status) {
 							$role = 6;
 						}
 						
-				        uc_roles_grant($order_user, $role, time() + (28 * 24 * 60 * 60));
+						//im not sure this is the best idea to not give user role in his first week
+				        uc_roles_grant($order_user, $role, time() + (1 * 24 * 60 * 60));
 
 						$relationship = user_relationships_request_relationship($order->uid, $teacher_uid , $type , $approved);
 						if($relationship === FALSE){
 							drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 5 , '@val' => $value ,)), 'error');
 						}
+						
+						$params = array(
+						  'uid' => $order_user->uid,
+						  'points' => ($order->order_total * 1), /* ($price * 1.2) شارژ اضافه برای جشنواره*/
+						  'operation' => 'ثبت نام اولیه',
+						);
+						userpoints_userpointsapi($params);
+						drupal_set_message('حساب کاربری شما بابت افزودن تمرین شارژ شد.', 'status');
+						drupal_goto('/user/'. $order_user->uid);
 					}
 				}
 				
@@ -188,7 +198,9 @@ function add_collection($user, $instrument , $level , $session) {
   $entity->save();
   
   //for giving user file access 
-  define('FILE_ACCESS_USER', 1);
+  if (!defined('FILE_ACCESS_USER')) {
+    define('FILE_ACCESS_USER', 1);
+  }
 
 	$sql = "
 		SELECT main.entity_id as nid 
@@ -222,337 +234,22 @@ function add_collection($user, $instrument , $level , $session) {
 
 function which_teacher($value){
 	return instrument_info('persian_name', $value, array('ostad_uid'), 'online');
-	switch($value){
-		case 'تار':
-			return 164;
-			break;
-		case 'تنبک':
-			return 108;
-			break;
-		case 'سنتور':
-			// return 106; //پوربخت
-			return 1996; //کیان
-			break;
-		case 'سه تار':
-			return 111;
-			break;
-		case 'ویولن':
-			return 107;
-			break;
-		case 'پیانو':
-			return 30;
-			break;
-		case 'گیتار کلاسیک':
-			return 64;
-			break;
-		case 'گیتار فلامنکو':
-			return 109;
-			break;
-		case 'گیتار پاپ':
-			return 110;
-			break;
-		case 'دف':
-			return 1011;
-			break;
-		default:
-		case 'نی':
-			return 2785;
-			break;
-		case 'گیتار الکتریک':
-			return 3079;
-			break;
-		case 'هارمونیکا (سازدهنی)':
-			return 3314;
-			break;
-		case 'تئوری موسیقی':
-			return 1;
-			break;
-		case 'تنبور':
-			return 7259;
-			break;
-		case 'موسیقی کودک':
-			return 7262;
-			break;
-		case 'آواز پاپ':
-			return 7260;
-			break;
-		case 'فلوت':
-			return 7263;
-			break;
-		case 'آواز ایرانی':
-			return 7313;
-			break;
-
-		default:
-			return false;
-	}
 }
 
 function which_teacher_name($value){
 	return instrument_info('name', $value, array('ostad_uid'), 'online');
-	switch($value){
-		case 'tar':
-			return 164;
-			break;
-		case 'tonbak':
-			return 108;
-			break;
-		case 'santor':
-			// return 106; //پوربخت
-			return 1996; //کیان
-			break;
-		case 'setar':
-			return 111;
-			break;
-		case 'violin':
-			return 107;
-			break;
-		case 'piano':
-			return 30;
-			break;
-		case 'guitar':
-			return 64;
-			break;
-		case 'guitarflamenco':
-			return 109;
-			break;
-		case 'guitarpop':
-			return 110;
-			break;
-		case 'daf':
-			return 1011;
-			break;
-		default:
-		case 'ney':
-			return 2785;
-			break;
-		case 'guitarelectric':
-			return 3079;
-			break;
-		case 'harmonica':
-			return 3314;
-			break;
-		case 'music':
-			return 1;
-			break;
-		case 'tanbor'://'تنبور':
-			return 7259;
-			break;
-		case 'orf'://'موسیقی کودک':
-			return 7262;
-			break;
-		case 'avazpop'://'آواز پاپ':
-			return 7260;
-			break;
-		case 'flut'://'فلوت':
-			return 7263;
-			break;
-		case 'avazirani'://'آواز ایرانی':
-			return 7313;
-			break;
-
-		default:
-			return false;
-	}
 }
 
 function which_instrument($value){
 	return instrument_info('persian_name', $value, array('name'), 'online');
-	switch($value){
-		case 'تار':
-			return 'tar';
-			break;
-		case 'تنبک':
-			return 'tonbak';
-			break;
-		case 'سنتور':
-			return 'santor';
-			break;
-		case 'سه تار':
-			return 'setar';
-			break;
-		case 'ویولن':
-			return 'violin';
-			break;
-		case 'پیانو':
-			return 'piano';
-			break;
-		case 'گیتار کلاسیک':
-			return 'guitar';
-			break;
-		case 'گیتار فلامنکو':
-			return 'guitarflamenco ';
-			break;
-		case 'گیتار پاپ':
-			return 'guitarpop ';
-			break;
-		case 'دف':
-			return 'daf';
-			break;
-		case 'نی':
-			return 'ney';
-			break;
-		case 'گیتار الکتریک':
-			return 'guitarelectric ';
-			break;
-		case 'هارمونیکا (سازدهنی)':
-			return 'harmonica';
-			break;
-		case 'تئوری موسیقی':
-			return 'music';
-			break;
-		case 'تنبور':
-			return 'tanbor';
-			break;
-		case 'موسیقی کودک':
-			return 'orf';
-			break;
-		case 'آواز پاپ':
-			return 'avazpop';
-			break;
-		case 'فلوت':
-			return 'flut';
-			break;
-		case 'آواز ایرانی':
-			return 'avazirani';
-			break;
-		
-		default:
-			return false;
-	}
 }
 
 function which_teacher_key($value){
 	return instrument_info('oid', $value, array('ostad_uid'), 'online');
-	switch($value){
-		case 13: //'تار'
-			return 164;
-			break;
-		case 11://'تنبک'
-			return 108;
-			break;
-		case 10://'سنتور'
-			// return 106; //پوربخت
-			return 1996; //کیان
-			break;
-		case 14://'سه تار'
-			return 111;
-			break;
-		case 18://'ویولن'
-			return 107;
-			break;
-		case 9://'پیانو'
-			return 30;
-			break;
-		case 5://'گیتار کلاسیک'	
-			return 64;
-			break;
-		case 12://'گیتار فلامنکو'
-			return 109;
-			break;
-		case 16:// 'گیتار پاپ'
-			return 110;
-			break;
-		case 19://'دف'
-			return 1011;
-			break;
-		case 23://'نی'
-			return 2785;
-			break;
-		case 24://گیتار الکتریک
-			return 3079;
-			break;
-		case 25: //'هارمونیکا':
-			return 3314;
-			break;
-		case 2://'تئوری موسیقی':
-			return 1;
-			break;
-		case 47://'تنبور':
-			return 7259;
-			break;
-		case 46://'موسیقی کودک':
-			return 7262;
-			break;
-		case 44://'آواز پاپ':
-			return 7260;
-			break;
-		case 45://'فلوت':
-			return 7263;
-			break;
-		case 48://'آواز ایرانی':
-			return 7313;
-			break;
-
-		default:
-			return false;
-	}
 }
 
 function which_instrument_key($value){
 	return instrument_info('oid', $value, array('name'), 'online');
-	switch($value){
-		case 13: //'تار'
-			return 'tar';
-			break;
-		case 11://'تنبک'
-			return 'tonbak';
-			break;
-		case 10://'سنتور'
-			return 'santor';
-			break;
-		case 14://'سه تار'
-			return 'setar';
-			break;
-		case 18://'ویولن'
-			return 'violin';
-			break;
-		case 9://'پیانو'
-			return 'piano';
-			break;
-		case 5://'گیتار کلاسیک'	
-			return 'guitar';
-			break;
-		case 12://'گیتار فلامنکو'
-			return 'guitarflamenco ';
-			break;
-		case 16:// 'گیتار پاپ'
-			return 'guitarpop ';
-			break;
-		case 19://'دف'
-			return 'daf';
-			break;
-		case 23://'نی'
-			return 'ney';
-			break;
-		case 24://گیتار الکتریک
-			return 'guitarelectric ';
-			break;
-		case 25://'هارمونیکا':
-			return 'harmonica';
-			break;
-		case 2://'تئوری موسیقی':
-			return 1;
-			break;
-		case 47://'تنبور':
-			return 'tanbor';
-			break;
-		case 46://'موسیقی کودک':
-			return 'orf';
-			break;
-		case 44://'آواز پاپ':
-			return 'avazpop';
-			break;
-		case 45://'فلوت':
-			return 'flut';
-			break;
-		case 48://'آواز ایرانی':
-			return 'avazirani';
-			break;
-		
-		default:
-			return false;
-	}
 }
 
 /*
@@ -580,7 +277,11 @@ function student_node_refrence_form($form, &$form_state, $uid) {
 	$era_query_settings = array(array('type', 'course', '='));
 	global $user;
 	if(!isset($user->roles[3])){ //admin role id
+		if($user->uid == 164 || $user->uid == 111){
+			$era_query_settings[] = array('uid', array(111,164), 'IN');			
+		}else{
 		$era_query_settings[] = array('uid', $user->uid, '=');
+		}
 	}
 	$form['refrenced_node'] = array(
 		'#type' => 'entityreference', 

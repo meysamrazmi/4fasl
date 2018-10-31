@@ -689,7 +689,14 @@ a.btn.btn-primary:hover {
     top: 0;
     left: 30px;
 }
-
+.field-type-user-reference.field-name-field-user thead, 
+.field-type-user-reference.field-name-field-user .tabledrag-toggle-weight-wrapper{
+    display: none;
+}
+tr:not(.groupClass) .field-type-user-reference.field-name-field-user .field-add-more-submit,
+tr:not(.groupClass) .field-type-user-reference.field-name-field-user tr:nth-child(n + 2){
+    display: none;
+}
 
 
 

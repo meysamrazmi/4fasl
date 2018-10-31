@@ -54,11 +54,29 @@ $('body').append('<div class="modal fade ostad-timing" tabindex="-1" role="dialo
 .classes-timing td {
     border: 1px solid #eee;
 }
-.classes-timing td .busy,
 .classes-timing td .disabled {
     opacity: 0.4;
 	background: #ccc;
     cursor: default;
+}
+.classes-timing td .busy {
+    background: #eee;
+    cursor: default;
+}
+.classes-timing td .group {
+    background: transparent;
+    border: solid #2196F3;
+    border-width: 0 1px;
+	position: relative;
+}
+.classes-timing td .group:before {
+    content: "\f00e";
+    font-family: mat;
+    font-size: 18px;
+    vertical-align: middle;
+    color: #2196F3;
+    position: absolute;
+    left: 5px;
 }
 .classes-timing td label {
     padding: 10px;
@@ -120,6 +138,25 @@ td.day-persian_name {
 	display: flex;
     justify-content: space-around;
     box-shadow: 0 1px 6px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.12);
+}
+.classes-timing td .group:after {
+    content: "کلاس به صورت گروهی می باشد";
+    position: absolute;
+    width: 180px;
+    background: #fff;
+    z-index: 2;
+    padding: 5px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.12);
+    right: calc(50% - 90px);
+    border: solid #2196F3;
+    border-width: 0 2px;
+	transition: all 0.2s;
+    top: -25px;
+    opacity: 0;
+}
+.classes-timing td .group:hover:after {
+    opacity: 1;
+    top: -35px;
 }
 .course-info p {
     margin: 0;
@@ -419,7 +456,9 @@ var TeachersItems = function(key){
 	$('.attribute-7').find('.form-item input').attr( "checked" , false)
 	
 	$item = $('#edit-attributes-7 .form-item input#edit-attributes-7-' + key.Teacher_OptionId).closest('.form-item')
-	$item.css({'display':'block'}).addClass('acrive').append('<div class="teacher-intro">' + key.Teacher_Intro + '<p style="margin-top: 15px;"><button type="button" class="btn btn-info" data-toggle="modal" data-target=".ostad-timing" ostad="'+ key.ostad_uid +'">مشاهده برنامه زمانی استاد</button></p></div>');
+	$item.css({'display':'block'}).addClass('acrive').append('<div class="teacher-intro">' + key.Teacher_Intro + '<p style="margin-top: 15px;">\
+	<button type="button" class="btn btn-info" data-toggle="modal" data-target=".ostad-timing" ostad="'+ key.ostad_uid +'" style="margin-left: 5px;">مشاهده برنامه زمانی استاد</button>\
+	'+ (key.teacher_link != null ? '<a href="'+ key.teacher_link +'" target="_blank" class="btn btn-default">مشاهده فیلم های استاد</a>' : '') + '</p></div>');
 }
 
 $('#edit-submit-2597.node-add-to-cart').click(function(e){

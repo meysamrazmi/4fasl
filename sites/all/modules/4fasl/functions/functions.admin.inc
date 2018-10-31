@@ -11,6 +11,7 @@ function site_setting(){
 		t('Option Id'),
 		t('Ostad'),
 		t('Teacher Option Id'),
+		t('Link'),
 		t('Teacher Intro'),
 		t('Manage'), 
 	);
@@ -34,6 +35,7 @@ function site_setting(){
 				)) .
 				$ostad->field_naame['und'][0]['value'] . '</a></div>',	
 			$row->Teacher_OptionId,
+			!is_null($row->teacher_link) ? '<a href="'. $row->teacher_link .'" class="button" target="_blank">فیلم ها</a>' : '',
 			substr($row->Teacher_Intro, 0, 100) . '....',
 			'<a href="/admin/4fasl-setting/'. $row->id .'/edit">ویرایش</a>',
 		);
@@ -85,6 +87,10 @@ function add_site_setting($form, $form_state){
 		'#type' => 'textfield',
 		'#title' => t('Teacher Option Id'),
 		'#description' => 'لیست <a href="/admin/store/products/attributes/7/options" target="_blank">گزینه ها</a>'
+	);
+	$form['teacher_link'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Teacher Link'),
 	);
 	$form['Teacher_Intro'] = array(
 		'#type' => 'text_format',
@@ -170,6 +176,11 @@ function edit_site_setting($form, $form_state, $id){
 		'#default_value' => $result->Teacher_OptionId,
 		'#description' => 'لیست <a href="/admin/store/products/attributes/7/options" target="_blank">گزینه ها</a>'
 	);
+	$form['teacher_link'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Teacher Link'),
+		'#default_value' => $result->teacher_link,
+	);
 	$form['Teacher_Intro'] = array(
 		'#type' => 'text_format',
 		'#format' => 'full_html',
@@ -201,6 +212,7 @@ function add_site_setting_submit($form, &$form_state){
 			'persian_name' => 		$form_state['values']['persian_name'],
 			'name' => 					$form_state['values']['name'],
 			'ostad_uid' => 			$form_state['values']['ostad_uid'],
+			'teacher_link' => 			$form_state['values']['teacher_link'],
 			'Teacher_OptionId' => 	$form_state['values']['Teacher_OptionId'],
 			'Teacher_Intro' => 		$form_state['values']['Teacher_Intro']['value'],
 			))
@@ -217,6 +229,7 @@ function edit_site_setting_submit($form, &$form_state){
 			'persian_name' => 		$form_state['values']['persian_name'],
 			'name' => 					$form_state['values']['name'],
 			'ostad_uid' => 			$form_state['values']['ostad_uid'],
+			'teacher_link' => 			$form_state['values']['teacher_link'],
 			'Teacher_OptionId' => 	$form_state['values']['Teacher_OptionId'],
 			'Teacher_Intro' => 		$form_state['values']['Teacher_Intro']['value'],
 			))

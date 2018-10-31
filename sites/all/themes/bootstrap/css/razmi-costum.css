@@ -5092,7 +5092,7 @@ body.page-node-142  ul.action-links ,
 }
 #mini-panel-right_side .user-practice a.disabeld,
 .add-practice.disabeld {
-  cursor: no-drop;
+  cursor: pointer;
 }
 .grade-help {
   background: #fff;
@@ -5205,7 +5205,8 @@ body.page-node-142 .main-container .region-content{
 .role-authenticated-user:not(.role-administrator) div[id*="edit-field-vip"],
 .role-authenticated-user:not(.role-administrator) div[id*="edit-field-nid"],
 .role-authenticated-user:not(.role-administrator) div[id*="edit-field-nid"],
-.role-authenticated-user:not(.role-administrator) div[id*="edit-field-vip"] {
+.role-authenticated-user:not(.role-administrator) div[id*="edit-field-vip"],
+.role-authenticated-user:not(.role-administrator) div[id*="edit-field-enable"] {
   display: none;
 }
 .form-item-panes-coupon-code label {
@@ -7397,7 +7398,7 @@ html, body {
     overflow: overlay !important;
     height: initial !important;	
 }
-.shopping-stepper ~ p {
+.shopping-stepper + p {
     text-align: center;
     margin: 20px auto 0;
     width: 440px;

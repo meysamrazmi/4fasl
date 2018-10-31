@@ -213,7 +213,7 @@ function functions_menu() {
 	$items['user/%/money/charge'] = array(
 		'title' => 'شارژ حساب کاربری',
 		'page callback' => 'drupal_get_form',
-		'access arguments' => array('edit own main profile'),
+		'access arguments' => array('access content'),
 		'page arguments' => array('user_charge', 1),
 		'description' => t('Accounting Charge'),
 		'type' => MENU_NORMAL_ITEM,
@@ -230,7 +230,7 @@ function functions_menu() {
 		'title' => 'پرداخت برای تمرین جدید',
 		'page callback' => 'pay_for_practice',
 		'description' => 'پرداخت شهریه برای افزودن یک تمرین جدید',
-		'access arguments' => array('access pay'),
+		'access arguments' => array('access content'),
 		'page arguments' => array(1, 3),
 		'type' => MENU_CALLBACK,
 	);
@@ -490,13 +490,15 @@ function time_selection($ostad_uid){
 					days.field_days_value as days, 
 					times.field_time_value as times, 
 					en.field_enable_value as enabled, 
-					stu.field_user_uid as stu
+					stu.field_user_uid as stu,
+					vip.field_vip_value as grp 
 					
 					FROM `field_data_field_classes_timing` f
 					
 					LEFT JOIN field_data_field_enable en ON en.entity_id = f.field_classes_timing_value and en.bundle = 'field_classes_timing'
 					LEFT JOIN field_data_field_time times  ON times.entity_id = f.field_classes_timing_value and times.bundle = 'field_classes_timing'
 					LEFT JOIN field_data_field_days days ON days.entity_id = f.field_classes_timing_value and days.bundle = 'field_classes_timing'
+					LEFT JOIN field_data_field_vip vip ON vip.entity_id = f.field_classes_timing_value and vip.bundle = 'field_classes_timing'
 					LEFT JOIN field_data_field_user stu ON stu.entity_id = f.field_classes_timing_value and stu.bundle = 'field_classes_timing'
 					
 					WHERE f.entity_type = 'user' and f.entity_id = :uid
@@ -516,9 +518,17 @@ function time_selection($ostad_uid){
 			$output .= '<tr>';
 			$output .= '<td class="day-name">'. translate_days($day_key) .'</td>';
 			$odd = true;
+			$group = false;
 			foreach($day as $time){
+				if($time->grp == 1 && $group == false){
+					$group = true;
+				} else if($time->grp == 1){
+					continue;
+				}else{
+					$group = false;
+				}
 				$output .= ($odd)? '<td>' : '';
-				$output .= '<label class="'. (is_null($time->stu)? 'empty ' : 'busy ') . (($time->enabled == 1)? 'enabled ' : 'disabled ') .'">'; 
+				$output .= '<label class="'. (is_null($time->stu)? 'empty ' : 'busy ') . (($time->enabled == 1)? 'enabled ' : 'disabled ') . (($group == true)? 'group ' : '') .'">'; 
 				//$output .= '<input type="radio" name="time_select" value="select_'. $day_key .'_'. $time->times .'" '. (!is_null($time->stu) || ($time->enabled == 0)? 'disabled' : '') .' required>';
 				$output .= translate_hours($time->times);
 				$output .= '</label>';
@@ -666,66 +676,6 @@ function custom_ajax_callback($page_callback_result) {
 
 function translate_teachers_att_id($att_id){
 	return instrument_info('Teacher_OptionId',$att_id,array('ostad_uid'));
-	switch($att_id){
-		case 30: //'تار'
-			return 164;
-			break;
-		case 29://'تنبک'
-			return 108;
-			break;
-		case 32://'سنتور'
-			// return 106; //پوربخت
-			return 1996; //کیان
-			break;
-		case 31://'سه تار'
-			return 111;
-			break;
-		case 28://'ویولن'
-			return 107;
-			break;
-		case 33://'پیانو'
-			return 30;
-			break;
-		case 38://'گیتار کلاسیک'	
-			return 64;
-			break;
-		case 35://'گیتار فلامنکو'
-			return 109;
-			break;
-		case 36:// 'گیتار پاپ'
-			return 110;
-			break;
-		case 42:// 'آواز پاپ'
-			return 7260;
-			break;
-		case 34:// 'نی'
-			return 2785;
-			break;
-		case 37://گیتار الکتریک
-			return 3079;
-			break;
-		case 27: //'هارمونیکا':
-			return 3314;
-			break;
-		case 39://مسیح کریمی
-			return 7259;
-			break;
-		case 40://سرور رضازاده
-			return 7261;
-			break;
-		case 41://پوریا عطاکویی
-			return 7262;
-			break;
-		case 43://'تئوری موسیقی':
-			return 7263;
-			break;
-		case 49://صادق شیخ زاده:
-			return 7313;
-			break;
-
-		default:
-			return false;
-	}
 }
 
 function get_site_setting($type = 'both', $fileds = array()){
@@ -985,12 +935,11 @@ function pay_for_practice($user, $points){
 		':description' => ''
 	));
 	if($result){
-		$desc = 'پرداخت برای ارسال تمرین';
 		$params = array(
 			'uid' => $user->uid,
 			'points' => -$points,
 			'operation' => 'بابت افزودن تمرین',
-			'description' => $desc,
+			'description' => NULL,
 		);
 		userpoints_userpointsapi($params);
 		drupal_set_message('مبلغ '. $points .' از اعتبار شما کسر شد.');
@@ -1015,12 +964,24 @@ function get_current_points($user){
 	$points = userpoints_get_current_points($user->uid, 'all');
 
 	$payed = db_select('pay_practice', 'payed')
-				->fields('payed', array())
-				->condition('nid', 0)
-				->condition('uid', $user->uid)
-				->execute()->fetchAll();
+			->fields('payed', array())
+			->condition('uid', $user->uid)
+			->condition('nid', 0)
+			->execute()->fetchAll();
 
-	$data = array('points' => $points, 'displayPoints' => formatMoney($points), 'available' => count($payed));
+	$last =  db_select('pay_practice', 'payed')
+			->fields('payed', array())
+			->condition('uid', $user->uid)
+			->condition('nid', 0, '!=')
+			->orderBy('description', 'DESC')
+			->execute()->fetchObject();
+ 
+	$data = array(
+		'points' => $points, 
+		'displayPoints' => formatMoney($points), 
+		'available' => count($payed),
+		'lastPractice' => isset($last->id)? $last->description : 0
+	);
 	
 	drupal_json_output($data);
 	drupal_exit();
@@ -1037,7 +998,7 @@ function functions_node_presave($node) {
 					->condition('nid', 0)
 					->condition('uid', $node->uid)
 					->execute()->fetchAll();
-		if(count($payed) < 1 && $node->uid == 1){
+		if(count($payed) < 1){
 			drupal_set_message('شما ابتدا باید بابت افزودن تمرین مبلغ مورد نظر را از اعتبار خود پرداخت کنید.', 'error');
 			drupal_goto('user/'. $node->uid);
 		}
@@ -1054,14 +1015,26 @@ function functions_node_insert($node){
 					->condition('nid', 0)
 					->condition('uid', $node->uid)
 					->execute()->fetchAll();
-					
-		//TODO: I handled this if in hook_node_presave function so make sure about payment and delete this if
-		if(count($payed) > 0 && $node->uid == 1){ 
+
+		$userpoint_transaction = db_select('userpoints_txn', 'points')
+				->fields('points', array())
+				->condition('description', NULL)
+				->condition('uid', $node->uid)
+				->orderBy('txn_id', 'asc')
+				->execute()->fetchObject();
+	  
+    	//TODO: I handled this if in hook_node_presave function so make sure about payment and delete this if
+		if(count($payed) > 0){ 
 			db_update('pay_practice')
 				->fields(array('description' => time(), 'nid' => $node->nid))
 				->condition('id', $payed[0]->id)
 				->execute();
-				
+
+			db_update('userpoints_txn')
+				->fields(array('description' => 'تمرین '. $node->nid))
+				->condition('txn_id', $userpoint_transaction->txn_id)
+				->execute();
+
 			$user = user_load($node->uid);
 			if($node->field_vip['und'][0]['value'] == 0) //honarjoo role id
 				$role = 4; 
@@ -1079,4 +1052,21 @@ function functions_node_insert($node){
 	}
 }
 
-
+/**
+ * Implements hook_comment_insert().
+ */
+function functions_comment_insert($comment){
+	if($comment->node_type == "comment_node_homework"){
+		$node = node_load($comment->nid);
+		$user = user_load($comment->uid);
+		
+		//this comment is the first one and a teacher is posting
+		if($node->comment_count = 1 && isset($user->roles[5])){
+			db_update('pay_practice')
+				->fields(array('description' => time()))
+				->condition('nid', $comment->nid)
+				->condition('uid', $node->uid)
+				->execute();
+		}
+	}
+}
