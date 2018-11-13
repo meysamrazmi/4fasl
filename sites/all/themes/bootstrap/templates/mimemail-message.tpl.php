@@ -33,8 +33,8 @@
   <body id="mimemail-body" <?php if ($module && $key): print 'class="'. $module .'-'. $key .'"'; endif; ?>>
     <div id="center">
 		<div id="header-mail">
-			<a href="http://4faslmusic.ir"  target="_blank">
-			<img src="http://4faslmusic.ir/sites/all/themes/bootstrap/images/socials/logo2.png" alt="">
+			<a href="https://4faslmusic.ir"  target="_blank">
+			<img src="https://4faslmusic.ir/sites/all/themes/bootstrap/images/socials/logo2.png" alt="">
 			</a>
 		</div>
 		<div id="main">
@@ -42,15 +42,15 @@
 		</div>
 		<div id="footer-mail">
 			<div class="first-row">
-				<a href="http://4faslmusic.ir"  target="_blank">با ما در ارتباط باشید</a>
+				<a href="https://4faslmusic.ir"  target="_blank">با ما در ارتباط باشید</a>
 			</div>
 			<div>
 				<div class="socialss">	
 					<a class="instagram" href="http://instagram.com/4faslmusic.ir" target="_blank">
-						<img src="http://4faslmusic.ir/sites/all/themes/bootstrap/images/socials/insta.png">
+						<img src="https://4faslmusic.ir/sites/all/themes/bootstrap/images/socials/insta.png">
 					</a>
 					<a class="telegram" href="http://telegram.me/music4fasl" target="_blank" title="عضویت در گروه تلگرام">
-						<img src="http://4faslmusic.ir/sites/all/themes/bootstrap/images/socials/Telegram-icon.png">
+						<img src="https://4faslmusic.ir/sites/all/themes/bootstrap/images/socials/Telegram-icon.png">
 					</a>
 					<!--
 					

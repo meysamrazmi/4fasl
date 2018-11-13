@@ -257,6 +257,31 @@ div#edit-attributes-7 .form-item .teacher-intro {
     width: 100%;
     overflow: auto;
 }
+span.icon:before {
+    content: "\f00e";
+    font-family: mat;
+    font-size: 18px;
+    vertical-align: middle;
+    color: #2196F3;
+    padding: 6px;
+    border: 1px solid;
+    margin: 0 5px;
+}
+.teacher-intro .btn {
+    margin-bottom: 5px;
+}
+td.day-name {
+    text-align: center;
+}
+@media (max-width: 992px){
+    .modal-dialog {
+        min-width: 98%;
+    }
+    .classes-timing td label {
+        padding: 5px 0;
+        text-align: center;
+    }
+}
 </style>
 <script>
 (function ($) {
@@ -455,10 +480,12 @@ var TeachersItems = function(key){
 	//به صورت پیش فرض تو تنظیمات دروپال یکی از آیتم ها انتخاب شده که به این صورت برش میدارم
 	$('.attribute-7').find('.form-item input').attr( "checked" , false)
 	
-	$item = $('#edit-attributes-7 .form-item input#edit-attributes-7-' + key.Teacher_OptionId).closest('.form-item')
-	$item.css({'display':'block'}).addClass('acrive').append('<div class="teacher-intro">' + key.Teacher_Intro + '<p style="margin-top: 15px;">\
-	<button type="button" class="btn btn-info" data-toggle="modal" data-target=".ostad-timing" ostad="'+ key.ostad_uid +'" style="margin-left: 5px;">مشاهده برنامه زمانی استاد</button>\
-	'+ (key.teacher_link != null ? '<a href="'+ key.teacher_link +'" target="_blank" class="btn btn-default">مشاهده فیلم های استاد</a>' : '') + '</p></div>');
+	var $item = $('#edit-attributes-7 .form-item input#edit-attributes-7-' + key.Teacher_OptionId).closest('.form-item')
+    if(key.ostad_uid == 7262 || key.ostad_uid == 1011)
+        key.Teacher_Intro = '<p style="border-right: 2px solid #F44335;padding: 10px 15px;background: #eee;">کلاس های این استاد به صورت گروهی و ترمی می باشد و هزینه پرداختی بابت ثبت نام اولیه می باشد.</p>' + key.Teacher_Intro
+    $item.css({'display':'block'}).addClass('acrive').append('<div class="teacher-intro">' + key.Teacher_Intro + '<p style="margin-top: 15px;">\
+    <button type="button" class="btn btn-info" data-toggle="modal" data-target=".ostad-timing" ostad="'+ key.ostad_uid +'" style="margin-left: 5px;">مشاهده برنامه زمانی استاد</button>\
+    '+ (key.teacher_link != null ? '<a href="'+ key.teacher_link +'" target="_blank" class="btn btn-default">مشاهده فیلم های استاد</a>' : '') + '</p></div>');
 }
 
 $('#edit-submit-2597.node-add-to-cart').click(function(e){
@@ -481,7 +508,7 @@ $('#edit-attributes-7').on('click', '.teacher-intro button', function(){
 	$.ajax({
 		url: "/time-selection/"+ $(this).attr('ostad'),
 		success: function(result){
-			$('.modal-content').html($.parseHTML('<p style="margin: 0;padding: 15px;text-align: center;">زمانهای خالی و قابل انتخاب با رنگ سفید مشخص شده است.</p>' + result.timing + '<p style="margin: 0;padding: 15px;text-align: center;">پس از تکمیل ثبت نام می توانید آنها را انتخاب کنید</p>'))
+			$('.modal-content').html($.parseHTML('<p style="margin: 0;padding: 15px;text-align: center;">زمانهای خالی و قابل انتخاب با رنگ سفید مشخص شده است.</p>' + result.timing + '<p style="margin: 10px 15px;padding: 5px 15px;border-right: 2px solid #F44336;">مواردی که آیکن <span class="icon"></span> را دارند، کلاسهای گروهی هستند.</p><p style="margin: 0;padding: 15px;text-align: center;">پس از تکمیل ثبت نام می توانید آنها را انتخاب کنید</p>'))
 			$('.modal-content #time-selection tr').each(function(){
 				var hidden = true
 				$(this).find('label').each(function(){

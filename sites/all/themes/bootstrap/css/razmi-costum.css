@@ -1090,7 +1090,7 @@ div#userpoints_list_wrapper > div,
     top: -50px;
 }
 .field-name-user-practices.field-label-above > .field-label {
-  margin: 0 0 0px 0 !important;
+  margin: 0 0 0 0 !important;
 }
 .page-user-edit .form-type-password {
   width: 100%;
@@ -1155,7 +1155,7 @@ div#userpoints_list_wrapper > div,
     margin: 15px;
 }
 .\E6\ED\D1\C7\ED\D4\<span.class\=\"element-invisible\"\>\(\E1\C8\E5.\DD\DA\C7\E1\)\<\/span\>,
-.page-user li.\E6\ED\D1\C7\ED\D4<span {
+.page-user li.\E6\ED\D1\C7\ED\D4 span {
     display: none !important;
 }
 .page-user li.\E6\ED\D1\C7\ED\D4,
@@ -1387,6 +1387,7 @@ aside.main-side {
 }
 div#mini-panel-right_side {
   max-height: 100vh !important;
+  overflow: auto;
   overflow: overlay;
   padding-bottom: 50px;
 }
@@ -7120,6 +7121,9 @@ label:hover .course-link {
   .add-to-cart .attributes .attribute:not(.attribute-4) {
     padding: 0 !important;
   }
+  div#edit-attributes-7 .form-item .teacher-intro {
+    padding: 15px 15px 0 5px !important;
+  }
 }
 #uc_Progressbar .num {
   display: block;
@@ -7257,8 +7261,13 @@ label:hover .course-link {
 	}
 	div#edit-attributes-7 .form-item .teacher-intro {
 		width: 100% !important;
-		padding: 15px !important;
+		padding: 15px 5px !important;
 	}
+  div#edit-attributes-7 .form-item > label {
+    float: none !important;
+    margin: auto;
+    display: block;
+  }
 }
 #block-system-main-menu {
     z-index: 100;

@@ -547,9 +547,9 @@ function time_selection($ostad_uid){
 		// }
 		$output .= '</form>';
 		
-	if($ostad_uid == 7262 || $ostad_uid == 1011){
-		$output = '<p class="hozouri">این کلاس به صورت گروهی برگزار می شود. برای شرکت در این کلاس با دفتر آموزشگاه با شماره های 44044497 - 44043963 تماس بگیرید.</p>' ;
-	}
+//	if($ostad_uid == 7262 || $ostad_uid == 1011){
+//		$output = '<p class="hozouri">این کلاس به صورت گروهی برگزار می شود. برای شرکت در این کلاس با دفتر آموزشگاه با شماره های 44044497 - 44043963 تماس بگیرید.</p>' ;
+//	}
 
 	$data = array('timing' => $output);
 
@@ -913,7 +913,7 @@ function functions_init(){
 		array_splice($aliases, 0, 2);//removing myuserpoints/transaction
 		$url = implode('/', $aliases);
 		//drupal_goto("user/$user->uid/points/$url");
-		Header('Location: http://4faslmusic.ir/user/'. $user->uid .'/points/'. $url);
+		Header('Location: https://4faslmusic.ir/user/'. $user->uid .'/points/'. $url);
 		die();
 	}
 }
