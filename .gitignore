@@ -28,6 +28,7 @@ index.php
 install.php
 update.php
 xmlrpc.php
+.idea
 
 #ignore some file types
 *.zip
