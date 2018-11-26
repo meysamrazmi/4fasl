@@ -1354,8 +1354,14 @@ div#edit-support-ticket-upload {
   border-radius: 4px;
 }
 .file-resup-wrapper {
-  display: none;
+  /*display: none;*/
   margin: 15px 0 15px 0;
+}
+.has-resumeable .bootstrap-filestyle {
+  display: none;
+}
+.has-resumeable .bootstrap-filestyle {
+  display: none;
 }
 .file-resup-wrapper .drop {
   width: 75%;

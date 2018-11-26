@@ -168,7 +168,7 @@ function theme_mediaelement_video($variables) {
   $output = '<div class="mediaelement-video">';
   $output .= '<video ' . drupal_attributes($variables['attributes']) . ' ></video>';
   if ($variables['settings']['download_link']) {
-    $output .= '<div class="mediaelement-download-link"><a href="' . $variables['attributes']['src'] . '">' . filter_xss_admin($variables['settings']['download_text']) . '</a></div>';
+    $output .= '<div class="mediaelement-download-link"><a href="' . $variables['attributes']['src'] . '" download>' . filter_xss_admin($variables['settings']['download_text']) . '</a></div>';
   }
   $output .= '</div>';
   return $output;
@@ -178,7 +178,7 @@ function theme_mediaelement_audio($variables) {
   $output = '<div class="mediaelement-audio">';
   $output .= '<audio ' . drupal_attributes($variables['attributes']) . ' ></audio>';
   if ($variables['settings']['download_link']) {
-    $output .= '<div class="mediaelement-download-link"><a href="' . $variables['attributes']['src'] . '">' . filter_xss_admin($variables['settings']['download_text']) . '</a></div>';
+    $output .= '<div class="mediaelement-download-link"><a href="' . $variables['attributes']['src'] . '" download>' . filter_xss_admin($variables['settings']['download_text']) . '</a></div>';
   }
   $output .= '</div>';
   return $output;

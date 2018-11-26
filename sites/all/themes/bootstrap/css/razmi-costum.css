@@ -1295,7 +1295,7 @@ div[id*="edit-support-ticket-upload"] {
   border-radius: 4px;
 }
 .file-resup-wrapper {
-  display: none;
+  /*display: none;*/
   margin: 15px 0 15px 0;
 }
 .file-resup-wrapper .drop {
@@ -4107,6 +4107,9 @@ div#saaz-film {
   position: relative;
   min-height: 650px;
 }
+div#saaz-film .field-name-field-tozihaat {
+  padding: 0 0 50px;
+}
 div#saaz-film .field-name-field-film-image {
   padding: 40px 5% 40px;
   position: absolute;
@@ -5458,7 +5461,7 @@ tbody > tr:last-child {
   border-bottom: 1px solid #ddd;
   background-size: cover;
   background: #fff;
-  height: 100px;
+  height: 80px;
   background-position: 0 center;
   /* box-shadow: rgba(0, 0, 0, 0.117647) 0px 1px 6px, rgba(0, 0, 0, 0.117647) 0px 1px 4px; */
   border-radius: 0;
@@ -7573,7 +7576,53 @@ div#smile {
 	right: 0;
 	height: 100%;
 }
+.page-gallery #block-system-main-menu .menu.nav > li > a, .page-gallery #block-system-main-menu .menu.nav > li > span {
+  color: #505050;
+  height: 80px;
+  line-height: 80px;
+}
 
+.page-gallery #block-system-main-menu .menu.nav > li > a, .page-gallery #block-system-main-menu .menu.nav > li > span {}
 
+.page-gallery #block-system-main-menu .menu.nav > li > a:hover, .page-gallery #block-system-main-menu .menu.nav > li > a:focus, .page-gallery #block-system-main-menu .menu.nav > li > span:hover, .page-gallery #block-system-main-menu .menu.nav > li.open > span {
+  background: #eee !important;
+}
+
+.page-gallery #block-system-main-menu .dropdown-menu {
+  background: #fff;
+}
+
+.page-gallery #block-system-main-menu .dropdown-menu a {
+  color: #555 !important;
+  border-color: #eee;
+}
+.page-gallery #block-system-main-menu .menu.nav > li a:hover,
+.page-gallery #block-system-main-menu .menu.nav > li a:focus,
+.page-gallery #block-system-main-menu .menu.nav > li >span:hover {
+  background: #eee;
+}
+.page-gallery #block-block-3 a.user {
+  line-height: 80px;
+  color: #555;
+  padding: 0 15px;
+}
+.page-gallery #block-block-3 a.user > * {
+  color: #555;
+}
+
+.page-gallery #block-block-3 a.user:hover,
+.page-gallery #block-block-3 .open > a {
+  background: #eee;
+  height: 79px;
+}
+
+.page-gallery .user .message-num {
+  top: 17px;
+  color: #fff !important;
+}
+
+.page-gallery .get_started {
+  margin-top: 22px;
+}
 
 
