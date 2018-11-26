@@ -33,6 +33,7 @@ function entityreference_autocomplete_autocomplete_callback($entity_type, $bundl
   // $context will hold the metadata of entities found, so that modules
   // can alter the results in any way they want.
   $context = array();
+  $context_append = '';
 
   // Decode the query settings passed and then parse the result string to get
   // the actual settings array.
@@ -71,6 +72,11 @@ function entityreference_autocomplete_autocomplete_callback($entity_type, $bundl
     if (!empty($query_settings['property_conditions']) && is_array($query_settings['property_conditions'])) {
       foreach ($query_settings['property_conditions'] as $property_condition) {
         $query->propertyCondition($property_condition[0], $property_condition[1], $property_condition[2]);
+
+        //send user id to hook for magic
+        if($property_condition[2] != "="){
+          $context_append = $property_condition[1];
+        }
       }
     }
 
@@ -132,6 +138,15 @@ function entityreference_autocomplete_autocomplete_callback($entity_type, $bundl
       }
     }
   }
+  //we attach user id to remove items that were already sent
+  $context_user = user_load($context_append);
+  $context['uid'] = array(
+    'entity' => $context_user,
+    'entity_id' => $context_user->uid,
+    'entity_type' => 'user',
+    'entity_bundle' => 'user',
+    'rendered_html' => '',
+  );
 
   // Let other drupal modules alter the results.
   drupal_alter('entityreference_autocomplete_matches', $matches, $context);

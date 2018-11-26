@@ -283,6 +283,10 @@ function student_node_refrence_form($form, &$form_state, $uid) {
 		$era_query_settings[] = array('uid', $user->uid, '=');
 		}
 	}
+
+	//we attach user id to remove items that were already sent
+  $era_query_settings[] = array('uid', $uid, '!=');
+
 	$form['refrenced_node'] = array(
 		'#type' => 'entityreference', 
 		'#required' => true,

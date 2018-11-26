@@ -1070,3 +1070,18 @@ function functions_comment_insert($comment){
 		}
 	}
 }
+
+/**
+ * Implements hook_entityreference_autocomplete_matches_alter().
+ * this function removes duplicate items from suggested list
+ */
+function functions_entityreference_autocomplete_matches_alter(&$matches, $context){
+  if(isset($context['uid']['entity_id']) && $context['uid']['entity_id'] > 0){
+    $user = $context['uid']['entity'];
+    foreach($context as $key => $value){
+      if(in_array_r($value['entity_id'] ,$user->field_node_refrence)){
+        unset($matches[$key]);
+      }
+    }
+  }
+}
