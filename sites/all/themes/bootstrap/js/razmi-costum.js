@@ -510,6 +510,10 @@ if($('.node-type-course').length && $('.no-video').length){
 	}
 }
 
+/*-----------------------------------------------------------------------------------------------------------*/
+$(".node-points").mouseup(function(){
+	window.location.href = $(this).find(".points-link")[0].getAttribute("href")
+})
 
 
 

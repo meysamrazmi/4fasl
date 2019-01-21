@@ -7626,3 +7626,78 @@ div#smile {
 }
 
 
+.charge-cards {padding: 0px 20px;display: flex;flex-direction: row;justify-content: space-between;
+  flex-wrap: wrap;
+}
+.node-points {
+  background: #fff;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.12);
+  width: 23%;
+  /*border-bottom: 2px solid #673AB7;*/
+  padding: 0 15px 20px;
+  cursor: pointer;
+}
+.node-points .field-name-title {
+  padding: 10px 0 5px;
+  display: inline-block;
+  width: 100%;
+  margin-bottom: 35px;
+}
+.node-points .field-name-title h4 {
+  color: #555;
+  font-size: 13px;
+}
+.node-points .sell-price {
+  color: #4CAF50;
+  font-size: 18px;
+  float: right;
+}
+.node-points .uc-price-label {
+  display: none;
+}
+.node-points .add-to-cart {
+  display: none;
+}
+.node-points img {
+  width: calc(100% + 30px);
+  max-width: none;
+  margin-right: -15px;
+}
+.node-points .points-link {
+  float: left;
+  font-size: 0;
+}
+.node-points .points-link:before {
+  content: "\f675";
+  line-height: 24px;
+  font-family: mat;
+  font-size: 24px;
+}
+form#user-charge {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+form#user-charge * {
+  display: none;
+}
+.page-money.page-charge #block-system-main {
+  min-height: 150px;
+}
+@media all and (max-width: 1100px){
+  .charge-cards {
+    justify-content: space-around;
+  }
+  .node-points {
+    width: 45%;
+    margin-bottom: 25px;
+  }
+
+
+}
+@media all and (max-width: 450px) {
+  .node-points {
+    width: 75%;
+    min-width: 280px;
+  }
+}

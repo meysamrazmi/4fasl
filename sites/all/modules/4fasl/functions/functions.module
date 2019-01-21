@@ -729,6 +729,10 @@ function user_charge($form, &$form_state, $uid) {
 			</div>',
 		);*/
 
+  $output = node_view_multiple(node_load_multiple([4460,4462,4463,4464]), 'teaser');
+  $charge_cards = '<div class="charge-cards">'. render($output) .'</div>';
+  $form['#suffix'] = $charge_cards;
+
 	return $form;
 }
 
