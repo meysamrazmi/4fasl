@@ -4997,12 +4997,16 @@ body.node-type-support-ticket .nav-tabs {
   border: solid #D1C4E9;
   background: linear-gradient(to bottom left, #4976f5 ,#8828da);
   border-width: 0px 0px;
-  width: 150px;
+  width: 170px;
   padding: 10px 15px 10px 0;
   margin: auto;
   border-radius: 35px;
   color: #fff;
   box-shadow: rgba(0, 0, 0, 0.156863) 0px 3px 10px, rgba(0, 0, 0, 0.227451) 0px 3px 10px;
+}
+.user-support .message-num.list {
+  position: initial;
+  display: inline-block;
 }
 #mini-panel-right_side .pane-block-2 .pane-content .user-support {
   margin: 20px auto 0;

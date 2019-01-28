@@ -62,9 +62,26 @@ function recaptcha_admin_settings() {
     '#options' => array(
       '' => t('Normal (default)'),
       'compact' => t('Compact'),
+      'invisible' => t('Invisible'),
     ),
     '#title' => t('Size'),
     '#type' => 'select',
+  );
+  $form['recaptcha_widget_settings']['recaptcha_badge'] = array(
+    '#default_value' => variable_get('recaptcha_badge', 'bottomright'),
+    '#description' => t('Reposition the reCAPTCHA badge. "Inline" allows you to control the CSS.'),
+    '#options' => array(
+      'bottomright' => t('Bottom Right (default)'),
+      'bottomleft' => t('Bottom Left'),
+      'inline' => t('Inline'),
+    ),
+    '#title' => t('Badge'),
+    '#type' => 'select',
+    '#states' => array(
+      'visible' => array(
+        ':input[name="recaptcha_size"]' => array('value' => 'invisible'),
+      ),
+    ),
   );
   $form['recaptcha_widget_settings']['recaptcha_tabindex'] = array(
     '#type' => 'textfield',

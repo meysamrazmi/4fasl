@@ -11,6 +11,9 @@ require_once dirname(__FILE__) . '/recaptcha-php/src/ReCaptcha/RequestParameters
 require_once dirname(__FILE__) . '/recaptcha-php/src/ReCaptcha/Response.php';
 require_once dirname(__FILE__) . '/src/ReCaptcha/RequestMethod/Drupal7Post.php';
 
+use ReCaptcha\ReCaptcha;
+use ReCaptcha\RequestMethod\Drupal7Post;
+
 /**
  * Implements hook_help().
  */
@@ -68,7 +71,7 @@ function recaptcha_permission() {
 /**
  * Implements hook_captcha().
  */
-function recaptcha_captcha($op, $captcha_type = '') {
+function recaptcha_captcha($op, $captcha_type = '', $captcha_sid = '') {
   global $language;
 
   switch ($op) {
@@ -101,6 +104,7 @@ function recaptcha_captcha($op, $captcha_type = '') {
           }
 
           $attributes = array(
+            'id' => 'g-recaptcha' . $captcha_sid,
             'class' => 'g-recaptcha',
             'data-sitekey' => $recaptcha_site_key,
             'data-theme' => variable_get('recaptcha_theme', 'light'),
@@ -108,26 +112,39 @@ function recaptcha_captcha($op, $captcha_type = '') {
             'data-size' => variable_get('recaptcha_size', ''),
             'data-tabindex' => variable_get('recaptcha_tabindex', 0),
           );
+
+          if (variable_get('recaptcha_size', '') == 'invisible') {
+            $attributes['data-callback'] = 'onInvisibleSubmit';
+            $attributes['data-badge'] = variable_get('recaptcha_badge', 'bottomright');
+
+            $captcha['form']['#attached']['js'] = array(
+              drupal_get_path('module', 'recaptcha') . '/recaptcha.invisible.js',
+            );
+          }
+
           // Filter out empty tabindex/size.
           $attributes = array_filter($attributes);
 
           $captcha['form']['recaptcha_widget'] = array(
             '#markup' => '<div' . drupal_attributes($attributes) . '></div>',
             '#suffix' => $noscript,
-          );
-
-          // @todo: #1664602: D7 does not yet support "async" in drupal_add_js().
-          // drupal_add_js(url('https://www.google.com/recaptcha/api.js', array('query' => array('hl' => $language->language), 'absolute' => TRUE)), array('defer' => TRUE, 'async' => TRUE, 'type' => 'external'));
-          $data = array(
-            '#tag' => 'script',
-            '#value' => '',
-            '#attributes' => array(
-              'src' => url('https://www.google.com/recaptcha/api.js', array('query' => array('hl' => $language->language), 'absolute' => TRUE)),
-              'async' => 'async',
-              'defer' => 'defer',
+            '#attached' => array(
+              'js' => array(
+                drupal_get_path('module', 'recaptcha') . '/recaptcha.js',
+                array(
+                  'data' => url('https://www.google.com/recaptcha/api.js', array(
+                    'query' => array(
+                      'hl' => $language->language,
+                      'onload' => 'drupalRecaptchaOnLoad',
+                      'render' => 'explicit',
+                    ),
+                    'absolute' => TRUE,
+                  )),
+                  'type' => 'external',
+                ),
+              ),
             ),
           );
-          drupal_add_html_head($data, 'recaptcha_api');
         }
         else {
           // Fallback to Math captcha as reCAPTCHA is not configured.
@@ -148,7 +165,7 @@ function recaptcha_captcha_validation($solution, $response, $element, $form_stat
   }
 
   // Use drupal_http_request() to circumvent all issues with the Google library.
-  $recaptcha = new \ReCaptcha\ReCaptcha($recaptcha_secret_key, new \ReCaptcha\RequestMethod\Drupal7Post());
+  $recaptcha = new ReCaptcha($recaptcha_secret_key, new Drupal7Post());
 
   $resp = $recaptcha->verify(
     $_POST['g-recaptcha-response'],
@@ -187,5 +204,11 @@ function recaptcha_captcha_validation($solution, $response, $element, $form_stat
 function template_preprocess_recaptcha_widget_noscript(&$variables) {
   $variables['sitekey']  = check_plain($variables['widget']['sitekey']);
   $variables['language'] = check_plain($variables['widget']['language']);
-  $variables['url']      = check_url(url('https://www.google.com/recaptcha/api/fallback', array('query' => array('k' => $variables['widget']['sitekey'], 'hl' => $variables['widget']['language']), 'absolute' => TRUE)));
+  $variables['url']      = check_url(url('https://www.google.com/recaptcha/api/fallback', array(
+    'query' => array(
+      'k' => $variables['widget']['sitekey'],
+      'hl' => $variables['widget']['language'],
+    ),
+    'absolute' => TRUE,
+  )));
 }
