@@ -1,4 +1,4 @@
-<?
+<?php
 
 function site_setting(){
 	
@@ -339,4 +339,33 @@ function add_relationship_submit($form, &$form_state){
 	
 	user_relationships_request_relationship($user, $ostad , $form_state['values']['type'] , true);
 	$form_state['redirect'] = array('admin/people/relationships', array('query' => array('requester_id' => $user->name))); 
+}
+
+
+function site_rules_form($form){
+  $form = array();
+
+  $form['offline_rules'] = array(
+    '#type' => 'text_format',
+    '#format' => 'full_html',
+    '#title' => 'قوانین ثبت نام حضوری',
+    '#default_value' => variable_get('offline_rules', ''),
+    '#description' => ''
+  );
+  $form['online_rules'] = array(
+    '#type' => 'text_format',
+    '#format' => 'full_html',
+    '#title' => 'قوانین ثبت نام مجازی',
+    '#default_value' => variable_get('online_rules', ''),
+    '#description' => ''
+  );
+  $form['practice_rules'] = array(
+    '#type' => 'text_format',
+    '#format' => 'full_html',
+    '#title' => 'قوانین ارسال تمرین',
+    '#default_value' => variable_get('practice_rules', ''),
+    '#description' => ''
+  );
+
+  return system_settings_form($form);
 }

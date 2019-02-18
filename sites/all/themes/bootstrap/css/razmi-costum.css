@@ -2765,17 +2765,6 @@ div#register-form .form-actions {
 #mini-panel-right_side .pane-block-2 .user_naghsh{
 	margin-top: 0;
 }
-.front-header{
-  height: 250px;
-  overflow: hidden;
-  position: relative;
-  display: none;
-}
-.front-header img{
-  position: absolute;
-  bottom: -50px;
-  width: 100%;
-}
 div#metro-section {
   padding: 60px 20px 20px;
   background-image: url(../images/blur-bg2.jpg);

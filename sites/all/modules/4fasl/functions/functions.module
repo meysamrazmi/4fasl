@@ -187,6 +187,19 @@ function functions_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
+  $items['admin/4fasl-setting/rules'] = array(
+    'title' => 'شرایط و قوانین',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('site_rules_form'),
+    'access arguments' => array('administer modules'),
+    'file' => 'functions.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['admin/4fasl-setting/rules/get'] = array(
+    'page callback' => 'get_site_rules',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
   $items['time-selection/%'] = array(
     'page callback' => 'time_selection',
     'type' => MENU_CALLBACK,
@@ -1088,4 +1101,16 @@ function functions_entityreference_autocomplete_matches_alter(&$matches, $contex
       }
     }
   }
+}
+
+function get_site_rules(){
+  $rules = array(
+    'offline_rules' => variable_get('offline_rules', ''),
+    'online_rules' => variable_get('online_rules', ''),
+    'practice_rules' => variable_get('practice_rules', '')
+  );
+
+  drupal_json_output($rules);
+  drupal_exit();
+  return $rules;
 }
