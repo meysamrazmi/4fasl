@@ -246,7 +246,7 @@ function fivestar_field_widget_settings_form($field, $instance) {
     $form['widget']['fivestar_widget'] = array(
       '#type' => 'radios',
       '#options' => array('default' => t('Default')) + $widgets,
-      '#default_value' => isset($instance['widget']['settings']['widget']['fivestar_widget']) ? $instance['widget']['settings']['widget']['fivestar_widget'] : 'default',
+      '#default_value' => isset($instance['widget']['settings']['widget']['fivestar_widget']) ? $instance['widget']['settings']['widget']['fivestar_widget'] : 'basic',
       '#attributes' => array('class' => array('fivestar-widgets', 'clearfix')),
       '#pre_render' => array('fivestar_previews_expand'),
       '#attached' => array('css' => array(drupal_get_path('module', 'fivestar') . '/css/fivestar-admin.css')),
@@ -296,7 +296,7 @@ function fivestar_field_widget_form(&$form, &$form_state, $field, $instance, $la
 
   elseif ($instance['widget']['type'] == 'stars') {
     $widgets = module_invoke_all('fivestar_widgets');
-    $active = isset($instance['widget']['settings']['widget']['fivestar_widget']) ? $instance['widget']['settings']['widget']['fivestar_widget'] : 'default';
+    $active = isset($instance['widget']['settings']['widget']['fivestar_widget']) ? $instance['widget']['settings']['widget']['fivestar_widget'] : 'basic';
     $widget = array(
       'name' => isset($widgets[$active]) ? strtolower($widgets[$active]) : 'default',
       'css' => $active,

@@ -60,14 +60,20 @@ $('body').append('<div class="modal fade ostad-timing" tabindex="-1" role="dialo
     cursor: default;
 }
 .classes-timing td .busy {
-    background: #eee;
+    background: #e9e9e9;
     cursor: default;
+    color: rgba(0, 0, 0, 0.6);
 }
 .classes-timing td .group {
     background: transparent;
     border: solid #2196F3;
     border-width: 0 1px;
 	position: relative;
+}
+.classes-timing td .disabled.group {
+    opacity: 0.4;
+    background: #ccc;
+    cursor: default;
 }
 .classes-timing td .group:before {
     content: "\f00e";
