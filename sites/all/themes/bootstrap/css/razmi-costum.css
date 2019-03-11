@@ -7694,3 +7694,120 @@ form#user-charge * {
     min-width: 280px;
   }
 }
+
+/*body.page-user.page-register,
+body.page-user.page-login {
+  background-image: url(/sites/all/themes/bootstrap/images/signup.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  padding-bottom: 70px;
+}
+.toboggan-unified {
+  max-width: 900px;
+  margin: 60px auto !important;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 5px;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: row-reverse;
+  padding: 15px 40px;
+  margin-top: 60px;
+}
+.toboggan-unified #login-links {
+  display: none;
+}
+#register-form, form#user-pass, #login-form {
+  display: block;
+  padding: 15px 35px 25px;
+  background-color: #fff;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.12);
+  max-width: 370px;
+  width: 96%;
+  margin: -60px auto;
+  border-radius: 5px;
+}
+.toboggan-unified #login-message, .toboggan-unified #register-message {
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 2.2;
+}
+#register-message, #login-message {
+  font-size: 14px !important;
+  text-align: center;
+  padding: 0 25px;
+}
+a.switch-login {
+  color: #fff;
+  border: 1px solid;
+  padding: 2px 30px;
+  border-radius: 30px;
+  margin-top: 30px;
+}
+div#register-message:before {
+  content: "\f234";
+  font-family: fa;
+  display: block;
+  font-size: 80px;
+  margin: -30px 0 10px 0;
+}
+form#user-pass .form-item, form#user-login .form-item, form#user-register-form .form-item {
+  min-width: unset;
+  width: 100%;
+  margin-bottom: 5px;
+}
+.help-block.password-help {
+  margin: 0;
+  padding: 0px 5px;
+}
+.help-block.password-help ul {
+  margin: 0px;
+}
+#register-form input, form#user-pass input, #login-form input {
+  border: none;
+  background: #f5f5f5;
+  border-radius: 30px;
+  box-shadow: none;
+  transition: all 0.3s ease;
+}
+#register-form input:hover, form#user-pass input:hover, #login-form input:hover {
+  background: #e8e8e8;
+}
+#register-form input:focus, form#user-pass input:focus, #login-form input:focus {
+  box-shadow: rgba(0,0,0,0.117647) 0 1px 6px, rgba(0,0,0,0.117647) 0 1px 4px;
+  background: #fff;
+}
+#register-form label, form#user-pass label, #login-form label {
+  font-weight: normal;
+  font-size: 12px;
+}
+select.form-select {
+  border-radius: 30px;
+}
+div#register-form .form-actions {
+  text-align: center;
+}
+#user-register-form #edit-submit--2, .page-user-password #block-system-main form #edit-submit, .page-user-reset #block-system-main form #edit-submit {
+  border-radius: 30px;
+  padding: 8px 35px;
+  font-size: 13px;
+}
+.progress {
+  height: 2px;
+  margin: -3px 12px 0;
+}
+.form-group {
+  margin-bottom: 10px;
+}
+.toboggan-unified.register #login-message,
+.toboggan-unified.login #register-message {
+  display: none;
+}
+form#user-pass > div, form#user-login {
+  margin: 90px 0 50px 0 !important;
+}*/
+
+

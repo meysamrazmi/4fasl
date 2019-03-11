@@ -516,6 +516,26 @@ $(".node-points").mouseup(function(){
 })
 
 
+/*-----------------------------------------------------------------------------------------------------------*/
+/*$('.toboggan-unified #login-message').remove()
+$('.toboggan-unified #login-form').after('<div id="login-message"><span>درصورتی که حساب کاربری ندارید از قسمت "عضویت در سایت" اقدام به ساخت حساب کاربری نمایید.</span><a href="/user/register" class="switch-login">عضویت در سایت</a></div>')
+$('.toboggan-unified #register-form').before('<div id="register-message"><span>اگر در سایت حساب کاربری دارید میتوانید از لینک زیر وارد پرتال کاربری خود شوید</span><a href="/user/login" class="switch-login">ورود به سایت</a></div>')
+  $('a.switch-login').click(function(e){
+  	e.preventDefault()
+    $('a.login-link:not(.lt-active)').click()
+
+    $('.toboggan-unified').toggleClass('login')
+    $('.toboggan-unified').toggleClass('register')
+
+    // if($('.toboggan-unified').hasClass('login')){
+    //   $('.toboggan-unified').addClass('register').removeClass('login')
+    // }else {
+    //   $('.toboggan-unified').addClass('login').removeClass('register')
+    // }
+
+	})*/
+
+
 
 
 });
