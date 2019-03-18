@@ -385,8 +385,8 @@ form#user-pass .form-item,
 form#user-login .form-item, 
 form#user-register-form .form-item {
   width: 40%;
-  margin: 0px auto 15px;
-  min-width: 370px;
+  margin: 0px auto 10px;
+  min-width: 300px;
 }
 div#views_slideshow_cycle_teaser_section_main_slideshow-block, div#views_slideshow_cycle_teaser_section_main_slideshow-block>div {
  /* padding-top: 120px;*/

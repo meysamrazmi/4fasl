@@ -325,10 +325,6 @@ a.user_register{
 l.tb-megamenu-nav.nav.level-0.items-4 li {
     margin-right: 11px;
 }
-#login-message{
-	margin-bottom: 20px;
-	font-size: 17px !important;
-}
 #login-message span {
     font-size: 15px;
     display: block;
@@ -361,17 +357,6 @@ l.tb-megamenu-nav.nav.level-0.items-4 li {
 .toboggan-unified #login-links a:hover {
     background: #eee;
 }
-#register-form,
-form#user-pass,
-#login-form{
-	display: block;
-    padding: 25px 15px 15px;
-    background-color: #fff;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.12);
-    max-width: 410px;
-	width: 96%;
-    margin: auto;
-}
 body.page-user-password form#user-pass{
   position: relative;
   margin-top: 140px;
@@ -396,12 +381,15 @@ form#user-pass > div,
 form#user-login {
     margin: 50px 0 50px 0 !important;
 }
-.login-forgot{
-  display: inline-block;
-  margin-right: calc(100% - 220px);
+.login-forgot {
   margin-top: 25px;
-  border-bottom: 1px solid #7d43bd;
-  padding-bottom: 5px;
+  order: 1;
+  min-width: 300px;
+}
+.login-forgot a {
+  border-bottom: 1px dashed;
+  padding: 5px 6px;
+  margin-right: 15px;
 }
 #user-pass #edit-actions,
 #user-login #edit-actions{
@@ -421,6 +409,13 @@ form#user-login {
   border-color: transparent;
   border: none;
   box-shadow: 0 1px 6px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.12);
+  border-radius: 30px;
+  padding: 8px 35px;
+  font-size: 14px;
+  min-width: 150px;
+}
+#user-login #edit-actions #edit-submit span {
+  display: none;
 }
 #user-register-form #edit-submit--2,
 .page-user-password #block-system-main form #edit-submit,

@@ -517,25 +517,36 @@ $(".node-points").mouseup(function(){
 
 
 /*-----------------------------------------------------------------------------------------------------------*/
-/*$('.toboggan-unified #login-message').remove()
-$('.toboggan-unified #login-form').after('<div id="login-message"><span>درصورتی که حساب کاربری ندارید از قسمت "عضویت در سایت" اقدام به ساخت حساب کاربری نمایید.</span><a href="/user/register" class="switch-login">عضویت در سایت</a></div>')
-$('.toboggan-unified #register-form').before('<div id="register-message"><span>اگر در سایت حساب کاربری دارید میتوانید از لینک زیر وارد پرتال کاربری خود شوید</span><a href="/user/login" class="switch-login">ورود به سایت</a></div>')
-  $('a.switch-login').click(function(e){
-  	e.preventDefault()
-    $('a.login-link:not(.lt-active)').click()
+$('.login-forgot').prepend('<span>گذرواژه خود را فراموش کرده اید؟</span>')
+$('.toboggan-unified #login-message').remove()
+$('.toboggan-unified #login-form').after('<div id="login-message"><h3>ورود به سایت</h3>'+
+		'<p class="switch-login">در صورتی که حساب کاربری ندارید از طریق لینک زیر اقدام کنید<a href="/user/register" class="switch-login">عضویت در سایت</a></p>'+
+		'</div>')
 
-    $('.toboggan-unified').toggleClass('login')
-    $('.toboggan-unified').toggleClass('register')
+$('.toboggan-unified #register-form').before('<div id="register-message"><h3>ساخت حساب کاربری</h3><a href="/faq?category%5B0%5D=58" target="_blank">راهنما</a>'+
+	'<div class="ff"><span>پورتال اختصاصی</span>'+
+	'<p>در سایت چهارفصل میتوانید همه ی فیلم ها و تمرین ها و پیام های خود را مدیریت کنید</p></div>'+
+	'<div class="ss"><span>دسترسی به محتواهای آموزشی</span>'+
+	'<p>در سایت چهارفصل میتوانید به محتوای آموزشی رایگان دسترسی پیدا کنید</p></div>'+
+	'<div class="tt"><span>پشتیبانی 24 ساعته</span>'+
+	'<p>در هر زمان میتوانید سوالات و مشکلات خود را در بخش پشتیبانی مطرح کنید تا کارشناسان ما به شما پاسخ دهند</p></div>'+
+	'<p class="switch-login">در صورتی که حساب کاربری دارید از طریق لینک زیر وارد شوید<a href="/user/login" class="switch-login">ورود به سایت</a></p>'+
+	'</div>')
 
-    // if($('.toboggan-unified').hasClass('login')){
-    //   $('.toboggan-unified').addClass('register').removeClass('login')
-    // }else {
-    //   $('.toboggan-unified').addClass('login').removeClass('register')
-    // }
+$('a.switch-login').click(function(e){
+	e.preventDefault()
+	// $('a.login-link:not(.lt-active)').click()
 
-	})*/
+	$('.toboggan-unified').toggleClass('login')
+	$('.toboggan-unified').toggleClass('register')
 
+	// if($('.toboggan-unified').hasClass('login')){
+	//   $('.toboggan-unified').addClass('register').removeClass('login')
+	// }else {
+	//   $('.toboggan-unified').addClass('login').removeClass('register')
+	// }
 
+})
 
 
 });
