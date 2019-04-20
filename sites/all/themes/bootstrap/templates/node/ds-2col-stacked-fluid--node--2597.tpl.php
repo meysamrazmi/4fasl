@@ -317,7 +317,6 @@ $('div#edit-attributes-3 .form-item').each(function(){
 	if(oldtitle[1] != "undefined"){
 		$(this).find('label').append('<span class="price">'+ oldtitle[1] +'</span>');
 	}
-    $(this).find('label').append('<p class="" style="text-align: center;color: #F44336;">با 20 درصد تخفیف ثبت نام</p>');
 
   // var item = $(this);
 	// var key ;

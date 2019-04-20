@@ -79,8 +79,7 @@ $('div#edit-attributes-3 .form-item').each(function(){
 	if(oldtitle[1] != "undefined"){
 		$(this).find('label').append('<span class="price">'+ oldtitle[1] +'</span>');
 	}
-	$(this).find('label').append('<p class="" style="text-align: center;color: #F44336;">به علاوه 40 هزار تومان هدیه</p>'+
-        '<p class="course-link"><a href="/'+ translate_optionsId[$(this).find('input').attr('value')].name +'" target="_blank">معرفی دوره</a></p>');
+	$(this).find('label').append('<span style="text-align: center;color: #f00;display: block;margin: -10px 0 5px 0;">به علاوه 10 هزار تومن هدیه</span><p class="course-link"><a href="/'+ translate_optionsId[$(this).find('input').attr('value')].name +'" target="_blank">معرفی دوره</a></p>');
 });  
 $('div#edit-attributes-7 .form-item').each(function(){
 	$(this).addClass('col-lg-2 col-md-3 col-sm-4 col-xs-6 card-view').css({'display':'none'});
