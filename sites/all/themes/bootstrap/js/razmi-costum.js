@@ -515,7 +515,6 @@ $(".node-points").mouseup(function(){
 	window.location.href = $(this).find(".points-link")[0].getAttribute("href")
 })
 
-
 /*-----------------------------------------------------------------------------------------------------------*/
 $('.login-forgot').prepend('<span>گذرواژه خود را فراموش کرده اید؟</span>')
 $('.toboggan-unified #login-message').remove()
@@ -535,17 +534,12 @@ $('.toboggan-unified #register-form').before('<div id="register-message"><h3>س�
 
 $('a.switch-login').click(function(e){
 	e.preventDefault()
-	// $('a.login-link:not(.lt-active)').click()
-
 	$('.toboggan-unified').toggleClass('login')
 	$('.toboggan-unified').toggleClass('register')
-
-	// if($('.toboggan-unified').hasClass('login')){
-	//   $('.toboggan-unified').addClass('register').removeClass('login')
-	// }else {
-	//   $('.toboggan-unified').addClass('login').removeClass('register')
-	// }
-
+})
+/*-----------------------------------------------------------------------------------------------------------*/
+$('.description.rules .close').click(function(){
+	$(this).parent().slideUp()
 })
 
 

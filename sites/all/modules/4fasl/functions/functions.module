@@ -1114,3 +1114,45 @@ function get_site_rules(){
   drupal_exit();
   return $rules;
 }
+
+/**
+ * Implements hook_cron().
+ */
+function functions_cron() {
+  /*
+   * this section removes all stars from users based on their last practice
+   * */
+  $q = "SELECT * FROM
+        (
+          SELECT uid, max(description) as last 
+          FROM `pay_practice` 
+          GROUP BY uid
+        ) last_practices
+        WHERE last < :time";
+  $results = db_query($q, array(':time' => (time() - 60*60*24*14)))->fetchAll();
+  $uids = array_map(function($e) {
+    return is_object($e) ? $e->uid : $e['uid'];
+  }, $results);
+
+  db_delete('votingapi_cache')
+    ->condition('entity_type', 'user')
+    ->condition('entity_id', $uids, 'IN')
+    ->condition('tag', 'vote')
+    ->execute();
+
+  db_delete('votingapi_vote')
+    ->condition('entity_type', 'user')
+    ->condition('entity_id', $uids, 'IN')
+    ->condition('tag', 'vote')
+    ->execute();
+
+  db_delete('field_data_field_stu_stars')
+    ->condition('entity_type', 'user')
+    ->condition('entity_id', $uids, 'IN')
+    ->execute();
+  db_delete('field_revision_field_stu_stars')
+    ->condition('entity_type', 'user')
+    ->condition('entity_id', $uids, 'IN')
+    ->execute();
+
+}
