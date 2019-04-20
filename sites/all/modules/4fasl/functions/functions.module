@@ -1119,11 +1119,16 @@ function get_site_rules(){
  * Implements hook_cron().
  */
 function functions_cron() {
-  /*
-   * this section removes all stars from users based on their last practice
-   * */
-  $q = "SELECT * FROM
-        (
+  delete_stars();
+  notify_about_stars();
+
+}
+
+/*
+ * this function removes all stars from users based on their last practice
+ * */
+function delete_stars(){
+  $q = "SELECT * FROM (
           SELECT uid, max(description) as last 
           FROM `pay_practice` 
           GROUP BY uid
@@ -1154,5 +1159,21 @@ function functions_cron() {
     ->condition('entity_type', 'user')
     ->condition('entity_id', $uids, 'IN')
     ->execute();
+}
 
+/*
+ * this function sends a notification to users for their stars that are about to be deleted
+ * */
+function notify_about_stars(){
+  $q = "SELECT * FROM (
+          SELECT uid, max(description) as last 
+          FROM `pay_practice` 
+          GROUP BY uid
+        ) last_practices
+        WHERE last < :start_time AND last > :end_time";
+  $results = db_query($q, array(':start_time' => (time() - 60*60*24*12), ':end_time' => (time() - 60*60*24*12 - 60*60*6)))->fetchAll();
+  $uids = array_map(function($e) {
+    return is_object($e) ? $e->uid : $e['uid'];
+  }, $results);
+  privatemsg_new_thread($uids, '2 روز تا پاک شدن امتیاز ها', '12 روز از ارسال آخرین تمرین شما میگذرد.<br>اگر تا دو روز دیگر تمرین جدید ارسال نکنید امتیاز های شما حذف خواهند شد و نمیتوانید از مزیت آن استفاده کنید',array('author' => user_load(86) ,'format' => 'full_html'));
 }
