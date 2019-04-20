@@ -4836,7 +4836,6 @@ function hook_filetransfer_info_alter(&$filetransfer_info) {
 function hook_format_date_alter(&$formatted_date, array $context) {
   $formatted_date .= ' ' . $context['type'];
 }
-
 /**
  * @} End of "addtogroup hooks".
  */
