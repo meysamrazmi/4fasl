@@ -5,7 +5,6 @@
  * Payment administration menu items.
  */
 
-
 /**
  * Displays an overview of the available payment methods.
  *
@@ -107,7 +106,13 @@ function theme_uc_payment_method_table($variables) {
 function uc_payment_method_settings_form($form, &$form_state, $method_id) {
   $callback = _uc_payment_method_data($method_id, 'callback');
   $null = NULL;
-  $form = $callback('settings', $null, array(), $form_state);
+  if (function_exists($callback)) {
+    $form = $callback('settings', $null, array(), $form_state);
+  }
+  else {
+    drupal_not_found();
+    drupal_exit();
+  }
   return system_settings_form($form);
 }
 

@@ -2,6 +2,7 @@
  * @file
  * Styles for uc_file module.
  */
+
 .download-table-row {
   vertical-align: top;
 }
@@ -14,7 +15,7 @@
   display: inline;
 }
 
-.duration  {
+.duration {
   display: inline;
   white-space: nowrap;
 }

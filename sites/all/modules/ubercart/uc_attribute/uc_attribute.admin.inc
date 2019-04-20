@@ -64,6 +64,7 @@ function uc_attribute_admin() {
  * Form builder for product attributes.
  *
  * @see uc_attribute_form_submit()
+ *
  * @ingroup forms
  */
 function uc_attribute_form($form, &$form_state, $attribute = NULL) {
@@ -95,6 +96,7 @@ function uc_attribute_form($form, &$form_state, $attribute = NULL) {
     '#title' => t('Label'),
     '#description' => t("Enter a label that customers will see instead of the attribute name. Use &lt;none&gt; if you don't want a title to appear at all."),
     '#default_value' => $label,
+    '#maxlength' => 255,
   );
   $form['description'] = array(
     '#type' => 'textfield',
@@ -233,6 +235,7 @@ function uc_attribute_delete_confirm_submit($form, &$form_state) {
  *
  * @see uc_attribute_options_form_validate()
  * @see uc_attribute_options_form_submit()
+ *
  * @ingroup forms
  */
 function uc_attribute_options_form($form, &$form_state, $attribute) {
@@ -262,7 +265,7 @@ function uc_attribute_options_form($form, &$form_state, $attribute) {
         '#price' => $data->price,
       ),
       'weight' => array(
-        '#markup' => (string)$data->weight,
+        '#markup' => (string) $data->weight,
       ),
       'ordering' => array(
         '#type' => 'weight',
@@ -357,6 +360,7 @@ function theme_uc_attribute_options_form($variables) {
  *
  * @see uc_attribute_option_form_validate()
  * @see uc_attribute_option_form_submit()
+ *
  * @ingroup forms
  */
 function uc_attribute_option_form($form, &$form_state, $attribute, $option = NULL) {
@@ -537,6 +541,7 @@ function uc_attribute_option_delete_confirm_submit($form, &$form_state) {
  *
  * @see uc_object_attributes_form_submit()
  * @see theme_uc_object_attributes_form()
+ *
  * @ingroup forms
  */
 function uc_object_attributes_form($form, &$form_state, $object, $type, $view = 'overview') {
@@ -550,6 +555,7 @@ function uc_object_attributes_form($form, &$form_state, $object, $type, $view = 
       drupal_set_title($class->name);
       $attributes = uc_class_get_attributes($id);
       break;
+
     case 'product':
     default:
       $product = $object;
@@ -591,9 +597,10 @@ function uc_object_attributes_form($form, &$form_state, $object, $type, $view = 
             '#title_display' => 'invisible',
             '#default_value' => empty($attribute->label) ? $attribute->name : $attribute->label,
             '#size' => 20,
+            '#maxlength' => 255,
           ),
           'option' => array(
-            '#markup' => $option ? (check_plain($option->name) . ' (' . theme('uc_price', array('price' => $option->price)) . ')' ) : t('n/a'),
+            '#markup' => $option ? (check_plain($option->name) . ' (' . theme('uc_price', array('price' => $option->price)) . ')') : t('n/a'),
           ),
           'required' => array(
             '#type' => 'checkbox',
@@ -642,7 +649,7 @@ function uc_object_attributes_form($form, &$form_state, $object, $type, $view = 
       '#title' => t('Attributes'),
       '#options' => count($unused_attributes) > 0 ? $unused_attributes : array(t('No attributes left to add.')),
       '#disabled' => count($unused_attributes) == 0 ? TRUE : FALSE,
-      '#weight' => -1
+      '#weight' => -1,
     );
     $form['actions'] = array('#type' => 'actions');
     $form['actions']['add'] = array(
@@ -677,6 +684,7 @@ function uc_object_attributes_form($form, &$form_state, $object, $type, $view = 
  *   - form: A render element representing the form.
  *
  * @see uc_object_attributes_form()
+ *
  * @ingroup themeable
  */
 function theme_uc_object_attributes_form($variables) {
@@ -850,6 +858,7 @@ function uc_object_attributes_form_submit($form, &$form_state) {
  * @see uc_object_options_form_validate()
  * @see uc_object_options_form_submit()
  * @see theme_uc_object_options_form()
+ *
  * @ingroup forms
  */
 function uc_object_options_form($form, &$form_state, $object, $type) {
@@ -1001,6 +1010,7 @@ function uc_object_options_form($form, &$form_state, $object, $type) {
  *   - form: A render element representing the form.
  *
  * @see uc_object_options_form()
+ *
  * @ingroup themeable
  */
 function theme_uc_object_options_form($variables) {
@@ -1082,7 +1092,7 @@ function theme_uc_product_attributes($variables) {
   foreach (element_children($attributes) as $key) {
     $optionstr = '';
 
-    foreach ((array)$attributes[$key]['#options'] as $option) {
+    foreach ((array) $attributes[$key]['#options'] as $option) {
       // We only need to allow translation from the second option onward
       if (empty($optionstr)) {
         $optionstr .= $option;
@@ -1201,6 +1211,7 @@ function uc_object_options_form_submit($form, &$form_state) {
  * Form builder: associate option combinations with a product variant's SKU.
  *
  * @see uc_product_adjustments_form_submit()
+ *
  * @ingroup forms
  */
 function uc_product_adjustments_form($form, &$form_state, $node) {
@@ -1258,7 +1269,7 @@ function uc_product_adjustments_form($form, &$form_state, $node) {
   $num_prod_attr = count($attribute_ids);
 
   if ($num_prod_attr) {
-    // Get previous values
+    // Get previous values.
     $old_vals = db_query("SELECT * FROM {uc_product_adjustments} WHERE nid = :nid", array(':nid' => $nid))->fetchAll();
 
     $result = $query->execute();
