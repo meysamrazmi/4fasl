@@ -389,6 +389,8 @@ function functions_user_presave(&$edit, $account, $category) {
 		$expires = timetoexpire($account->uid);
 		if($expires['honarjo'] == 0){
 			add_collection($account , $account->field_favorite['und'][0]['value'] , 'l1' , '1');
+      add_collection($account , $account->field_favorite['und'][0]['value'] , 'l1' , '2');
+      add_collection($account , $account->field_favorite['und'][0]['value'] , 'l1' , '3');
 		}
 	}elseif($edit['new_role_add'] == 6){//vip role id
 		$type = 3; //vip relationship id
@@ -466,7 +468,7 @@ function instrument_info($condition = '', $value = '', $fileds = array(), $type 
 	$q = ($type == 'both')? $q : $q->condition('type', array($type, 'both'), 'IN');	
 	$q = $q->orderBy('type', 'ASC');
 	$q = $q->execute()->fetchObject();
-	
+//	mdump($q, true);
 	if (is_object($q)){ 
 		if(isset($fileds[0]) && !isset($fileds[1])){
 			return $q->$fileds[0];
@@ -1078,7 +1080,7 @@ function functions_comment_insert($comment){
 		$user = user_load($comment->uid);
 		
 		//this comment is the first one and a teacher is posting
-		if($node->comment_count = 1 && isset($user->roles[5])){
+		if($node->comment_count = 1 && (isset($user->roles[5]) || isset($user->roles[3]))){
 			db_update('pay_practice')
 				->fields(array('description' => time()))
 				->condition('nid', $comment->nid)

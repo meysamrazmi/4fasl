@@ -46,7 +46,9 @@ function uc_user_uc_order($op, $order, $status) {
 						if(instrument_info('oid', $key, array('name'), 'online') != false){
 
 							add_collection($order_user , instrument_info('oid', $key, array('name'), 'online') , 'l1' , '1');
-							
+              add_collection($order_user , instrument_info('oid', $key, array('name'), 'online') , 'l1' , '2');
+              add_collection($order_user , instrument_info('oid', $key, array('name'), 'online') , 'l1' , '3');
+
 							$field_favorite['und'][0]['value'] =  instrument_info('oid', $key, array('name'), 'online');
 							$order_user = user_save($order_user, array('field_favorite' => $field_favorite));
 						} else{

@@ -61,7 +61,7 @@ if($('.field-name-add-practice, #block-formblock-homework').length){
 	$('.add-practice:not(.disabeld) , #mini-panel-right_side .user-practice a:not(.disabeld)').click(function(e){
 		e.preventDefault();
 		var el = $('.field-name-add-practice, #block-formblock-homework');
-		el.find('[id*="edit-title"]').val($(this).attr('title-text'));
+		// el.find('[id*="edit-title"]').val($(this).attr('title-text'));
 		el.find('[id*="edit-field-nid-und-0-value"]').val($(this).attr('nid'));
 		el.slideToggle(400).toggleClass('open');
 		$('.add-practice:not(.disabeld)').toggleClass('open');

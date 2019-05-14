@@ -9,6 +9,7 @@ function site_setting(){
 		t('Persian Name'),
 		t('English Name'),
 		t('Option Id'),
+    'nid محتوای معرفی',
 		t('Ostad'),
 		t('Teacher Option Id'),
 		t('Link'),
@@ -27,7 +28,8 @@ function site_setting(){
 			$row->persian_name,
 			$row->name,
 			$row->oid,
-			'<a href="/user/'. $row->ostad_uid .'" style="display: inline-flex;align-items: center;">'. 
+      $row->intro_nid,
+			'<a href="/user/'. $row->ostad_uid .'" style="display: inline-flex;align-items: center;">'.
 				theme('image_style', 
 				array(
 					'style_name' => '100x100', 'path' => $ostad->picture->uri, 
@@ -79,6 +81,10 @@ function add_site_setting($form, $form_state){
 		'#title' => t('Option Id'),
 		'#description' => 'لیست <a href="/admin/store/products/attributes/3/options" target="_blank">گزینه ها</a>'
 	);
+  $form['intro_nid'] = array(
+    '#type' => 'textfield',
+    '#title' => 'nid محتوای معرفی دوره',
+  );
 	$form['ostad_uid'] = array(
 		'#type' => 'textfield',
 		'#title' => t('Ostad'),
@@ -156,6 +162,11 @@ function edit_site_setting($form, $form_state, $id){
 		'#default_value' => $result->oid,
 		'#description' => 'لیست <a href="/admin/store/products/attributes/3/options" target="_blank">گزینه ها</a>'
 	);
+  $form['intro_nid'] = array(
+    '#type' => 'textfield',
+    '#title' => 'nid محتوای معرفی دوره',
+    '#default_value' => $result->intro_nid,
+  );
 	$ostad = user_load($result->ostad_uid);
 	$form['ostad_uid'] = array(
 		'#type' => 'textfield',
@@ -209,12 +220,13 @@ function add_site_setting_submit($form, &$form_state){
 			'type' => 					$form_state['values']['type'],
 			'aid' => 						$form_state['values']['aid'],
 			'oid' => 						$form_state['values']['oid'],
-			'persian_name' => 		$form_state['values']['persian_name'],
+			'intro_nid' =>      $form_state['values']['intro_nid'],
+			'persian_name' => 	$form_state['values']['persian_name'],
 			'name' => 					$form_state['values']['name'],
 			'ostad_uid' => 			$form_state['values']['ostad_uid'],
-			'teacher_link' => 			$form_state['values']['teacher_link'],
+			'teacher_link' => 	$form_state['values']['teacher_link'],
 			'Teacher_OptionId' => 	$form_state['values']['Teacher_OptionId'],
-			'Teacher_Intro' => 		$form_state['values']['Teacher_Intro']['value'],
+			'Teacher_Intro' => 	$form_state['values']['Teacher_Intro']['value'],
 			))
 		->execute();
 	$form_state['redirect'] = 'admin/4fasl-setting';
@@ -226,12 +238,13 @@ function edit_site_setting_submit($form, &$form_state){
 			'type' => 					$form_state['values']['type'],
 			'aid' => 						$form_state['values']['aid'],
 			'oid' => 						$form_state['values']['oid'],
-			'persian_name' => 		$form_state['values']['persian_name'],
+      'intro_nid' =>      $form_state['values']['intro_nid'],
+			'persian_name' => 	$form_state['values']['persian_name'],
 			'name' => 					$form_state['values']['name'],
 			'ostad_uid' => 			$form_state['values']['ostad_uid'],
-			'teacher_link' => 			$form_state['values']['teacher_link'],
-			'Teacher_OptionId' => 	$form_state['values']['Teacher_OptionId'],
-			'Teacher_Intro' => 		$form_state['values']['Teacher_Intro']['value'],
+			'teacher_link' => 	$form_state['values']['teacher_link'],
+			'Teacher_OptionId'=>$form_state['values']['Teacher_OptionId'],
+			'Teacher_Intro' => 	$form_state['values']['Teacher_Intro']['value'],
 			))
 		->condition('id', $form_state['values']['id'])
 		->execute();
@@ -344,28 +357,45 @@ function add_relationship_submit($form, &$form_state){
 
 function site_rules_form($form){
   $form = array();
+  $result = db_select('site_rules', 's')
+    ->fields('s', array())
+    ->execute()->fetchAll();
 
-  $form['offline_rules'] = array(
-    '#type' => 'text_format',
-    '#format' => 'full_html',
-    '#title' => 'قوانین ثبت نام حضوری',
-    '#default_value' => variable_get('offline_rules', ''),
-    '#description' => ''
+  foreach ($result as $row){
+    $form[$row->name] = array(
+      '#type' => 'fieldset',
+      '#title' => $row->p_name,
+      '#collapsed' => true,
+      '#collapsible' => true
+    );
+    $form[$row->name]['id'. $row->id] = array(
+      '#type' => 'hidden',
+      '#default_value' => $row->id,
+    );
+    $form[$row->name]['body'. $row->id] = array(
+      '#type' => 'text_format',
+      '#format' => 'full_html',
+      '#rows' => 10,
+      '#default_value' => $row->body,
+    );
+  }
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
   );
-  $form['online_rules'] = array(
-    '#type' => 'text_format',
-    '#format' => 'full_html',
-    '#title' => 'قوانین ثبت نام مجازی',
-    '#default_value' => variable_get('online_rules', ''),
-    '#description' => ''
-  );
-  $form['practice_rules'] = array(
-    '#type' => 'text_format',
-    '#format' => 'full_html',
-    '#title' => 'قوانین ارسال تمرین',
-    '#default_value' => variable_get('practice_rules', ''),
-    '#description' => ''
-  );
+//  mdump($form, true);
+  return $form;
+}
 
-  return system_settings_form($form);
+function site_rules_form_submit($form, &$form_state){
+  mdump($form_state, true);
+  foreach ($form_state['values'] as $key => $row){
+
+    db_update('site_rules')
+      ->fields(array('body' => $row['body']['value']))
+      ->condition('id', $row['id'])
+      ->execute();
+  }
+
+  $form_state['redirect'] = 'admin/4fasl-setting/rules';
 }

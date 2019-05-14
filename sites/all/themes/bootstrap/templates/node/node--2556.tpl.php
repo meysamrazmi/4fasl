@@ -260,7 +260,7 @@ td.day-name {
 	$('#time-selection tr').each(function(){
 		var hidden = true
 		$(this).find('label').each(function(){
-			if(!$(this).hasClass("disabled")){
+			if(!$(this).hasClass("disabled") && !$(this).hasClass("busy")){
 				hidden = false
 			}
 		})
@@ -318,9 +318,10 @@ function update_ostad_timing($ostad_uid, $student_uid, $timing) {
 	// Wrap it with Entity API
 	$collection = entity_metadata_wrapper('field_collection_item', $raw_collection);
 	//dsm the old value
-	dsm($collection->field_user->value());
+	//dsm($collection->field_user->value());
 	// Set a new value on the field_example textfield.
-	$collection->field_user = $student_uid;
+    mdump($raw_user, true);
+	$collection->field_user = array($student_uid);
 	// Save the changes to the entity
 	$collection->save(); 
 }
