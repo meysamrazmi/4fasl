@@ -34,7 +34,10 @@ define('POPUP_ONLOAD_IS_POPUP_ADDED', 'popup_onload_is_popup_added');
  * A stub to fetch all popup_onload entities.
  */
 function popup_onload_get_popups_all() {
-  $popups = entity_load('popup_onload', FALSE);
+  $conditions = [
+    'active_popup' => 1,
+  ];
+  $popups = entity_load('popup_onload', FALSE, $conditions);
 
   return $popups;
 }
@@ -66,7 +69,7 @@ function popup_onload_choose_popup() {
  * @see popup_onload_check_display_conditions()
  */
 function popup_onload_popup_onload_check_display_conditions($popup_onload) {
-  return !popup_onload_check_time_cookie();
+  return !popup_onload_check_time_cookie($popup_onload);
 }
 
 /**
@@ -107,6 +110,7 @@ function popup_onload_check_path() {
 
   return $page_match;
 }
+
 /**
  * Implements hook_init().
  */
@@ -124,7 +128,6 @@ function popup_onload_init() {
           if (popup_onload_check_display_conditions($popup_onload)) {
             $popup_settings = popup_onload_prepare_popup($popup_onload);
             popup_onload_add_popup($popup_settings);
-            popup_onload_save_time_cookie($popup_onload);
           }
         }
       }
@@ -136,6 +139,13 @@ function popup_onload_init() {
       }
     }
   }
+}
+
+/**
+ * AJAX gate for popup cookie saving.
+ */
+function popup_onload_save_cookie() {
+  popup_onload_save_time_cookie();
 }
 
 /**
@@ -156,9 +166,9 @@ function popup_onload_sort_method_random() {
  * @see popup_onload_sort_method_random()
  */
 function popup_onload_popup_onload_sort_methods() {
-  return array(
+  return [
     POPUP_ONLOAD_DEFAULT_SORT_METHOD => t('Random (default)'),
-  );
+  ];
 }
 
 /**
@@ -178,15 +188,20 @@ function popup_onload_sort_methods() {
  *   Popup javascript settings
  */
 function popup_onload_prepare_popup($popup_onload) {
-  $popup_markup = entity_view('popup_onload', array($popup_onload->popup_id => $popup_onload), 'full', NULL, TRUE);
-  $popup_settings = array(
+  $popup_markup = entity_view('popup_onload', [$popup_onload->popup_id => $popup_onload], 'full', NULL, TRUE);
+  $overlay_close = TRUE;
+  if (isset($popup_onload->field_overlayclose)) {
+    $overlay_close = $popup_onload->field_overlayclose['und'][0]['value'] == 1 ? TRUE : FALSE;
+  }
+  $popup_settings = [
     'html' => drupal_render($popup_markup['popup_onload']),
     'delay' => variable_get(POPUP_ONLOAD_VAR_DISPLAY_DELAY, POPUP_ONLOAD_DEFAULT_DELAY),
     'fixed' => (bool) $popup_onload->fixed_position,
     'popup_id' => $popup_onload->popup_id,
     'className' => 'popup_onload',
+    'overlayClose' => $overlay_close,
     'close' => '',
-  );
+  ];
 
   if ($popup_onload->width) {
     $popup_settings['innerWidth'] = $popup_onload->width;
@@ -206,15 +221,31 @@ function popup_onload_prepare_popup($popup_onload) {
  */
 function popup_onload_check_time_cookie($popup_onload = NULL) {
   $cookie_name = variable_get(POPUP_ONLOAD_VAR_COOKIE_NAME, POPUP_ONLOAD_DEFAULT_COOKIE_NAME);
+
+  if (isset($popup_onload) && !empty($popup_onload->cookie_lifetime_single)) {
+    $cookie_name .= '_' . $popup_onload->popup_id;
+  }
+
   return isset($_COOKIE[$cookie_name]);
 }
 
 /**
  * Save popup display time into the cookie.
+ *
+ * @param object $popup_onload
+ *   Popup object.
  */
-function popup_onload_save_time_cookie() {
+function popup_onload_save_time_cookie($popup_onload = NULL) {
   $cookie_name = variable_get(POPUP_ONLOAD_VAR_COOKIE_NAME, POPUP_ONLOAD_DEFAULT_COOKIE_NAME);
-  $expire_seconds = variable_get(POPUP_ONLOAD_VAR_COOKIE_LIFETIME, POPUP_ONLOAD_DEFAULT_COOKIE_LIFETIME);
+
+  if (isset($popup_onload->cookie_lifetime_single) && !empty($popup_onload->cookie_lifetime_single)) {
+    $expire_seconds = $popup_onload->cookie_lifetime_single;
+    $cookie_name .= '_' . $popup_onload->popup_id;
+  }
+  else {
+    $expire_seconds = variable_get(POPUP_ONLOAD_VAR_COOKIE_LIFETIME, POPUP_ONLOAD_DEFAULT_COOKIE_LIFETIME);
+  }
+
   $cur_time = time();
   setcookie($cookie_name,
       $cur_time,
@@ -228,37 +259,42 @@ function popup_onload_save_time_cookie() {
  * Code has been taken from Colorbox module.
  */
 function popup_onload_libraries_info() {
-  $libraries['colorbox'] = array(
-    'name' => 'Colorbox plugin',
-    'vendor url' => 'http://www.jacklmoore.com/colorbox',
-    'download url' => 'http://www.jacklmoore.com/colorbox',
-    'version arguments' => array(
-      'file' => 'jquery.colorbox-min.js',
-      'pattern' => '@Colorbox.+([0-9\.a-z]+)@',
-      'lines' => 5,
-    ),
-    'files' => array(
-      'js' => array(
-        'jquery.colorbox-min.js',
-      ),
-    ),
-    'variants' => array(
-      'minified' => array(
-        'files' => array(
-          'js' => array(
-            'jquery.colorbox-min.js',
-          ),
-        ),
-      ),
-      'source' => array(
-        'files' => array(
-          'js' => array(
-            'jquery.colorbox.js',
-          ),
-        ),
-      ),
-    ),
-  );
+  $libraries = [];
+
+  // If the colorbox module is present don't overwrite its library definition.
+  if (!function_exists('colorbox_libraries_info')) {
+    $libraries['colorbox'] = [
+      'name' => 'Colorbox plugin',
+      'vendor url' => 'http://www.jacklmoore.com/colorbox',
+      'download url' => 'http://www.jacklmoore.com/colorbox',
+      'version arguments' => [
+        'file' => 'jquery.colorbox-min.js',
+        'pattern' => '@Colorbox.+([0-9\.a-z]+)@',
+        'lines' => 5,
+      ],
+      'files' => [
+        'js' => [
+          'jquery.colorbox-min.js',
+        ],
+      ],
+      'variants' => [
+        'minified' => [
+          'files' => [
+            'js' => [
+              'jquery.colorbox-min.js',
+            ],
+          ],
+        ],
+        'source' => [
+          'files' => [
+            'js' => [
+              'jquery.colorbox.js',
+            ],
+          ],
+        ],
+      ],
+    ];
+  }
 
   return $libraries;
 }
@@ -273,7 +309,7 @@ function popup_onload_add_popup($popup_settings) {
   $module_path = drupal_get_path('module', 'popup_onload');
 
   // Add popup_onload javascripts.
-  drupal_add_js(array('popup_onload' => $popup_settings), 'setting');
+  drupal_add_js(['popup_onload' => $popup_settings], 'setting');
   drupal_add_js($module_path . '/popup_onload.js');
 
   // Add some basic colorbox styling.
@@ -287,43 +323,43 @@ function popup_onload_add_popup($popup_settings) {
  * Implements hook_entity_info().
  */
 function popup_onload_entity_info() {
-  $info['popup_onload'] = array(
+  $info['popup_onload'] = [
     'label' => 'Popup On Load',
     'entity class' => 'PopupOnLoad',
     'controller class' => 'PopupOnLoadController',
     'base table' => 'popup_onload',
     'fieldable' => TRUE,
-    'entity keys' => array(
+    'entity keys' => [
       'id' => 'popup_id',
       'bundle' => 'bundle_type',
       'label' => 'name',
       'language' => 'language',
-    ),
-    'bundle keys' => array(
+    ],
+    'bundle keys' => [
       'bundle' => 'bundle_type',
-    ),
-    'bundles' => array(
-      'popup_onload_basic' => array(
+    ],
+    'bundles' => [
+      'popup_onload_basic' => [
         'label' => 'Popup On Load',
-        'admin' => array(
+        'admin' => [
           'path' => 'admin/structure/popup_onload/manage',
-          'access arguments' => array('administer popup_onload entities'),
-        ),
-      ),
-    ),
-    'view modes' => array(
-      'full' => array(
+          'access arguments' => ['administer popup_onload entities'],
+        ],
+      ],
+    ],
+    'view modes' => [
+      'full' => [
         'label' => t('Full content'),
         'custom settings' => TRUE,
-      ),
-    ),
+      ],
+    ],
     'access callback' => 'popup_onload_access',
     'module' => 'popup_onload',
-    'admin ui' => array(
+    'admin ui' => [
       'path' => 'admin/content/popup_onload',
       'file' => 'popup_onload.admin.inc',
-    ),
-  );
+    ],
+  ];
 
   return $info;
 }
@@ -339,15 +375,15 @@ function popup_onload_access($op, $type = NULL, $account = NULL) {
  * Fetch a popup_onload object.
  */
 function popup_onload_load($popup_onload_id = NULL, $reset = FALSE) {
-  $popup_onload_ids = (isset($popup_onload_id) ? array($popup_onload_id) : array());
-  $popup_onload = popup_onload_load_multiple($popup_onload_ids, array(), $reset);
+  $popup_onload_ids = (isset($popup_onload_id) ? [$popup_onload_id] : []);
+  $popup_onload = popup_onload_load_multiple($popup_onload_ids, [], $reset);
   return $popup_onload ? reset($popup_onload) : FALSE;
 }
 
 /**
  * Loads multiple popup_onload entities.
  */
-function popup_onload_load_multiple($popup_onload_ids = FALSE, $conditions = array(), $reset = FALSE) {
+function popup_onload_load_multiple($popup_onload_ids = FALSE, $conditions = [], $reset = FALSE) {
   return entity_load('popup_onload', $popup_onload_ids, $conditions, $reset);
 }
 
@@ -355,35 +391,50 @@ function popup_onload_load_multiple($popup_onload_ids = FALSE, $conditions = arr
  * Implements hook_menu().
  */
 function popup_onload_menu() {
-  $items = array();
+  $items = [];
 
-  $items['admin/config/user-interface/popup_onload'] = array(
+  $items['admin/config/user-interface/popup_onload'] = [
     'title' => 'Popup On Load',
     'description' => 'Configure popups on page load.',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('popup_onload_admin_settings_form'),
+    'page arguments' => ['popup_onload_admin_settings_form'],
     'file' => 'popup_onload.admin.inc',
-    'access arguments' => array('administer popup_onload entities'),
+    'access arguments' => ['administer popup_onload entities'],
     'type' => MENU_NORMAL_ITEM,
-  );
+  ];
 
-  $items['admin/structure/popup_onload/manage'] = array(
+  $items['admin/structure/popup_onload/manage'] = [
     'title' => 'Popup On Load',
-    'access arguments' => array('administer popup_onload entities'),
-  );
+    'access arguments' => ['administer popup_onload entities'],
+  ];
+
+  $items['popup_onload_save_cookie_gateway'] = [
+    'title' => 'Popup cookie AJAX gate',
+    'page callback' => 'popup_onload_save_cookie',
+    'access arguments' => ['access content'],
+    'type' => MENU_CALLBACK,
+  ];
 
   return $items;
+}
+
+/**
+ * Implements hook_menu_alter().
+ */
+function popup_onload_menu_alter(&$items) {
+  $items['admin/content/popup_onload']['type'] = MENU_LOCAL_TASK;
+  $items['admin/content/popup_onload']['title'] = t('Popups');
 }
 
 /**
  * Implements hook_permission().
  */
 function popup_onload_permission() {
-  $permissions = array(
-    'administer popup_onload entities' => array(
+  $permissions = [
+    'administer popup_onload entities' => [
       'title' => t('Administer Popup On Load entities'),
-    ),
-  );
+    ],
+  ];
   return $permissions;
 }
 
@@ -391,41 +442,56 @@ function popup_onload_permission() {
  * Implements hook_field_extra_fields().
  */
 function popup_onload_field_extra_fields() {
-  $form_elements['name'] = array(
+  $form_elements['name'] = [
     'label' => t('Name'),
     'description' => t('Popup name'),
     'weight' => 0,
-  );
-  $form_elements['body'] = array(
+  ];
+  $form_elements['body'] = [
     'label' => t('Body'),
     'description' => t('Popup body'),
     'weight' => 1,
-  );
-  $form_elements['width'] = array(
+  ];
+  $form_elements['width'] = [
     'label' => t('Width'),
     'description' => t('Popup width'),
     'weight' => 2,
-  );
-  $form_elements['height'] = array(
+  ];
+  $form_elements['height'] = [
     'label' => t('Height'),
     'description' => t('Popup height'),
     'weight' => 3,
-  );
-  $form_elements['fixed_position'] = array(
+  ];
+  $form_elements['fixed_position'] = [
     'label' => t('Fixed position'),
     'description' => t('Whether a popup is fixed'),
     'weight' => 4,
-  );
+  ];
+  $form_elements['active_popup'] = [
+    'label' => t('Active'),
+    'description' => t('Popup status'),
+    'weight' => 5,
+  ];
+  $form_elements['cookie_lifetime_single_checkbox'] = [
+    '#title' => t('Specify popup cookie lifetime'),
+    '#type' => 'checkbox',
+    'weight' => 5,
+  ];
+  $form_elements['cookie_lifetime_single'] = [
+    'label' => t('Cookie lifetime single'),
+    'description' => t('Cookie lifetime for single popup.'),
+    'weight' => 6,
+  ];
 
   // Since we have only one bundle type, we'll just provide the extra_fields
   // for it here.
-  $extra_fields = array(
-    'popup_onload' => array(
-      'popup_onload_basic' => array(
+  $extra_fields = [
+    'popup_onload' => [
+      'popup_onload_basic' => [
         'form' => $form_elements,
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $extra_fields;
 }
@@ -434,25 +500,25 @@ function popup_onload_field_extra_fields() {
  * Implements hook_entity_property_info().
  */
 function popup_onload_entity_property_info() {
-  $info = array();
+  $info = [];
   // Add meta-data about the basic node properties.
   $properties = &$info['popup_onload']['properties'];
-  $properties['popup_id'] = array(
+  $properties['popup_id'] = [
     'label' => t('Popup ID'),
     'type' => 'integer',
     'description' => t('Popup ID'),
     'schema field' => 'popup_id',
     'setter callback' => 'entity_property_verbatim_set',
-  );
-  $properties['bundle_type'] = array(
+  ];
+  $properties['bundle_type'] = [
     'label' => t("Bundle type"),
     'type' => 'token',
     'description' => t("The type of the entity."),
     'setter callback' => 'entity_property_verbatim_set',
     'required' => TRUE,
     'schema field' => 'bundle_type',
-  );
-  $properties['language'] = array(
+  ];
+  $properties['language'] = [
     'label' => t("Language"),
     'type' => 'token',
     'description' => t("The language of the popup."),
@@ -460,49 +526,63 @@ function popup_onload_entity_property_info() {
     'options list' => 'entity_metadata_language_list',
     'schema field' => 'language',
     'setter permission' => 'administer popup_onload entities',
-  );
-  $properties['name'] = array(
+  ];
+  $properties['name'] = [
     'label' => t("name"),
     'description' => t("The name of the popup."),
     'setter callback' => 'entity_property_verbatim_set',
     'schema field' => 'name',
     'required' => TRUE,
-  );
-  $properties['body'] = array(
+  ];
+  $properties['body'] = [
     'type' => 'text_formatted',
     'label' => t('The main body text'),
     'setter callback' => 'entity_property_verbatim_set',
     'property info' => entity_property_text_formatted_info(),
     'auto creation' => 'entity_property_create_array',
-  );
-  $properties['format'] = array(
+  ];
+  $properties['format'] = [
     'label' => t("Format"),
     'description' => t("The format of the popup body."),
     'setter callback' => 'entity_property_verbatim_set',
     'schema field' => 'format',
     'required' => TRUE,
-  );
-  $properties['width'] = array(
+  ];
+  $properties['width'] = [
     'label' => t("Width"),
     'description' => t("Popup width."),
     'type' => 'integer',
     'setter callback' => 'entity_property_verbatim_set',
     'schema field' => 'width',
-  );
-  $properties['height'] = array(
+  ];
+  $properties['height'] = [
     'label' => t("Height"),
     'description' => t("Popup height."),
     'type' => 'integer',
     'setter callback' => 'entity_property_verbatim_set',
     'schema field' => 'height',
-  );
-  $properties['fixed_position'] = array(
+  ];
+  $properties['fixed_position'] = [
     'label' => t("Fixed position"),
     'description' => t("Whether the popup position is fixed."),
     'type' => 'boolean',
     'setter callback' => 'entity_property_verbatim_set',
     'schema field' => 'fixed_position',
-  );
+  ];
+  $properties['active_popup'] = [
+    'label' => t("Active"),
+    'description' => t("Activate or deactivate a popup."),
+    'type' => 'boolean',
+    'setter callback' => 'entity_property_verbatim_set',
+    'schema field' => 'active_popup',
+  ];
+  $properties['cookie_lifetime_single'] = [
+    'label' => t("Cookie lifetime single"),
+    'description' => t("Cookie lifetime for single popup."),
+    'type' => 'boolean',
+    'setter callback' => 'entity_property_verbatim_set',
+    'schema field' => 'fixed_position',
+  ];
 
   return $info;
 }

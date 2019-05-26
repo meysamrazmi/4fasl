@@ -10,41 +10,41 @@
  * Implements hook_schema().
  */
 function popup_onload_statistics_schema() {
-  $schema = array();
+  $schema = [];
 
-  $schema['popup_onload_statistics'] = array(
+  $schema['popup_onload_statistics'] = [
     'description' => 'Primary Key: Identifier for a popup.',
-    'fields' => array(
-      'aid' => array(
+    'fields' => [
+      'aid' => [
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'description' => 'Primary Key: Identifier for an action.',
-      ),
-      'popup_id' => array(
+      ],
+      'popup_id' => [
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'description' => 'Popup identifier.',
-      ),
-      'type' => array(
+      ],
+      'type' => [
         'type' => 'varchar',
         'not null' => TRUE,
         'length' => 32,
         'description' => 'Action type.',
-      ),
-      'atime' => array(
+      ],
+      'atime' => [
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
         'description' => 'Action time.',
-      ),
-    ),
-    'primary key' => array('aid'),
-    'indexes' => array(
-      'popup_id' => array('popup_id'),
-    ),
-  );
+      ],
+    ],
+    'primary key' => ['aid'],
+    'indexes' => [
+      'popup_id' => ['popup_id'],
+    ],
+  ];
 
   return $schema;
 }

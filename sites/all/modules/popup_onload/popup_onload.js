@@ -18,7 +18,18 @@ Drupal.behaviors.initPopupOnLoad = {
         $.colorbox(popup_onload_settings);
       }, popup_onload_settings.delay);
     });
+
+    $(document).bind('cbox_complete', function() {
+      $.ajax({
+        async: false,
+        dataType: 'json',
+        data: {
+          popup_id: settings.popup_onload.popup_id
+        },
+        type: 'POST',
+        url: '/popup_onload_save_cookie_gateway'
+      });
+    });
   }
 }
-
 })(jQuery);

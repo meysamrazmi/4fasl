@@ -14,7 +14,7 @@ extends Entity {
   /**
    * Entity constructor.
    */
-  public function __construct($values = array()) {
+  public function __construct($values = []) {
     parent::__construct($values, 'popup_onload');
   }
 
@@ -47,9 +47,9 @@ extends EntityAPIController {
    *
    * @see EntityAPIController::create()
    */
-  public function create(array $values = array()) {
+  public function create(array $values = []) {
     // Add values that are specific to our popup_onload.
-    $values += array(
+    $values += [
       'popup_id' => '',
       'bundle_type' => 'popup_onload_basic',
       'is_new' => TRUE,
@@ -60,7 +60,8 @@ extends EntityAPIController {
       'width' => 0,
       'height' => 0,
       'fixed_position' => 0,
-    );
+      'active_popup' => 1,
+    ];
 
     $popup_onload = parent::create($values);
     return $popup_onload;
@@ -85,8 +86,8 @@ extends EntityAPIController {
    *   Optionally. Allows pre-populating the built content to ease overridding
    *   this method.
    */
-  public function buildContent($entity, $view_mode = 'full', $langcode = NULL, $content = array()) {
-    $content['body'] = array(
+  public function buildContent($entity, $view_mode = 'full', $langcode = NULL, $content = []) {
+    $content['body'] = [
       '#theme' => 'field',
       '#weight' => 0,
       '#title' => t('Body'),
@@ -98,10 +99,10 @@ extends EntityAPIController {
       '#field_type' => 'text',
       '#entity_type' => 'popup_onload',
       '#bundle' => $entity->bundle_type,
-      '#items' => array(array('value' => $entity->body)),
+      '#items' => [['value' => $entity->body]],
       '#formatter' => 'text_default',
-      0 => array('#markup' => check_markup($entity->body, $entity->format),),
-    );
+      0 => ['#markup' => check_markup($entity->body, $entity->format)],
+    ];
     return parent::buildContent($entity, $view_mode, $langcode, $content);
   }
 

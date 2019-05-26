@@ -14,9 +14,9 @@
  * @see popup_onload_sort_methods()
  */
 function hook_popup_onload_sort_methods() {
-  return array(
+  return [
     'mymodule_callback' => t('Sort method'),
-  );
+  ];
 }
 
 /**
@@ -28,7 +28,7 @@ function hook_popup_onload_sort_methods() {
  * @see popup_onload_check_display_conditions()
  */
 function hook_popup_onload_check_display_conditions($popup_onload) {
-  return !popup_onload_check_time_cookie();
+  return !popup_onload_check_time_cookie($popup_onload);
 }
 
 /**

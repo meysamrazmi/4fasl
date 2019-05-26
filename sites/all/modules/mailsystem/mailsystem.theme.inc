@@ -1,13 +1,13 @@
 <?php
 
 /**
-* @file
-* The theme system, which controls the output of email messages.
-*/
+ * @file
+ * The theme system, which controls the output of email messages.
+ */
 
 /**
-* Implements hook_theme_registry_alter().
-*/
+ * Implements hook_theme_registry_alter().
+ */
 function mailsystem_theme_theme_registry_alter(&$theme_registry) {
   global $theme_key;
   static $recursion_prevention = FALSE;
@@ -26,7 +26,7 @@ function mailsystem_theme_theme_registry_alter(&$theme_registry) {
     if (isset($themes[$mailsystem_theme])) {
       $theme = clone $themes[$mailsystem_theme];
       if (isset($theme)) {
-		// Swap to the mailsystem theme.
+        // Swap to the mailsystem theme.
         $old_theme = $theme_key;
         mailsystem_theme_swap_theme($mailsystem_theme);
 
@@ -46,11 +46,11 @@ function mailsystem_theme_theme_registry_alter(&$theme_registry) {
 
         // Include template files to let _theme_load_registry add preprocess
         // functions.
-        
         foreach ($base_theme as $base) {
-          include_once(drupal_get_path('theme', $base->name) . '/template.php');
+          include_once drupal_get_path('theme', $base->name) . '/template.php';
         }
-		include_once drupal_get_path('theme', $theme->name) . '/template.php';
+        include_once drupal_get_path('theme', $theme->name) . '/template.php';
+
         // Get the theme_registry cache.
         $cache = _theme_load_registry($theme, $base_theme, $theme_engine);
 
@@ -79,15 +79,14 @@ function mailsystem_theme_theme_registry_alter(&$theme_registry) {
             }
           }
         }
-		
-		// Swap back to the original theme.
-        mailsystem_theme_swap_theme($old_theme); 
+
+        // Swap back to the original theme.
+        mailsystem_theme_swap_theme($old_theme);
       }
     }
   }
   $recursion_prevention = FALSE;
 }
-
 
 /**
  * Helper to swap themes safely for use by mailsystem_theme_theme_registry_alter().
