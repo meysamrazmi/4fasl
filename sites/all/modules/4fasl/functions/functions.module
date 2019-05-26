@@ -57,7 +57,8 @@ function unread_tickets($user){
 }
 
 function unread_tickets_count($user){
-	return count(unread_tickets($user));
+  $tickets = unread_tickets($user);
+	return ($tickets != null)? count($tickets) : 0;
 }
 
 function student_films($uid , $detail = false){

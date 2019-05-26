@@ -318,10 +318,9 @@ function update_ostad_timing($ostad_uid, $student_uid, $timing) {
 	// Wrap it with Entity API
 	$collection = entity_metadata_wrapper('field_collection_item', $raw_collection);
 	//dsm the old value
-	//dsm($collection->field_user->value());
+	dpm($collection->field_user->value());
 	// Set a new value on the field_example textfield.
-    mdump($raw_user, true);
-	$collection->field_user = array($student_uid);
+    $collection->field_user = array($student_uid);
 	// Save the changes to the entity
 	$collection->save(); 
 }
