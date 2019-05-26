@@ -22,6 +22,8 @@ if (!class_exists('cmfcExceptionStandAlone')) {
 
 define('CMF_ClassesCore_Ok',true,true);
 define('CMF_ClassesCore_Error',2,true);
+define('CMF_Error',     1);
+define('CMF_Ln_English',     'en');
 
 /**
  * all cmf classes inherit from this class

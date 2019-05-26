@@ -1,6 +1,6 @@
 === DESCRIPTION  ===
 
-  Support for various calendar systems like Jalali, Gregorian, Hijir, Hebew, Thai, etc.
+  Support for various calendar systems like Iranian, Gregorian, Hijri, Hebew, Thai, etc.
 
   - Supports Iranian/Persian , Arabic/Hijri/Islamic, Thai, Gregorian Calendar systems
   - Integration with Drupal's node "authored on" and "admin authored" fields
@@ -33,7 +33,7 @@ calendar_systems_get_calendar_instance
 
   You can use calendar_systems_get_calendar_instance($calendar_system = NULL, $language = NULL) to get and instance
   of a calendar system.
-  For exmaple to get an instance of iranian calendar system : 
+  For example to get an instance of iranian calendar system : 
   $calendar = calendar_systems_get_calendar_instance('iranian');
   $calendar->date('Y-m-d',time());
 
@@ -65,10 +65,10 @@ calendar_systems_get_calendar_system_name
 
 === Extend : Plugin System and adding new calendar system ===
 
-Calendar systems mopdule has a plugable architecure which means that each calendar system is a plugin
+Calendar systems module has a pluggable architecture which means that each calendar system is a plug-in
 new calendar system can easily be added.
-Plugins are located at calendar\v1\calendarSystems, they will be automatically detected and included by
-Caledanr systems module once put on this location.
+Plug-ins are located at calendar\v1\calendarSystems, they will be automatically detected and included by
+Calendar systems module once put on this location.
 Copy and rename one of the calendar system in this folder and start implementing you new calendar :)
 
 === Support ===
