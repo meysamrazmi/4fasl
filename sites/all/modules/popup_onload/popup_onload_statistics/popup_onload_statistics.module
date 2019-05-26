@@ -9,12 +9,12 @@
  * Implements hook_theme().
  */
 function popup_onload_statistics_theme($existing, $type, $theme, $path) {
-  $items = array(
-    'popup_onload_statistics_table' => array(
-      'variables' => array('stats' => NULL),
+  $items = [
+    'popup_onload_statistics_table' => [
+      'variables' => ['stats' => NULL],
       'file' => 'popup_onload_statistics.theme.inc',
-    ),
-  );
+    ],
+  ];
 
   return $items;
 }
@@ -51,23 +51,23 @@ function popup_onload_statistics_add_js() {
  * Implements hook_menu().
  */
 function popup_onload_statistics_menu() {
-  $items = array();
+  $items = [];
 
-  $items['popup_onload_stats_log'] = array(
+  $items['popup_onload_stats_log'] = [
     'title' => 'Popup statistics AJAX gate',
     'page callback' => 'popup_onload_statistics_log',
-    'access arguments' => array('access content'),
+    'access arguments' => ['access content'],
     'type' => MENU_CALLBACK,
-  );
+  ];
 
-  $items['admin/reports/popup-statistics'] = array(
+  $items['admin/reports/popup-statistics'] = [
     'title' => 'Popup statistics',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('popup_onload_statistics_admin_form'),
+    'page arguments' => ['popup_onload_statistics_admin_form'],
     'file' => 'popup_onload_statistics.admin.inc',
-    'access arguments' => array('access site reports'),
+    'access arguments' => ['access site reports'],
     'type' => MENU_NORMAL_ITEM,
-  );
+  ];
 
   return $items;
 }
@@ -89,14 +89,14 @@ function popup_onload_statistics_log() {
 
   drupal_write_record('popup_onload_statistics', $record);
 
-  drupal_json_output(array('status' => 1));
+  drupal_json_output(['status' => 1]);
 }
 
 /**
  * Fetch statistics from the database.
  */
 function popup_onload_statistics_get_stats($date_from = NULL, $date_to = NULL) {
-  $params = array();
+  $params = [];
   $date_sql = '';
 
   if (!is_null($date_from)) {
@@ -112,15 +112,15 @@ function popup_onload_statistics_get_stats($date_from = NULL, $date_to = NULL) {
   $query->leftJoin('popup_onload_statistics', 'sps', 'sps.popup_id = p.popup_id ' . $date_sql, $params);
   $query->addExpression('COUNT(sps.type)', 'action_count');
   $query
-    ->fields('p', array('name', 'popup_id'))
-    ->fields('sps', array('atime', 'type', 'aid'))
+    ->fields('p', ['name', 'popup_id'])
+    ->fields('sps', ['atime', 'type', 'aid'])
     ->groupBy('popup_id')
     ->groupBy('type')
     ->orderBy('name');
 
   $result = $query->execute()->fetchAll();
 
-  $stats = array();
+  $stats = [];
   $group_id = 0;
   foreach ($result as $row) {
     if ($row->popup_id != $group_id) {

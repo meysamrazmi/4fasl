@@ -29,7 +29,7 @@ install.php
 update.php
 xmlrpc.php
 .idea
-
+tmp/
 #ignore some file types
 *.zip
 *.rar

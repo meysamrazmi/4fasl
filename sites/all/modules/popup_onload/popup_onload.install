@@ -9,73 +9,86 @@
  * Implements hook_schema().
  */
 function popup_onload_schema() {
-  $schema = array();
+  $schema = [];
 
-  $schema['popup_onload'] = array(
+  $schema['popup_onload'] = [
     'description' => 'The base table for popup entities.',
-    'fields' => array(
-      'popup_id' => array(
+    'fields' => [
+      'popup_id' => [
         'description' => 'Primary Key: Identifier for a popup.',
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
-      ),
-      'bundle_type' => array(
+      ],
+      'bundle_type' => [
         'description' => 'The type of the popup.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-      ),
-      'language' => array(
+      ],
+      'language' => [
         'description' => 'The language of the popup.',
         'type' => 'varchar',
         'length' => 32,
         'not null' => TRUE,
         'default' => '',
-      ),
-      'name' => array(
+      ],
+      'name' => [
         'description' => 'The name of the popup - a human-readable identifier.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => '',
-      ),
-      'body' => array(
+      ],
+      'body' => [
         'type' => 'text',
         'not null' => FALSE,
         'description' => 'The body of the popup.',
-      ),
-      'format' => array(
+      ],
+      'format' => [
         'type' => 'varchar',
         'length' => 255,
         'not null' => FALSE,
         'description' => 'Format of the popup\'s body.',
-      ),
-      'width' => array(
+      ],
+      'width' => [
         'description' => 'The width of the popup.',
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
-      ),
-      'height' => array(
+      ],
+      'height' => [
         'description' => 'The height of the popup.',
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
-      ),
-      'fixed_position' => array(
+      ],
+      'fixed_position' => [
         'description' => 'Indicate whether the popup position is fixed in the browser.',
         'type' => 'int',
         'size' => 'tiny',
         'not null' => TRUE,
         'default' => 0,
-      ),
-    ),
-    'primary key' => array('popup_id'),
-    'indexes' => array(
-      'bundle_type' => array('bundle_type'),
-    ),
-  );
+      ],
+      'active_popup' => [
+        'description' => 'Provide option to deactivate popup.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 1,
+      ],
+      'cookie_lifetime_single' => [
+        'description' => 'Provide ability to set cookie lifetime for single popup',
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => NULL,
+      ],
+    ],
+    'primary key' => ['popup_id'],
+    'indexes' => [
+      'bundle_type' => ['bundle_type'],
+    ],
+  ];
 
   return $schema;
 }
@@ -109,4 +122,35 @@ function popup_onload_update_7101() {
   variable_set(POPUP_ONLOAD_VAR_COOKIE_LIFETIME, $popup_cookie_lifetime * 24 * 60 * 60);
   // Set default popup cookie name.
   variable_set(POPUP_ONLOAD_VAR_COOKIE_NAME, 'popup_onload_cookie_name');
+}
+
+/**
+ * Implements hook_update_N().
+ *
+ * 1. Add active_popup field.
+ */
+function popup_onload_update_7102() {
+  db_add_field('popup_onload', 'active_popup', [
+      'description' => 'Provide option to deactivate popup.',
+      'type' => 'int',
+      'size' => 'tiny',
+      'not null' => TRUE,
+      'default' => 1,
+    ]
+  );
+}
+
+/**
+ * Implements hook_update_N().
+ *
+ * 1. Add cookie cookie_lifetime_single field.
+ */
+function popup_onload_update_7103() {
+  db_add_field('popup_onload', 'cookie_lifetime_single', [
+      'description' => 'Provide ability to set cookie lifetime for single popup',
+      'type' => 'int',
+      'not null' => FALSE,
+      'default' => NULL,
+    ]
+  );
 }

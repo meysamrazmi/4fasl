@@ -8,7 +8,7 @@
  * Implements hook_default_rules_configuration().
  */
 function popup_onload_display_default_rules_configuration() {
-  $items = array();
+  $items = [];
   $items['rules_display_popup_onload'] = entity_import('rules_config', '{ "rules_display_popup_onload" : {
       "LABEL" : "Display a popup on page load",
       "PLUGIN" : "reaction rule",
