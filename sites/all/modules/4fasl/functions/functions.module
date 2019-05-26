@@ -106,7 +106,7 @@ function student_films($uid , $detail = false){
 		}
 	}
 
-	return count($output)? $output : null;
+	return $output;
 }
 
 function timetoexpire($uid){
@@ -472,7 +472,7 @@ function instrument_info($condition = '', $value = '', $fileds = array(), $type 
 //	mdump($q, true);
 	if (is_object($q)){ 
 		if(isset($fileds[0]) && !isset($fileds[1])){
-			return $q->$fileds[0];
+			return $q->{$fileds[0]};
 		}else {
 			return $q;
 		}
