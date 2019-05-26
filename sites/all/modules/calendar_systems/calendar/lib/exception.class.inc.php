@@ -49,7 +49,8 @@ class cmfcExceptionStandAlone extends Exception {
 	}
 	
 	public static function isError($obj,$code=null) {
-        if (strtolower(get_class($obj))==strtolower('cmfcExceptionStandAlone') || strtolower(get_class($obj))==strtolower('Exception') || strtolower(get_class($obj))=='pear_error') {
+		$className = is_object($obj)? get_class($obj) : '';
+		if (strtolower($className)==strtolower('cmfcExceptionStandAlone') || strtolower($className)==strtolower('Exception') || strtolower($className)=='pear_error') {
 			return true;
 		} else {
 			return false;

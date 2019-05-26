@@ -786,4 +786,17 @@ class cmfcCalendarV1Arabic extends cmfcCalendarV1 implements cmfcCalendarV1Plugi
 	    );
         return $stringGroups;
     }
+
+    /**
+    * @desc accept array,timestamp and string as input datetime in jalali or gregorian format
+    */
+    function smartGet($type, $value="now") {
+      if ($value!='now') {
+          $value=$this->strtotime($value);
+      }
+
+      if (empty($value)) return;
+
+      return $this->date($type,$value);
+    }
 }
