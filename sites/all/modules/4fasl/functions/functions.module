@@ -982,6 +982,7 @@ function pay_for_practice($user, $points){
 
 function get_current_points($user){
 	$points = userpoints_get_current_points($user->uid, 'all');
+  $last_practice = 0;
 
 	$payed = db_select('pay_practice', 'payed')
 			->fields('payed', array())
@@ -995,12 +996,26 @@ function get_current_points($user){
 			->condition('nid', 0, '!=')
 			->orderBy('description', 'DESC')
 			->execute()->fetchObject();
- 
+  $last_practice = isset($last->id)? $last->description : 0;
+
+  //new user just enrolled
+  if(!isset($last->id) && (isset($user->roles[4]) || isset($user->roles[7])) ) {//user has a role but didn't send any practice, so he is new registered
+    $expiration = db_select('uc_roles_expirations', 'e')
+      ->fields('e', array())
+      ->condition('e.uid', $user->uid)
+      ->condition('e.expiration', time() , '>')
+      ->orderBy('e.expiration', 'DESC')
+      ->execute()->fetchObject();
+
+    if(isset($expiration->reid) && ((int)$expiration->expiration - time()) > 0 ){
+      $last_practice = (int)$expiration->expiration - (60*60*24*6);
+    }
+  }
 	$data = array(
 		'points' => $points, 
 		'displayPoints' => formatMoney($points), 
 		'available' => count($payed),
-		'lastPractice' => isset($last->id)? $last->description : 0
+		'lastPractice' => $last_practice
 	);
 	
 	drupal_json_output($data);
