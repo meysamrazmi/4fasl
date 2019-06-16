@@ -120,6 +120,9 @@
 .hoda {
   font-family: hoda;
 }
+.front .hidden-in-front{
+  display: none;
+}
 .userpoints-points, .add-to-cart .attributes label, .hms, .digit, .ui-widget-header, .top-title, #jquery-countdown-timer-note, #content .fc-header h2, .cart-block-item-qty, .uc-price {
   font-family: fanum;
 }
@@ -1224,7 +1227,7 @@ div#userpoints_list_wrapper > div,
     margin: 15px;
 }
 .æíÑÇíÔ\<span.class\=\"element-invisible\"\>\(áÈå.ÝÚÇá\)\<\/span\>,
-.page-user li.æíÑÇíÔ<span {
+.page-user li.æíÑÇíÔ > span {
     display: none !important;
 }
 .page-user li.æíÑÇíÔ,
@@ -5230,7 +5233,7 @@ body.has-vip:before {
   top: 0;
   z-index: 0;
   opacity: 0;
-  background-image: url(http://4faslmusic.ir/sites/all/themes/bootstrap/images/colors-loading.gif);
+  background-image: url(/sites/all/themes/bootstrap/images/colors-loading.gif);
   background-repeat: no-repeat;
   background-position: center center;
 }

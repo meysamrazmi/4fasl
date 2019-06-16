@@ -196,6 +196,16 @@ background-color: #36134e;
 .saaz-request a:before {
     content: "\f07a";
 }
+.user-messages a:before {
+  content: '\f36a';
+  font-family: mat;
+  color: #693496;
+  font-weight: normal;
+  float: right;
+  margin: -3px 2px 0 10px;
+  font-size: 21px;
+  vertical-align: middle;
+}
 #mini-panel-right_side .user-tamdid a:before {
   content: "\f0e8";
   font-family: mat;

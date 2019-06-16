@@ -37,8 +37,8 @@ function site_setting(){
 				)) .
 				$ostad->field_naame['und'][0]['value'] . '</a></div>',	
 			$row->Teacher_OptionId,
-			!is_null($row->teacher_link) ? '<a href="'. $row->teacher_link .'" class="button" target="_blank">فیلم ها</a>' : '',
-			substr($row->Teacher_Intro, 0, 100) . '....',
+			!is_null($row->teacher_link) ? '<a href="'. $row->teacher_link .'" class="button" target="_blank">فیلم ها</a>' : '',
+			substr(strip_tags($row->Teacher_Intro), 0, 100) . '....',
 			'<a href="/admin/4fasl-setting/'. $row->id .'/edit">ویرایش</a>',
 		);
 	}

@@ -75,9 +75,15 @@ function uc_user_uc_order($op, $order, $status) {
 						}
 						
 						//im not sure this is the best idea to not give user role in his first week
-				        uc_roles_grant($order_user, $role, time() + (1 * 24 * 60 * 60));
+				        uc_roles_grant($order_user, $role, time() + (7 * 24 * 60 * 60));
 
-						$relationship = user_relationships_request_relationship($order->uid, $teacher_uid , $type , $approved);
+						//sending message to user
+						$node = node_load(4887);
+						$body = isset($node->body['und'][0])? $node->body['und'][0]['value'] : '';
+            privatemsg_new_thread(array(user_load($order_user->uid)), 'راهنمای بعد از ثبت نام', $body, array('author' => user_load(86) , 'format' => 'full_html'));
+
+
+            $relationship = user_relationships_request_relationship($order->uid, $teacher_uid , $type , $approved);
 						if($relationship === FALSE){
 							drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 5 , '@val' => $value ,)), 'error');
 						}

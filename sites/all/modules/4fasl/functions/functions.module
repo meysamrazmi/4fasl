@@ -1008,7 +1008,7 @@ function get_current_points($user){
       ->execute()->fetchObject();
 
     if(isset($expiration->reid) && ((int)$expiration->expiration - time()) > 0 ){
-      $last_practice = (int)$expiration->expiration - (60*60*24*6);
+      $last_practice = (int)$expiration->expiration - (60*60*24*7);
     }
   }
 	$data = array(

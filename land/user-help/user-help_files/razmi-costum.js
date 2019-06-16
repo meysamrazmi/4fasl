@@ -267,7 +267,7 @@ Drupal.behaviors.myBehavior = {attach: function (context, settings) {
 /*-----------------*/
 	
 	$('.table > thead > tr > th img').each(function(){
-		if($(this).attr('src') == 'http://4faslmusic.ir/misc/arrow-desc.png'){
+		if($(this).attr('src') == '/misc/arrow-desc.png'){
 			$(this).parent().addClass('desc').removeClass('asc');
 		}else{
 			$(this).parent().addClass('asc').removeClass('desc');

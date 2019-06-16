@@ -1,0 +1,325 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function privatemsg_mod_menu() {
+	$items['admin/content/messages'] = array(
+		'title' => t('all messages'),
+		'page callback' => 'administer_messages',
+		'access arguments' => array('administer privatemsg settings'),
+		'file' => 'admin.inc',
+		'type' => MENU_LOCAL_TASK,
+		'weight' => 1,
+	);
+	$items['messages/edit/%privatemsg_thread/%privatemsg_message'] = array(
+		'title'           			=> t('Edit message'),
+		'page callback'   	=> 'drupal_get_form',
+		'page arguments'	=> array('privatemsg_edit', 2, 3),
+		'access callback'   	=> 'privatemsg_mod_access',
+		'access arguments' => array('edit privatemsg', 3),
+		'type'             		=> MENU_CALLBACK,
+		'weight'           		=> -10,
+	);
+	$items['user/%user/messages/view/%privatemsg_thread'] = array(
+		// Set the third argument to TRUE so that we can show access denied instead of not found.
+		'load arguments'   => array(NULL, NULL, TRUE),
+		'title'            => 'Read message',
+		'page callback'    => 'privatemsg_view',
+		'page arguments'   => array(4),
+		'file'             => 'privatemsg.pages.inc',
+		'access callback'  => 'privatemsg_mod_view_access',
+		'access arguments' => array(1,4),
+		'type'             => MENU_LOCAL_TASK,
+		'weight'           => -5,
+		'menu_name'        => 'user-menu',
+		'file path' => drupal_get_path('module', 'privatemsg'),
+	);
+	$items['user/%user/messages/new'] = array(
+		'title'            => 'Write new message',
+		'page callback'    => 'drupal_get_form',
+		'page arguments'   => array('privatemsg_new', 4, 5, NULL),
+		'file'             => 'privatemsg.pages.inc',
+		'access callback'  => 'privatemsg_mod_access',
+		'access arguments' => array('write privatemsg', null),
+		'type'             => MENU_LOCAL_TASK,
+		'weight'           => -3,
+		'menu_name'        => 'user-menu',
+		'file path' => drupal_get_path('module', 'privatemsg'),
+	);	
+	return $items;
+}
+
+/**
+ * Implementation of hook_form_alter().
+ *
+ * adding validation and submitting functions for new messages
+ * to check and prevent of multiple threads between 2 users
+ */
+function privatemsg_mod_form_alter(&$form, &$form_state, $form_id) {
+	//adding a button for writing new message
+	if($form_id == 'privatemsg_list'){
+		$form['new_message_button'] = array(
+            '#type' => 'link',
+            '#title' => t('new message'),
+            '#href' => '/messages/new',
+			'#attributes' => array('class' => 'green-btn' , 'target' => '_blank'),
+		);
+	}
+
+	if($form_id == 'privatemsg_new'){
+		array_push($form['#validate'], 'privatemsg_new_mod_validate');
+		array_push($form['#submit'], 'privatemsg_new_mod_submit');
+	}
+}
+
+function privatemsg_new_mod_validate($form, &$form_state){
+	$message = $form_state['validate_built_message'];
+	$recipient = reset($message->recipients);
+	if(count($message->recipients) == 1 && !isset($message->thread_id) && $recipient->type == 'user'){
+		$author_id = $message->author->uid;
+		//finding previous threads of twe users
+		$thread = db_query(
+			'SELECT DISTINCT in1.thread_id FROM {pm_index} in1 
+			JOIN {pm_index} in2 ON in1.thread_id = in2.thread_id AND in1.recipient != in2.recipient 
+			WHERE in1.recipient = :author AND in2.recipient = :recipient 
+			AND in1.thread_id NOT IN (
+				SELECT DISTINCT in1.thread_id FROM {pm_index} in1 
+				JOIN {pm_index} in2 ON in1.thread_id = in2.thread_id AND in1.recipient != in2.recipient 
+				WHERE in1.recipient = :author AND in2.recipient <> :recipient)', 
+			array(':author' => $author_id, ':recipient' => $recipient->uid)
+		);
+		$thread = $thread->fetchObject();
+		if(count($thread) == 1)
+			$message->thread_id = $thread->thread_id;
+	}
+	$form_state['validate_built_message'] = $message;
+}
+
+/*
+ * redirecting user to message after submitting the form
+ */
+function privatemsg_new_mod_submit($form, &$form_state){
+	$message = $form_state['validate_built_message'];
+	$form_state['redirect'] = '/user/'. $message->author->uid . '/messages/view/'. $message->thread_id; 
+}
+
+/**
+ * Access callback for user account editing.
+ */
+function privatemsg_mod_access($permission, $message) {
+	global $user;
+	if($permission == 'write privatemsg'){
+		$access = privatemsg_user_access($permission);
+		return $access;
+	}
+	if(isset($message)){
+		if(!is_object($message)){
+			$message = privatemsg_message_load($message);
+		}
+		$author = $message->author;
+		$end = $message->timestamp + (2 * 24 * 60 * 60);
+		if($user->uid == $author->uid && user_access($permission, $user) && time() < $end){
+			return true;
+		}
+		//grant all access to administrator
+		if(user_access('administer privatemsg settings', $user)){
+			return true;
+		}		
+	}
+	
+	return false;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function privatemsg_mod_permission() {
+return array(
+		'edit privatemsg' => array(
+			'title' => t('Edit Privatemsg'),
+			'description' => t('edit own private messages'),
+		),
+	);
+}
+
+function privatemsg_edit($form, $form_state, $thread, $message) {
+	$form['pmid'] = array(
+		'#type' => 'value',
+		'#value' => $message->mid,
+	);
+	if (isset($thread['participants'])) {
+		$recipients_plain = $thread['participants'];
+	}
+	$form['body'] = array(
+		'#type' => 'text_format',
+		'#title' => t('Message'),
+		'#rows' => 6,
+		'#weight' => -3,
+		'#default_value' => $message->body,
+		'#resizable' => TRUE,
+	);
+	$form['subject'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Subject'),
+		'#size' => 50,
+		'#maxlength' => 255,
+		'#default_value' => $message->subject,
+		'#weight' => -5,
+	);
+	$url = isset($_REQUEST['destination'])? $_REQUEST['destination'] : 'messages/view/' . $message->thread_id;
+	$form['edit_destination'] = array(
+		'#type' => 'value',
+		'#value' => $url,
+	);
+	$form['actions'] = array('#type' => 'actions');	
+	$form['actions']['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Send message'),
+		'#weight' => 49,
+	);
+	$form['actions']['cancel'] = array(
+		'#markup' => l(t('Cancel'), $url , array('attributes' => array('id' => 'edit-cancel'))),
+	);
+	field_attach_form('privatemsg_message', $message, $form, $form_state);
+	return $form;
+}
+
+function privatemsg_edit_submit($form, &$form_state) {
+	$message = $form_state['build_info']['args'][1];
+	$thread = $form_state['build_info']['args'][0];
+	$flag = false;
+	
+	$changes = array();
+	if(strcmp($form_state['values']['body']['value'], $message->body) != 0){
+		$changes['body'] = $form_state['values']['body']['value'];
+		$flag = true;
+	}
+	if(strcmp($form_state['values']['subject'], $message->subject) != 0){
+		$changes['subject'] = $form_state['values']['subject'];
+		$flag = true;
+		//to do: change hole thread subject for every message
+	}
+	
+	//handle other fields of messages
+	$message->field_files = $form_state['values']['field_files'];
+	field_attach_presave('privatemsg_message', $message);
+	field_attach_update('privatemsg_message', $message);
+
+	if($flag){
+		db_update('pm_message')
+		->fields($changes)
+		->condition('mid', $message->mid)
+		->execute();
+	}
+	$form_state['redirect'] = $form_state['values']['edit_destination'];
+}
+
+function privatemsg_mod_privatemsg_message_view_alter(&$vars){
+	if (isset($vars['mid']) && isset($vars['thread_id']) && privatemsg_mod_access('edit privatemsg', $vars['mid']) ) {
+		$vars['message_actions'][] = array('title' => t('Edit'), 'href' => 'messages/edit/' . $vars['thread_id'] . '/' . $vars['mid']);
+	}
+}
+
+function privatemsg_mod_preprocess_html(&$variables) {
+	global $user;
+	$path = drupal_get_path_alias();
+	$aliases = explode('/', $path);
+  
+	if(isset($aliases[0]) && !isset($aliases[1]) && $aliases[0] == 'messages'){
+		drupal_goto("user/$user->uid/messages");
+		die();
+	}
+}
+
+/**
+ * Implements hook_init().
+ */
+function privatemsg_mod_init() {
+	$path = drupal_get_path_alias();
+	$aliases = explode('/', $path);
+	if(isset($aliases[0]) && $aliases[0] == 'messages'){
+		global $user;
+		if(!isset($aliases[1]) || $aliases[1] == 'list'){
+			drupal_goto("user/$user->uid/messages");
+			die();
+		}
+		//redirecting  messages/view/% to  user/%uid/messages/view/%
+		elseif($aliases[1] == 'view'){
+			if(isset($aliases[2])){
+				$thread = privatemsg_thread_load($aliases[2]);
+				foreach($thread['participants'] as $participant){
+					if($participant->type == 'user' && $participant->uid == $user->uid){
+						drupal_goto("user/$user->uid/messages/view/$aliases[2]");
+						die();
+					}
+				}
+			}
+			else{
+				drupal_goto("user/$user->uid/messages/view");
+				die();
+			}
+		}
+		//redirecting message/new
+		 elseif(isset($aliases[1]) && $aliases[1] == 'new'){
+
+			if(isset($aliases[2])){
+				//finding previous threads of twe users
+				$thread = db_query(
+					'SELECT DISTINCT in1.thread_id 
+					FROM {pm_index} in1 
+					JOIN {pm_index} in2 ON in1.thread_id = in2.thread_id AND in1.recipient != in2.recipient 
+					WHERE in1.recipient = :author AND in2.recipient = :recipient
+					AND in1.deleted = 0
+					AND in1.thread_id NOT IN (
+						SELECT DISTINCT in1.thread_id FROM {pm_index} in1 
+						JOIN {pm_index} in2 ON in1.thread_id = in2.thread_id AND in1.recipient != in2.recipient 
+						WHERE in1.recipient = :author AND in2.recipient <> :recipient
+					)',
+					array(':author' => $user->uid, ':recipient' => $aliases[2])
+				);
+				$thread = $thread->fetchObject();
+				if((count($thread) > 0) && (isset($thread->thread_id))){
+					drupal_goto("user/$user->uid/messages/view/$thread->thread_id");
+					die();
+				}
+			}
+								
+			drupal_goto("user/$user->uid/$path");
+			die();
+		} 
+	}
+}
+
+/**
+ * Check access to the view messages page.
+ *
+ * Function to restrict the access of the view messages page to just the
+ * messages/view/% pages and not to leave tabs artifact on other lower
+ * level pages such as the messages/new/%.
+ *
+ * @param $thread
+ *   A array containing all information about a specific thread, generated by
+ *   privatemsg_thread_load().
+ *
+ * @ingroup api
+ */
+function privatemsg_mod_view_access($account, $thread) {
+	// Do not allow access to threads without messages.
+	if (empty($thread['messages'])) {
+		// Count all messages, if there
+		return FALSE;
+	}
+	if (privatemsg_user_access('read privatemsg') || privatemsg_user_access('read all private messages')) {
+		global $user;
+		foreach($thread['participants'] as $participant){
+			if((($participant->type == 'user' && $participant->uid == $account->uid) || 
+				($participant->type == 'role' && isset($account->roles[$participant->recipient]))
+				) && 
+				($user->uid == $account->uid || privatemsg_user_access('read all private messages'))){
+				return TRUE;
+			}
+		}
+	}
+	return FALSE;
+}
