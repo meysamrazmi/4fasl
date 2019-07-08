@@ -4434,6 +4434,8 @@ div#cart-form-pane td.remove button:before {
 div#cart-form-pane .table {
   margin-bottom: 100px;
   position: relative;
+  margin-top: 10px;
+  box-shadow: rgba(0, 0, 0, 0.117647) 0px 1px 6px, rgba(0, 0, 0, 0.117647) 0px 1px 4px;
 }
 .cart-review tbody tr, 
 #uc-cart-checkout-form tbody tr, 
@@ -4442,9 +4444,6 @@ div#cart-form-pane tbody tr {
 }
 .cart-review th, #uc-cart-checkout-form th, div#cart-form-pane th {
   border: none;
-}
-div#cart-form-pane tbody {
-  box-shadow: rgba(0, 0, 0, 0.117647) 0px 1px 6px, rgba(0, 0, 0, 0.117647) 0px 1px 4px;
 }
 #uc-cart-checkout-form td.products a, #uc-cart-view-form td.desc a {
   color: #555;
