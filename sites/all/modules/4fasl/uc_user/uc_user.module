@@ -288,12 +288,14 @@ function student_node_refrence_form($form, &$form_state, $uid) {
 		if($user->uid == 164 || $user->uid == 111){
 			$era_query_settings[] = array('uid', array(111,164), 'IN');			
 		}else{
-		$era_query_settings[] = array('uid', $user->uid, '=');
+		  $era_query_settings[] = array('uid', $user->uid, '=');
 		}
 	}
 
 	//we attach user id to remove items that were already sent
   $era_query_settings[] = array('uid', $uid, '!=');
+
+	//remove users categorized courses from option list to prevent duplicates
 
 	$form['refrenced_node'] = array(
 		'#type' => 'entityreference', 
@@ -322,24 +324,69 @@ function student_node_refrence_form($form, &$form_state, $uid) {
 function student_node_refrence_form_submit($form, &$form_state) {
 	$node = node_load($form_state['values']['refrenced_node']['entity_id']);
 	$user = user_load($form_state['values']['uid']);
-	$index = 0;
-	if(isset($user->field_node_refrence['und'][0]['nid'])){
-		$field_node_refrence = $user->field_node_refrence;
-		$index = sizeof($user->field_node_refrence['und']);
-	}
-	$field_node_refrence['und'][$index]['nid'] =  $node->nid;
-	$user->field_node_refrence = $field_node_refrence;
-	if(user_save($user, array('field_node_refrence' => $field_node_refrence)) ){
-		//adding access to view file
-		if(isset($node->field_course_film['und'][0]) && function_exists('file_access_set_file_access')){
-			file_access_set_file_access($node->field_course_film['und'][0]['fid'] , $user->uid , NULL , 1 /*FILE_ACCESS_USER*/);
-		}else{
-			drupal_set_message('خطایی در دسترسی فیلم های ارسالی به هنرجو رخ داده است. لطفا با مدیریت تماس بگیرید.','error');
-		}
-		drupal_set_message('فیلم مورد نظر به کاربر ارسال شد');
 
-	}else{
-		drupal_set_message("خطایی رخ داده است.", 'error');
-	}
+  //sending categorized course
+  if(isset($node->field_siteinfo_stu['und'][0])){
+    $collection_items = entity_load('field_collection_item', array($node->field_siteinfo_stu['und'][0]['value']));
+    $collection_item = array_pop($collection_items);
+    add_collection(
+      $user,
+      $collection_item->field_instrument['und'][0]['value'],
+      $collection_item->field_levelnumber['und'][0]['value'],
+      $collection_item->field_sessionnumber['und'][0]['value']
+    );
+    drupal_set_message('فیلم مورد نظر به کاربر ارسال شد');
+    return;
+  }
+  else{//sending special courses
+    $index = 0;
+    if(isset($user->field_node_refrence['und'][0]['nid'])){
+      $field_node_refrence = $user->field_node_refrence;
+      $index = sizeof($user->field_node_refrence['und']);
+    }
+    $field_node_refrence['und'][$index]['nid'] =  $node->nid;
+    $user->field_node_refrence = $field_node_refrence;
+    if(user_save($user, array('field_node_refrence' => $field_node_refrence)) ){
+      //adding access to view file
+      if(isset($node->field_course_film['und'][0]) && function_exists('file_access_set_file_access')){
+        file_access_set_file_access($node->field_course_film['und'][0]['fid'] , $user->uid , NULL , 1 /*FILE_ACCESS_USER*/);
+      }else{
+        drupal_set_message('خطایی در دسترسی فیلم های ارسالی به هنرجو رخ داده است. لطفا با مدیریت تماس بگیرید.','error');
+      }
+      drupal_set_message('فیلم مورد نظر به کاربر ارسال شد');
+
+    }else{
+      drupal_set_message("خطایی رخ داده است.", 'error');
+    }
+  }
 }
 
+function user_nodes($uid){
+  $node_query = "SELECT max(sn.field_sessionnumber_value) as session
+        FROM field_data_field_siteinfo_stu main
+        INNER JOIN field_data_field_instrument ins
+        INNER JOIN field_data_field_levelnumber levn
+        INNER JOIN field_data_field_sessionnumber sn
+        ON main.field_siteinfo_stu_value = ins.entity_id
+        AND main.field_siteinfo_stu_value = levn.entity_id
+        AND main.field_siteinfo_stu_value = sn.entity_id
+        WHERE main.entity_type = 'node'
+        AND ins.field_instrument_value = :instrument
+        AND levn.field_levelnumber_value = :level ";
+
+  $user_query ="SELECT main.field_siteinfo_stu_value as field_id, ins.field_instrument_value as instrument, levn.field_levelnumber_value as level, sn.field_sessionnumber_value as session
+        FROM field_data_field_siteinfo_stu main
+        INNER JOIN field_data_field_instrument ins
+        INNER JOIN field_data_field_levelnumber levn
+        INNER JOIN field_data_field_sessionnumber sn
+        ON main.field_siteinfo_stu_value = ins.entity_id
+        AND main.field_siteinfo_stu_value = levn.entity_id
+        AND main.field_siteinfo_stu_value = sn.entity_id
+        WHERE main.entity_type = 'user'
+        AND main.entity_id = :uid  
+		ORDER BY `main`.`field_siteinfo_stu_value` DESC";
+
+  $user_result = db_query($user_query, array(':uid' => $uid))->fetchAll();
+  $node_result = db_query($node_query, array(':instrument' => $user_result->instrument, ':level' => $user_result->level))->fetchObject();
+
+}
