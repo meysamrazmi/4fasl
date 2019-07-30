@@ -74,7 +74,7 @@ function entityreference_autocomplete_autocomplete_callback($entity_type, $bundl
         $query->propertyCondition($property_condition[0], $property_condition[1], $property_condition[2]);
 
         //send user id to hook for magic
-        if($property_condition[2] != "="){
+        if($property_condition[0] == "uid" && $property_condition[2] == "!="){
           $context_append = $property_condition[1];
         }
       }

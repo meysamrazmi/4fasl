@@ -296,7 +296,10 @@ function student_node_refrence_form($form, &$form_state, $uid) {
   $era_query_settings[] = array('uid', $uid, '!=');
 
 	//remove users categorized courses from option list to prevent duplicates
-
+  $nids = user_nodes($uid);
+  if(!empty($nids))
+    $era_query_settings[] = array('nid', $nids, 'NOT IN');
+//  mdump($era_query_settings);
 	$form['refrenced_node'] = array(
 		'#type' => 'entityreference', 
 		'#required' => true,
@@ -362,7 +365,7 @@ function student_node_refrence_form_submit($form, &$form_state) {
 }
 
 function user_nodes($uid){
-  $node_query = "SELECT max(sn.field_sessionnumber_value) as session
+  $node_query = "SELECT main.entity_id
         FROM field_data_field_siteinfo_stu main
         INNER JOIN field_data_field_instrument ins
         INNER JOIN field_data_field_levelnumber levn
@@ -372,7 +375,8 @@ function user_nodes($uid){
         AND main.field_siteinfo_stu_value = sn.entity_id
         WHERE main.entity_type = 'node'
         AND ins.field_instrument_value = :instrument
-        AND levn.field_levelnumber_value = :level ";
+        AND levn.field_levelnumber_value = :level
+        AND sn.field_sessionnumber_value = :session";
 
   $user_query ="SELECT main.field_siteinfo_stu_value as field_id, ins.field_instrument_value as instrument, levn.field_levelnumber_value as level, sn.field_sessionnumber_value as session
         FROM field_data_field_siteinfo_stu main
@@ -387,6 +391,16 @@ function user_nodes($uid){
 		ORDER BY `main`.`field_siteinfo_stu_value` DESC";
 
   $user_result = db_query($user_query, array(':uid' => $uid))->fetchAll();
-  $node_result = db_query($node_query, array(':instrument' => $user_result->instrument, ':level' => $user_result->level))->fetchObject();
 
+  $nids = [];
+  foreach ($user_result as $item){
+    $node_result = db_query($node_query,
+      array(
+        ':instrument' => $item->instrument,
+        ':level' => $item->level,
+        ':session' => $item->session,
+        ))->fetchObject();
+    $nids[] = $node_result->entity_id;
+  }
+  return $nids;
 }
