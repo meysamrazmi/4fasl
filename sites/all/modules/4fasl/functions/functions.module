@@ -129,15 +129,19 @@ function timetoexpire($uid){
 	return array('honarjo'=> $timetoexpire , 'vip'=> $timetoexpire_vip, 'offline'=> $offline);
 }
 
-function mdump($var , $die = true){
+function mdump($var, $depth = 0){
 	global $user;
 	if($user->uid == 1 || $user->uid == 86){
+    if($depth > 0){
+      $new_array = array_map(function ($v) use ($depth) {
+        return parse($v, "...", $depth);
+      }, $var);
+      $var = $new_array;
+    }
 		echo '<pre>';
 		print_r($var);
 		echo '</pre>';
-		if($die){
-			die($die);
-		}
+    die();
 	}
 }
 
@@ -264,6 +268,10 @@ function functions_theme() {
   return array(
     'functions_user_expiration' => array(
       'render element' => 'form',
+      'file' => 'functions.theme.inc',
+    ),
+    'uc_product_kit_products' => array(
+      'arguments' => array('product' => NULL),
       'file' => 'functions.theme.inc',
     ),
   );

@@ -78,6 +78,8 @@
  *
  * @ingroup templates
  */
+
+//mdump($content['add_to_cart']['#form'], 3);
 ?>
 <article id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?> clearfix"<?php print $attributes; ?>>
   <?php if ((!$page && !empty($title)) || !empty($title_prefix) || !empty($title_suffix) || $display_submitted): ?>
@@ -94,7 +96,13 @@
   hide($content['comments']);
   hide($content['links']);
   hide($content['field_tags']);
+//  hide($content['products']);
   print render($content);
+
+//  foreach ($content['products'] as $key => $val){
+//    if(!is_array($val)) continue;
+//    print $val['qty']['#markup'];
+//  }
   ?>
   <?php if (!empty($content['field_tags']) || !empty($content['links'])): ?>
       <footer>
@@ -104,3 +112,10 @@
   <?php endif; ?>
   <?php print render($content['comments']); ?>
 </article>
+
+
+<style>
+.node-product-kit > .add-to-cart [id*=edit-products] {
+    display: none;
+}
+</style>

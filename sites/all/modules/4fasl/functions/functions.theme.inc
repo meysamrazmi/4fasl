@@ -55,3 +55,23 @@ function theme_functions_user_expiration($variables) {
 
   return $output;
 }
+
+/**
+ * Renders a product kit component.
+ *
+ * @ingroup themeable
+ */
+function theme_uc_product_kit_products($variables) {
+  $product = $variables['product'];
+
+  $node = node_load($product->nid);
+  if (node_access('view', $node)) {
+    $node_view = node_view($node, 'special_case');
+    $title = render($node_view);
+  }
+  else {
+    $title = check_plain($product->title);
+  }
+
+  return $title;
+}
