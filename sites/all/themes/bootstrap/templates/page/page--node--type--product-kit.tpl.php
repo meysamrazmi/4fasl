@@ -115,25 +115,8 @@
       </div>
     <?php endif; ?>
   </div>
-  <?php print render($title_prefix); ?>
-  <?php if (!empty($title)): ?>
-    <h1 class="page-header"><?php print $title; ?></h1>
-  <?php endif; ?>
-  <?php print render($title_suffix); ?>
+
 </header>
-
-<?php if(!empty($page['right_side'])): ?>
-  <aside id="right-side" class="col-lg-2 col-xs-3 main-side">
-    <?php print render($page['right_side']); ?>
-  </aside>
-<?php endif; ?>
-
-<?php if(!empty($page['left_side'])): ?>
-  <aside id="left-side" class="col-lg-2 col-xs-3 main-side">
-    <?php print render($page['left_side']); ?>
-  </aside>
-<?php endif; ?>
-
 
 <div class="main-container <?php print $container_class; ?>">
   <header role="banner" id="page-header">
