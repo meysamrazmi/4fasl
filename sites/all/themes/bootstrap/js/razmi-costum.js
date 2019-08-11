@@ -13,10 +13,10 @@ $(document).ready(function () {
 			$('body').addClass("fixedmenu");
         } else {
             nav.removeClass("topfix");
-			$('body').removeClass("fixedmenu"); 
+			$('body').removeClass("fixedmenu");
         }
     });
-	
+
 	$('#block-system-main-menu').append('<div id="menuoverlay" style="display: none;opacity: 0;"></div>');
 	$('#block-system-main-menu .block-title').after('<div class="logo"><a href="/"><img src="/sites/default/files/logo1.png"></a></div>');
 		$('#block-system-main-menu .block-title').click(function(){
@@ -26,7 +26,7 @@ $(document).ready(function () {
 		}else{
 			$('#menuoverlay').css({'display':'block'});
 			setTimeout(function(){$('#menuoverlay').css({'opacity' : '1'});}, 10);
-		} 
+		}
 		$(this).parent().toggleClass('opened');
 	});
 	$('#menuoverlay').click(function(){
@@ -40,7 +40,7 @@ if ($('.our-work').length){
 	var totop = totop - 130;
 	$(window).scroll(function () {
 		if ($(this).scrollTop() > totop) {
-			if (!$('.our-work').hasClass('counting')){		
+			if (!$('.our-work').hasClass('counting')){
 //			} else{
 				$('.our-work').addClass('counting');
 				countup($('.counter'));
@@ -104,7 +104,7 @@ if($('.field-name-add-practice, #block-formblock-homework').length){
 			// $('.add-practice , #mini-panel-right_side .user-practice a').attr('title' , "به ازای هر جلسه فقط یک تمرین می توانید آپلود کنید.");
 		// }
 	// }
-		
+
 // }
 
 /*---------------*/
@@ -113,9 +113,9 @@ if($('#block-formblock-support-ticket').length){
 		e.preventDefault();
 		if($(this).hasClass('sath')){
 			if(!$('#block-formblock-support-ticket .grade-help').length){
-				$('#block-formblock-support-ticket').prepend('<div class="grade-help"><p>در این قسمت شما می توانید ویدئوی کوتاهی از نوازندگی خود جهت تعیین سطح ارسال کنید. اساتید ما آن را بررسی کرده و به شما پاسخ خواهند داد.</p></div>');	
+				$('#block-formblock-support-ticket').prepend('<div class="grade-help"><p>در این قسمت شما می توانید ویدئوی کوتاهی از نوازندگی خود جهت تعیین سطح ارسال کنید. اساتید ما آن را بررسی کرده و به شما پاسخ خواهند داد.</p></div>');
 			}else{
-				$('#block-formblock-support-ticket .grade-help p').text('در این قسمت شما می توانید ویدئوی کوتاهی از نوازندگی خود جهت تعیین سطح ارسال کنید. اساتید ما آن را بررسی کرده و به شما پاسخ خواهند داد.');					
+				$('#block-formblock-support-ticket .grade-help p').text('در این قسمت شما می توانید ویدئوی کوتاهی از نوازندگی خود جهت تعیین سطح ارسال کنید. اساتید ما آن را بررسی کرده و به شما پاسخ خواهند داد.');
 			}
 			$('#block-formblock-support-ticket #edit-support').css({'display':'none'});
 			$('#block-formblock-support-ticket .block-title').text('تعیین سطح');
@@ -123,9 +123,9 @@ if($('#block-formblock-support-ticket').length){
 			$('#block-formblock-support-ticket textarea').val('درخواست تعیین سطح برای ثبت نام از سطوح بالاتر را دارم.');
 		}else{
 			if(!$('#block-formblock-support-ticket .grade-help').length){
-				$('#block-formblock-support-ticket').prepend('<div class="grade-help"><p>در این قسمت شما می توانید سوالات خود را مطرح نمایید. کارشناسان ما در اسرع وقت به شما پاسخ خواهند داد.</p></div>');	
+				$('#block-formblock-support-ticket').prepend('<div class="grade-help"><p>در این قسمت شما می توانید سوالات خود را مطرح نمایید. کارشناسان ما در اسرع وقت به شما پاسخ خواهند داد.</p></div>');
 			}else{
-				$('#block-formblock-support-ticket .grade-help p').text('در این قسمت شما می توانید سوالات خود را مطرح نمایید. کارشناسان ما در اسرع وقت به شما پاسخ خواهند داد.');					
+				$('#block-formblock-support-ticket .grade-help p').text('در این قسمت شما می توانید سوالات خود را مطرح نمایید. کارشناسان ما در اسرع وقت به شما پاسخ خواهند داد.');
 			}
 			// $('#block-formblock-support-ticket .grade-help').remove();
 			$('#block-formblock-support-ticket #edit-support').css({'display':'block'});
@@ -157,7 +157,7 @@ if($('.page-user-login, .page-user-register , .page-user-password , .page-user-r
 	$('.main-container , footer.footer').removeClass('col-md-9');
 	$('body').removeClass('right-sides');
 	$('a#register-link').text('عضویت در سایت');
-	//$('.page-user.right-sides header#navbar, .page-user.right-sides footer.footer, .page-user.right-sides .main-container').css({'float':'none'});	
+	//$('.page-user.right-sides header#navbar, .page-user.right-sides footer.footer, .page-user.right-sides .main-container').css({'float':'none'});
 }
 /*-----------------------------------------------------------------------------------------------------------*/
 if($('.user-profile.view-mode-full')){
@@ -168,7 +168,7 @@ if($('.user-profile.view-mode-full')){
 }
 
 /*-------------------------------------------------------------------------------------------------------------------------------*/
-$('#block-panels-mini-right-side h2').html($('#block-panels-mini-right-side h2').html() + $('#mini-panel-right_side .pane-block-2 .pane-content .user_pic').html()); 
+$('#block-panels-mini-right-side h2').html($('#block-panels-mini-right-side h2').html() + $('#mini-panel-right_side .pane-block-2 .pane-content .user_pic').html());
 $('#block-panels-mini-right-side h2').click(function(e){
 	e.preventDefault();
 	if($(this).parent().parent().parent().hasClass('opened')){
@@ -252,7 +252,7 @@ $('.node-homework.node-teaser .field-name-title').click(function(){
 		$(this).parent().addClass('open');
 		$(this).parent().children('.field-name-field-hw-video ,.field-name-body').slideDown();
 	}
-});	
+});
 /*-----------------------------------------------------------------------------------------------------------*/
 $('.comment-form').on('focus', 'textarea', function () {
     CommentOpen();
@@ -262,7 +262,7 @@ CommentOpen = function() {
     $('.comment-form').addClass('writing');
 	$('.comment-form').find('.bootstrap-fieldgroup-accordion , .form-actions').slideDown();
 	$('.comment-form').find('#edit-support , div#edit-support-ticket-upload').slideDown();
-    
+
 	$('html').unbind("click", CommentClose);
 };
 // Close Comment Form
@@ -270,12 +270,12 @@ CommentClose = function() {
     $('.comment-form').removeClass('writing');
 	$('.comment-form.ajax-comments-form-add').find('.field-name-field-hw-video , .form-actions').slideUp();
 	$('.comment-form').find('#edit-support , div#edit-support-ticket-upload').slideUp();
-	
+
 	$('html').unbind("click", CommentClose);
 };
 $('.comment-form').click(function(event){
     if(!$('.comment-form .bootstrap-fieldgroup-accordion').length){
-		event.stopPropagation();		
+		event.stopPropagation();
 	}
 });
 $('html').click(function(event){
@@ -325,7 +325,7 @@ $('.node-instrument .field-name-field-firstclass .group-right .field-item').html
 //$('.role-استاد .add-to-cart div#edit-actions , .role-هنرجو .add-to-cart div#edit-actions .role-استاد .attribute-4, .role-هنرجو .attribute-4').remove();
 $('#uc-cart-view-form .form-actions button:last-child,#edit-continue ,form#uc-zarinpal-pay-submission-form .btn ,#uc-cart-checkout-review-form #edit-submit').addClass('btn btn-success');
 $('#edit-continue-shopping, form#uc-cart-checkout-review-form .btn').addClass('btn btn-primary');
-$('#edit-empty,#edit-cancel').addClass('btn btn-danger'); 
+$('#edit-empty,#edit-cancel').addClass('btn btn-danger');
 $('.page-cart,.page-college').addClass('gray-main');
 $('.page-cart h1.page-header').addClass('container');
 $('#uc-cart-checkout-review-form #edit-submit ,#uc-zarinpal-pay-submission-form #edit-submit').text('پرداخت و ثبت نام');
@@ -386,9 +386,9 @@ $('.node-homework.node-teaser').each(function(){
 		$(this).parents('.view').addClass('has-new');
 	}
 	if($(this).find('.seen-content').length){
-		
+
 	}
-	
+
 });
 
 if($('.field-name-relatives .view-empty').length){
@@ -542,6 +542,32 @@ $('.description.rules .close').click(function(){
 	$(this).parent().slideUp()
 })
 
+/*-----------------------------------------------------------------------------------------------------------*/
+$('.field-name-product-film').each(function() {
+  $(this).parents('.product-qty').addClass('open')
+})
+  $('.field-name-product-film a').click(function(e) {
+    e.preventDefault()
+    let url = $(this).data('uri')
+    let video = $(this).parents('.node-product-kit').find('video')
+    video.attr('src', url)
+    $(this).parents('.node-product-kit').find('.mediaelement-download-link a').attr('href', url)
+
+    $('html, body').animate({
+      scrollTop: (video.offset().top - 0)
+    }, 1000);
+
+    player = new MediaElementPlayer('.node-product-kit video')
+    player.pause()
+    player.setSrc(url)
+    player.media.load()
+    setTimeout(() => {player.play()}, 1000)
+  })
+
+
+
+
+
 
 });
 
@@ -551,9 +577,9 @@ var applyHeights = function(x, y , z) {
 		x.height(y.height() + (z));
 	}else if (x.height() > y.height()){
 		y.height(x.height() + (z));
-	}else 
+	}else
 		return false;
-	
+
 	return true;
 }
 /*-----------------*/
@@ -579,7 +605,7 @@ function setCookie(name, value, days) {
         date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
         var expires = "; expires=" + date.toGMTString();
     }
-    else var expires = "";               
+    else var expires = "";
     document.cookie = name + "=" + value + expires + "; path=/";
 }
 function getCookie(name) {
@@ -620,7 +646,7 @@ function change_role(){
 				$('.add-practice').click();
 			}
 			setTimeout(function(){$('body').removeClass('changing');}, 500);
-			
+
 		}, 500);
 	});
 
@@ -634,7 +660,7 @@ Drupal.behaviors.myBehavior = {attach: function (context, settings) {
 	$('.file-resup-wrapper .messages').prepend('<span class="close">x</span>');
 	change_role();
 /*-----------------*/
-	
+
 	$('.table > thead > tr > th img').each(function(){
 		if($(this).attr('src') == 'https://4faslmusic.ir/misc/arrow-desc.png'){
 			$(this).parent().addClass('desc').removeClass('asc');
@@ -642,20 +668,20 @@ Drupal.behaviors.myBehavior = {attach: function (context, settings) {
 			$(this).parent().addClass('asc').removeClass('desc');
 		}
 	});
-/*-----------------*/	
+/*-----------------*/
 	if($('div[id*="edit-support-ticket-upload"] .file-widget, div[id*="edit-field-hw-video"] .file-widget , #user-profile-form input#edit-picture-upload').length){
 		$.getScript('/sites/all/themes/bootstrap/js/bootstrap-filestyle.min.js', function(){
 			$(":file").filestyle({buttonText: "انتخاب فایل", buttonName: "btn-primary",placeholder: "فایلی انتخاب نشده"});
 		});
 	}
-	
+
 	$('.field.video-help a').click(function(e){
 		e.preventDefault()
 		$(this).next().slideToggle();
 	});
-	
+
 	if($('.form-managed-file').find('.file-resup-wrapper').length){$('.form-managed-file').addClass('has-resumeable')}
-	
+
 	if($('.page-faq').length){
 		var selected = $('.view-faq #edit-category-wrapper select [selected="selected"]').attr('value')
 		$('.view-faq #edit-category-wrapper .form-item-edit-category-'+ selected).addClass('active')
