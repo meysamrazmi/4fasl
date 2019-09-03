@@ -1226,3 +1226,37 @@ function functions_uc_order($op, $order, $status) {
       }
   }
 }
+
+function is_bought_product($nid){
+  global $user;
+ $query = db_select('uc_orders', 'o');
+  $query->join('uc_order_products', 'p', 'o.order_id = p.order_id');
+  $results = $query->fields('o', array('order_id'))
+    ->fields('p', array('qty', 'data'))
+    ->condition('o.uid', $user->uid)
+    ->condition('p.nid', $nid)
+    ->condition('o.order_status', array('completed', 'pending'), 'IN')
+    ->execute()->fetchAll();
+  return count($results) > 0 ;
+}
+
+function bought_products_by_product_kit($nid){
+  global $user;
+  $query = db_select('uc_product_kits', 'kit');
+  $query->leftJoin('uc_order_products', 'p', 'p.nid = kit.product_id');
+  $query->leftJoin('uc_orders', 'o', 'o.order_id = p.order_id');
+  $results = $query->fields('p', array('nid'))
+    ->condition('o.uid', $user->uid)
+    ->condition('kit.nid', $nid)
+    ->condition('o.order_status', array('completed', 'pending'), 'IN')
+    ->execute()->fetchAll();
+  $nids = array();
+  foreach ($results as $row){
+    $nids[] = $row->nid;
+  }
+  return $nids;
+}
+
+function functions_preprocess_html(&$variables) {
+  drupal_add_css('https://cdn.materialdesignicons.com/4.2.95/css/materialdesignicons.min.css', array('type' => 'external'));
+}

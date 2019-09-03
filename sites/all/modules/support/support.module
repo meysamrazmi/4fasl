@@ -576,7 +576,7 @@ function support_active_clients() {
   static $clients = NULL;
 
   if (is_null($clients)) {
-    $result = db_query('SELECT * FROM {support_client} WHERE status = 1');
+    $result = db_query('SELECT * FROM {support_client} WHERE status = 1 ORDER BY clid ASC');
     foreach ($result as $client) {
       $clients[$client->clid] = $client;
     }
@@ -2661,7 +2661,7 @@ function _support_status_form_attach(&$form, &$form_state, $node) {
   if (!$available) {
     drupal_set_message(t('A site administrator must !create a client before you can create support tickets.', array('!create' => l(t('create and enable'), 'admin/support/clients/add'))), 'error');
   }
-  $clients = array('- select client -') + $clients;
+  $clients = array(t('- select client -')) + $clients;
   $client = isset($node->client) && is_numeric($node->client) ? $node->client : 0;
   if ($available == 1 ||
       (!user_access('can select client') &&
@@ -2971,7 +2971,7 @@ function _support_subscribe_form_attach(&$form, &$form_state, $node) {
  */
 function _support_clients_load($path = FALSE) {
   $clients = array();
-  $result = db_query('SELECT clid, path, name FROM {support_client} WHERE status = :status ORDER BY name', array(':status' => 1));
+  $result = db_query('SELECT clid, path, name FROM {support_client} WHERE status = :status ORDER BY clid', array(':status' => 1));
   foreach ($result as $client) {
     if ($path) {
       $clients[$client->clid] = check_plain($client->path);

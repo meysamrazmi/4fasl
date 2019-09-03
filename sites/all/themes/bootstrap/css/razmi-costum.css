@@ -1,3 +1,4 @@
+@import url("https://4faslmusic.ir/sites/all/themes/bootstrap/css/variables.css");
 /* for card item like wordpress{
  * 	border: 1px solid #f0f1f2;
  * 	padding: 0px 5px 10px 10px;
@@ -3997,6 +3998,9 @@ span[id*='views_slideshow_controls_text_next_user-block_1'] a:before {
 .box.kamanche {
 	background: #ffab90;
 }
+.box.bass {
+  background: #28657a;
+}
 .box.soon p {
   font-size: 13px;
   border: 1px solid #f00;
@@ -4071,6 +4075,9 @@ span[id*='views_slideshow_controls_text_next_user-block_1'] a:before {
 }
 .box.kamanche .icon {
   background-position: 0px -606px;
+}
+.box.bass .icon {
+  background-position: -130px -606px;
 }
 .field-name-field-star-points {
   position: absolute;
@@ -4864,8 +4871,15 @@ fieldset#edit-support .form-item {
   align-items: center;
 }
 .comment-form .form-item-state,
+#support-ticket-node-form .form-item-priority,
 #support-ticket-node-form .form-item-state {
   display: none !important;
+}
+fieldset#edit-support .form-item-client {
+  margin: 0 -24px 0 0;
+}
+fieldset#edit-support .form-item-client .input-group {
+  display: table;
 }
 .role-administrator .comment-form .form-item-state {
   display: inline-flex !important;
@@ -4957,6 +4971,7 @@ div.group-left {
 fieldset#edit-support {
   border: none;
   box-shadow: none;
+  display: block !important;
 }
 fieldset#edit-support legend {
   display: none;
@@ -8189,12 +8204,12 @@ a#edit-new-message-button {
   margin-right: 25px;
   position: relative;
 }
-.node-product-kit .group-left{
+.node-product-kit .products .group-left{
   float: right !important;
   width: 100px;
   margin-left: 15px;
 }
-.node-product-kit .group-right{
+.node-product-kit .products .group-right{
   float: left !important;
   width: 145px;
   display: flex;
@@ -8202,7 +8217,7 @@ a#edit-new-message-button {
   justify-content: center;
   align-items: center;
 }
-.node-product-kit .group-middle {
+.node-product-kit .products .group-middle {
   width: calc(100% - 260px);
   display: flex;
   align-items: baseline;
@@ -8322,13 +8337,6 @@ a#edit-new-message-button {
 .node-product-kit .field-name-body {
   white-space: pre-line;
 }
-.node-product-kit section.main {
-  background: #fff;
-  padding: 15px;
-  border-radius: 5px;
-  margin-top: 25px;
-  box-shadow: rgba(0,0,0,0.117647) 0 1px 6px, rgba(0,0,0,0.117647) 0 1px 4px;
-}
 .products {
   background: #fafafa;
   margin: 0 -15px -15px;
@@ -8404,4 +8412,33 @@ a#edit-new-message-button {
 .node-prod.view-mode-special_case {
   display: flex;
   align-items: stretch;
+}
+.node-product-kit header {
+  margin-bottom: -7px;
+}
+.user-profile.view-mode-special_case > .group-right {
+  width: 30%;
+}
+.user-profile.view-mode-special_case > .group-left {
+  width: 70%;
+}
+.user-profile.view-mode-special_case .hidden-in-front {
+  display: none;
+}
+.user-profile.view-mode-special_case .group-left i {
+  color: #9C27B0;
+  font-size: 24px;
+  border: 2px solid #23afd7;
+  width: 35px;
+  height: 35px;
+  vertical-align: middle;
+}
+.bg-text {
+  position: absolute;
+  font-size: 110px;
+  z-index: 0;
+  opacity: 0.04;
+  font-weight: bold;
+  top: 0px;
+  right: -20px;
 }

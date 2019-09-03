@@ -10,13 +10,13 @@
     $classes .= ' group-one-column';
   }
 ?>
-<<?php print $layout_wrapper; print $layout_attributes; ?> class="<?php print $classes;?> clearfix">
+<<?php print $layout_wrapper; print $layout_attributes; ?> class="<?php print $classes;?> clearfix d-flex card mt-5">
 
   <?php if (isset($title_suffix['contextual_links'])): ?>
   <?php print render($title_suffix['contextual_links']); ?>
   <?php endif; ?>
 
-  <<?php print $header_wrapper ?> class="group-header<?php print $header_classes; ?>">
+  <<?php print $header_wrapper ?> class="group-header<?php print $header_classes; ?> d-none">
     <?php print $header; ?>
   </<?php print $header_wrapper ?>>
 
@@ -32,7 +32,7 @@
     </<?php print $right_wrapper ?>>
   <?php endif; ?>
 
-  <<?php print $footer_wrapper ?> class="group-footer<?php print $footer_classes; ?>">
+  <<?php print $footer_wrapper ?> class="group-footer<?php print $footer_classes; ?> d-none">
     <?php print $footer; ?>
   </<?php print $footer_wrapper ?>>
 

@@ -79,33 +79,69 @@
  * @ingroup templates
  */
 
-$content['group_header']['add_to_cart']['#form']['actions']['submit']['#value'] = 'خرید کل دوره';
-//mdump($content, 3);
+//mdump($content['group_header'], 2);
 ?>
 <article id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?> clearfix"<?php print $attributes; ?>>
   <?php if ((!$page && !empty($title)) || !empty($title_prefix) || !empty($title_suffix) || $display_submitted): ?>
-      <header>
+      <header class="card">
         <?php print render($title_prefix); ?>
-        <?php if (!$page && !empty($title)): ?>
-            <h2<?php print $title_attributes; ?>><a href="<?php print $node_url; ?>"><?php print $title; ?></a></h2>
+        <?php if (!empty($title)): ?>
+            <h1 class="m-0 h3" <?php print $title_attributes; ?>><?php print $title; ?></h1>
+          <?php
+            if(isset($content['field_ostad']['#items']['0'] )):
+              $ostad = user_load($content['field_ostad']['#items']['0']['uid']);
+          ?>
+            <span class="text-muted">استاد دوره: <?php echo $ostad->field_naame['und'][0]['value'];?></span>
+          <?php endif;?>
         <?php endif; ?>
         <?php print render($title_suffix); ?>
       </header>
   <?php endif; ?>
   <?php
+      $bought_products = bought_products_by_product_kit($node->nid);
+      if(count($bought_products) > 0){
+        $content['group_header']['add_to_cart'] = array(
+            '#markup' => '<div><a href="#products" class="node-add-to-cart">جلسات دوره</a></div>',
+            '#weight' => 4
+        );
+      }else{
+        $content['group_header']['add_to_cart']['#form']['actions']['submit']['#value'] = 'خرید کل دوره';
+      }
+
       // Hide comments, tags, and links now so that we can render them later.
       hide($content['comments']);
       hide($content['links']);
       hide($content['field_tags']);
       hide($content['products']);
       hide($content['body']);
+      hide($content['field_ostad']);
       print render($content);
   ?>
-    <section class="main">
-        <?php print render($content['body']);?>
-        <div class="products">
+
+    <?php //print render(user_view($ostad, 'special_case'));?>
+    <div class="user-profile view-mode-special_case clearfix d-flex card mt-5 " style="position: relative;overflow: hidden;">
+        <div class="group-left">
+            <span class="bg-text">معرفی استاد</span>
+            <div class="h4 p-4 pr-5">
+                <i class="mdi mdi-account align-items-center d-inline-flex justify-content-center ml-4 rounded-circle"></i>
+              <?php echo $ostad->field_naame['und'][0]['value'] ;?>
+            </div>
+
+            <div class="field-tea-bio pr-3">
+                <?php print instrument_info('ostad_uid', $ostad->uid, array('Teacher_Intro'));?>
+            </div>
+        </div>
+
+        <div class="group-right">
+            <img typeof="foaf:Image" class="img-responsive" src="<?php print image_style_url('350x350', $ostad->field_secpicture['und'][0]['uri']) ;?>"alt="">
+        </div>
+    </div>
+
+    <section class="main card mt-5">
+      <?php print render($content['body']);?>
+        <div id="products" class="products">
             <h4>جلسات این دوره</h4>
-            <?php print render($content['products']);?>
+          <?php print render($content['products']);?>
         </div>
     </section>
   <?php if (!empty($content['field_tags']) || !empty($content['links'])): ?>
@@ -114,13 +150,13 @@ $content['group_header']['add_to_cart']['#form']['actions']['submit']['#value'] 
         <?php print render($content['links']); ?>
       </footer>
   <?php endif; ?>
-  <?php print render($content['comments']); ?>
+  <?php //print render($content['comments']); ?>
 </article>
 
 
 <style>
-.node-product-kit .add-to-cart [id*=edit-products] {
-    display: none;
-}
+    .node-product-kit .add-to-cart [id*=edit-products] {
+        display: none;
+    }
 
 </style>
