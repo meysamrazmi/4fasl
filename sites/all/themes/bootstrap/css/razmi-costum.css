@@ -7191,7 +7191,6 @@ label:hover .course-link {
   }
 }
 #uc_Progressbar .num {
-  display: block;
   color: #fff;
   line-height: 24px;
   text-align: center;
@@ -8233,12 +8232,6 @@ a#edit-new-message-button {
 .node-product-kit .mediaelement-video{
   max-width: 1140px;
 }
-.node-product-kit .group-header {
-  background: #fff;
-  padding: 15px;
-  border-radius: 5px;
-  box-shadow: rgba(0,0,0,0.117647) 0 1px 6px, rgba(0,0,0,0.117647) 0 1px 4px;
-}
 .node-product-kit .group-header h3 {
   display: none;
 }
@@ -8441,4 +8434,66 @@ a#edit-new-message-button {
   font-weight: bold;
   top: 0px;
   right: -20px;
+}
+.page-store .view-products [class*="col-"]{
+  float: right;
+}
+.node-product-kit.node-teaser .field-name-uc-product-image img {
+  margin: -35px auto 0;
+  border-radius: 10px;
+  box-shadow: rgba(0,0,0,0.117647) 0 1px 6px, rgba(0,0,0,0.117647) 0 1px 4px;
+}
+.node-product-kit.node-teaser .user-profile.view-mode-special_case > .group-right {
+  width: 60px;
+}
+.node-product-kit.node-teaser .user-profile.view-mode-special_case > .group-left {
+  width: calc(100% - 60px);
+}
+.view-products {
+  position: relative;
+}
+.view-products .view-content {
+  display: flex;
+  flex-flow: wrap;
+  justify-content: center;
+}
+.view-products .view-content > div[class*="col-"] {
+  max-width: 450px;
+}
+@media (max-width: 600px){
+  .view-products .view-content > div[class*="col-"] {
+    width: 100%;
+  }
+}
+.store-title {
+  position: relative;
+}
+.store-title:before {
+  content: "";
+  background: linear-gradient(to bottom left, #4976f5 ,#E91E63);
+  height: 3px;
+  width: 200px;
+  right: 0;
+  position: absolute;
+  bottom: 0;
+}
+.view-products .views-exposed-form .views-exposed-widget {
+  width: 100%;
+}
+.view-products .form-type-bef-link {
+  text-align: center;
+}
+.view-products .form-type-bef-link a {
+  padding: 5px 20px;
+  border-radius: 30px;
+  box-shadow: rgba(0,0,0,0.117647) 0 1px 6px, rgba(0,0,0,0.117647) 0 1px 4px;
+  background: #fff;
+  color: #555;
+  display: inline-block;
+  margin: 10px 0;
+  transition: all 0.2s;
+}
+.view-products .form-type-bef-link a:hover {
+  box-shadow: rgba(0,0,0,0.156863) 0 3px 10px, rgba(0,0,0,0.227451) 0 3px 10px;
+  /* background: #eee; */
 }

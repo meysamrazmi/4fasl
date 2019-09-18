@@ -948,6 +948,16 @@ function functions_init(){
 		Header('Location: https://4faslmusic.ir/user/'. $user->uid .'/points/'. $url);
 		die();
 	}
+	elseif (isset($aliases[1]) && $aliases[0] == 'store' && $aliases[1] == 'film'){
+	  $nid = db_select('uc_product_kits', 'kit')
+            ->fields('kit', array('nid'))
+            ->condition('kit.product_id', $aliases[2])
+            ->execute()->fetchObject();
+	  if($user->uid != 1 && isset($nid->nid)){
+      Header('Location: /node/'. $nid->nid . '#products');
+      die();
+    }
+  }
 }
 
 function pay_for_practice($user, $points){
@@ -1259,4 +1269,8 @@ function bought_products_by_product_kit($nid){
 
 function functions_preprocess_html(&$variables) {
   drupal_add_css('https://cdn.materialdesignicons.com/4.2.95/css/materialdesignicons.min.css', array('type' => 'external'));
+}
+
+function functions_preprocess_node(&$variables) {
+  $variables['theme_hook_suggestions'][] = 'node__' . $variables['type'] . '__' . $variables['view_mode'];
 }
