@@ -52,7 +52,7 @@ if($('.user-profile.view-mode-full')){
 }
 
 /*-------------------------------------------------------------------------------------------------------------------------------*/
-$('#block-panels-mini-right-side h2').html($('#block-panels-mini-right-side h2').html() + $('#mini-panel-right_side .pane-block-2 .pane-content .user_pic').html()); 
+$('#block-panels-mini-right-side h2').html($('#block-panels-mini-right-side h2').html() + $('#mini-panel-right_side .pane-block-2 .pane-content .user_pic').html());
 $('#block-panels-mini-right-side h2').click(function(e){
 	e.preventDefault();
 	if($(this).parent().parent().parent().hasClass('opened')){
@@ -89,9 +89,9 @@ $('section#block-menu-menu-gallery .block-title').click(function(){
 
 
 //$('.role-استاد .add-to-cart div#edit-actions , .role-هنرجو .add-to-cart div#edit-actions .role-استاد .attribute-4, .role-هنرجو .attribute-4').remove();
-$('#uc-cart-view-form .form-actions button:last-child,#edit-continue ,form#uc-zarinpal-pay-submission-form .btn ,#uc-cart-checkout-review-form #edit-submit').addClass('btn btn-success');
+$('#uc-cart-view-form .form-actions button:last-child,#edit-continue ,form#uc-zarinpal-pay-submission-form .btn ,#uc-cart-checkout-review-form #edit-submit, #uc-cart-checkout-review-form + form #edit-submit').addClass('btn btn-success');
 $('#edit-continue-shopping, form#uc-cart-checkout-review-form .btn').addClass('btn btn-primary');
-$('#edit-empty,#edit-cancel').addClass('btn btn-danger'); 
+$('#edit-empty,#edit-cancel').addClass('btn btn-danger');
 $('.page-cart,.page-college').addClass('gray-main');
 $('.page-cart h1.page-header').addClass('container');
 $('#uc-cart-checkout-review-form #edit-submit ,#uc-zarinpal-pay-submission-form #edit-submit').text('پرداخت و ثبت نام');
@@ -151,9 +151,9 @@ $('.node-homework.node-teaser').each(function(){
 		$(this).parents('.view').addClass('has-new');
 	}
 	if($(this).find('.seen-content').length){
-		
+
 	}
-	
+
 });
 
 if($('.field-name-relatives .view-empty').length){
@@ -182,9 +182,9 @@ var applyHeights = function(x, y , z) {
 		x.height(y.height() + (z));
 	}else if (x.height() > y.height()){
 		y.height(x.height() + (z));
-	}else 
+	}else
 		return false;
-	
+
 	return true;
 }
 /*-----------------*/
@@ -210,7 +210,7 @@ function setCookie(name, value, days) {
         date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
         var expires = "; expires=" + date.toGMTString();
     }
-    else var expires = "";               
+    else var expires = "";
     document.cookie = name + "=" + value + expires + "; path=/";
 }
 function getCookie(name) {
@@ -251,7 +251,7 @@ function change_role(){
 				$('.add-practice').click();
 			}
 			setTimeout(function(){$('body').removeClass('changing');}, 500);
-			
+
 		}, 500);
 	});
 
@@ -265,7 +265,7 @@ Drupal.behaviors.myBehavior = {attach: function (context, settings) {
 	$('.file-resup-wrapper .messages').prepend('<span class="close">x</span>');
 	change_role();
 /*-----------------*/
-	
+
 	$('.table > thead > tr > th img').each(function(){
 		if($(this).attr('src') == '/misc/arrow-desc.png'){
 			$(this).parent().addClass('desc').removeClass('asc');
@@ -273,7 +273,7 @@ Drupal.behaviors.myBehavior = {attach: function (context, settings) {
 			$(this).parent().addClass('asc').removeClass('desc');
 		}
 	});
-/*-----------------*/	
+/*-----------------*/
 	if($('div#edit-support-ticket-upload .file-widget, div#edit-field-hw-video .file-widget , #user-profile-form input#edit-picture-upload').length){
 		$.getScript('/user-help/user-help_files/bootstrap-filestyle.min.js', function(){
 			$(":file").filestyle({buttonText: "انتخاب فایل", buttonName: "btn-primary",placeholder: "فایلی انتخاب نشده"});
@@ -285,8 +285,8 @@ Drupal.behaviors.myBehavior = {attach: function (context, settings) {
     	/* Options will go here */
   	});
 });
-	
-	
+
+
 }};
 
 jQuery.fn.outerHTML = function() {return jQuery('<div />').append(this.eq(0).clone()).html();};
