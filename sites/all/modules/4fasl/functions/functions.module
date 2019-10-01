@@ -1267,10 +1267,25 @@ function bought_products_by_product_kit($nid){
   return $nids;
 }
 
+/**
+ * Implementation of hook_preprocess_html();
+ */
 function functions_preprocess_html(&$variables) {
   drupal_add_css('https://cdn.materialdesignicons.com/4.2.95/css/materialdesignicons.min.css', array('type' => 'external'));
 }
 
+/**
+ * Implementation of hook_preprocess_page();
+ */
+function functions_preprocess_page(&$variables) {
+  global $user;
+  $expires = timetoexpire($user->uid);
+  drupal_add_js(array('role_expiration' => $expires), 'setting');
+}
+
+/**
+ * Implementation of hook_preprocess_node();
+ */
 function functions_preprocess_node(&$variables) {
   $variables['theme_hook_suggestions'][] = 'node__' . $variables['type'] . '__' . $variables['view_mode'];
 }

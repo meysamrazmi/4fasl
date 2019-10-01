@@ -1728,6 +1728,7 @@ div#edit-attributes-3 .form-item .oldtitle {
   font-weight: bold;
   font-size: 17px;
 	position: relative;
+  white-space: nowrap;
 }
 .add-to-cart div#edit-actions {
   clear: both;
@@ -7515,8 +7516,14 @@ html, body {
     font-size: 15px;
     box-shadow: 0 1px 6px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.12);
 }
+.form-item-attributes-5.limited label,
 .form-item-attributes-5.disabled label{
     opacity: 0.7;
+  cursor: not-allowed;
+  filter: blur(2px);
+}
+#edit-attributes-5 + .card ~ .card {
+  display: none;
 }
 .form-item-attributes-5.disabled:before {
     content: "برای این دوره فقط می توانید به صورت VIP ثبت نام کنید. با ثبت نام در دوره vip در هر سطحی که باشید، آموزش آواز توسط استاد برای شما صورت میپذیرد";

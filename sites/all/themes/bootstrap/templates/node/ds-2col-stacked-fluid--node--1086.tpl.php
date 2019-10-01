@@ -251,6 +251,37 @@ var TypeSelection = function(){
 	}else{
 		$('#edit-attributes-5-20').attr("disabled", false).closest('.form-item-attributes-5').removeClass('disabled');
 	}
+
+	let expires = Drupal.settings.role_expiration
+  if(expires.honarjo != 0 && expires.vip == 0){
+    $('#edit-attributes-5-20')
+        .attr("disabled", true)
+        .prop('checked', false)
+        .closest('.form-item-attributes-5')
+          .addClass('limited')
+          .removeClass('selected disabled');
+    $('#edit-attributes-5-21').prop('checked', true).closest('.form-item-attributes-5').addClass('selected');
+    $('#edit-attributes-5').after('<div class="card h5" style="border-right: 4px solid #F44336;margin: -40px 0 50px;">شما نمیتوانید در دوره های مقدماتی دوبار ثبت نام کنید</div>')
+  }
+  else if(expires.honarjo == 0 && expires.vip != 0){
+    $('#edit-attributes-5-21')
+        .attr("disabled", true)
+        .prop('checked', false)
+        .closest('.form-item-attributes-5')
+          .addClass('limited')
+          .removeClass('selected disabled');
+    $('#edit-attributes-5-20').prop('checked', true).closest('.form-item-attributes-5').addClass('selected');
+    $('#edit-attributes-5').after('<div class="card h5" style="border-right: 4px solid #F44336;margin: -40px 0 50px;">شما نمیتوانید در دوره های VIP دوبار ثبت نام کنید</div>')
+  }
+  else if(expires.honarjo != 0 && expires.vip != 0){
+    $('#edit-attributes-5-20, #edit-attributes-5-21')
+        .attr("disabled", true)
+        .prop('checked', false)
+        .closest('.form-item-attributes-5')
+          .addClass('limited')
+          .removeClass('selected disabled');
+    $('#edit-attributes-5').after('<div class="card h5" style="border-right: 4px solid #F44336;margin: -40px 0 50px;">شما میتوانید فقط یک بار در هر یک از دوره ها ثبت نام کنید</div>')
+  }
 }
 
 $('#edit-submit-1086.node-add-to-cart').click(function(e){

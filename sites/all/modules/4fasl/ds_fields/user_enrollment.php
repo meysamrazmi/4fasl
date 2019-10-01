@@ -42,13 +42,15 @@ function user_enrollment($uid){
 		foreach($assigned_teachers as $row){
 			$ostad = user_load($row->ostad_uid);
 			$remain = ceil( $expires['offline'] / 7);
-			print '<div class="course-info">
-						<p class="saaz">دوره : <span>'. t($ostad->field_favorite['und'][0]['value']) .'</span></p>
-						<span class="seperator"></span>
-						<p class="ostad">استاد : <span>'. $ostad->field_naame['und'][0]['value'] .'</span></p>
-						<span class="seperator"></span>';
-			print ($remain >= 0)? 	'<p class="modat" style="font-family: fanum; text-align:center;margin-top: -10px;">هفته های باقی مانده : <span>'. $remain .' هفته</span>':
-											'<p class="modat" style="font-family: fanum; text-align:center;margin-top: -10px;">اتمام دوره کاربری';
+      print '<div class="course-info">';
+      print   '<p class="saaz">دوره : <span>'. t($ostad->field_favorite['und'][0]['value']) .'</span></p>';
+      print   '<span class="seperator"></span>';
+      print   '<p class="ostad">استاد : <span>'. $ostad->field_naame['und'][0]['value'] .'</span></p>';
+      print   '<span class="seperator"></span>';
+
+			print ($remain >= 0)?
+        '<p class="modat" style="font-family: fanum; text-align:center;margin-top: -10px;">هفته های باقی مانده : <span>'. $remain .' هفته</span>'
+        : '<p class="modat" style="font-family: fanum; text-align:center;margin-top: -10px;">اتمام دوره کاربری';
 
 			print '<span class="selected">روزهای '. translate_days($row->days) .' ساعت '. translate_hours($row->times) .'</span>';
 
@@ -57,42 +59,49 @@ function user_enrollment($uid){
 			print '</p></div>';
 		}
 	}
-	//the student has registered to a class
+	//the student has registered to a class but is not assigned to any teacher
 	elseif(count($user_orders) > 0){
-		$remain = $ostad_uid = 0;
-		$now = time();
-		$product_attributes = array();
 		foreach($user_orders as $row){
-			$remain = 4 - floor(($now - $row->created) / (60*60*24*7)); //remaining weeks
+      //remaining weeks
+      //we calculate remaining weeks based on user order and not with role expiration
+      //because we let users to register to multiple classes
+      $now = time();
+			$remain = 4 - floor(($now - $row->created) / (60*60*24*7));
+
 			$data = unserialize($row->data);
 			$ostad_uid = instrument_info('Teacher_OptionId',key($data['attributes']['ostad']),array('ostad_uid')); //gets the first selected ostad
 			$instrument = reset($data['attributes']);//gives us instrument
+
+      $product_attributes = array();
 			for($i = 0 ; $i < $row->qty ; $i++)
 				array_push($product_attributes, array(reset($instrument), $ostad_uid, $row->order_id));
+
+      $ostad = user_load($ostad_uid);
+      print '<div class="course-info">';
+      print   '<p class="saaz">دوره : <span>'. t($product_attributes[0][0]) .'</span></p>';
+			print   '<span class="seperator"></span>';
+      print   '<p class="ostad">استاد : <span>'. $ostad->field_naame['und'][0]['value'] .'</span></p>';
+      print   '<span class="seperator"></span>';
+
+      print ($remain >= 0)?
+        '<p class="modat" style="font-family: fanum; text-align:center;margin-top: -10px;">هفته های باقی مانده : <span>'. $remain .' هفته</span>'
+        : '<p class="modat" style="font-family: fanum; text-align:center;margin-top: -10px;">اتمام دوره کاربری';
+
+      $assigned = false;
+      foreach($assigned_teachers as $row){
+        if($row->stu == $user->uid && $row->ostad_uid == $ostad_uid){
+          print '<span class="selected">روزهای '. translate_days($row->days) .' ساعت '. translate_hours($row->times) .'</span>';
+          $assigned = true;
+        }
+      }
+      if(!$assigned && $remain >= 0)
+        print '<a href="/enrollment/time-selection" target="_blank">انتخاب برنامه زمانی</a>';
+
+      if($remain < 2)
+        print '<a href="/get-started/حضوری" target="_blank">تمدید کنید</a>';
+
+      print '</p></div>';
 		}
-		$ostad = user_load($ostad_uid);
-		print '<div class="course-info">
-				<p class="saaz">دوره : <span>'. t($product_attributes[0][0]) .'</span></p>
-				<span class="seperator"></span>
-				<p class="ostad">استاد : <span>'. $ostad->field_naame['und'][0]['value'] .'</span></p>
-				<span class="seperator"></span>';
-		print ($remain >= 0)? 	'<p class="modat" style="font-family: fanum; text-align:center;margin-top: -10px;">هفته های باقی مانده : <span>'. $remain .' هفته</span>':
-										'<p class="modat" style="font-family: fanum; text-align:center;margin-top: -10px;">اتمام دوره کاربری';
-
-		$printed = false;
-		foreach($assigned_teachers as $row){
-			if($row->stu == $user->uid && $row->ostad_uid == $ostad_uid){
-				print '<span class="selected">روزهای '. translate_days($row->days) .' ساعت '. translate_hours($row->times) .'</span>';
-				$printed = true;
-			}
-		}
-		if(!$printed && $remain >= 0)
-			print '<a href="/enrollment/time-selection" target="_blank">انتخاب برنامه زمانی</a>';
-
-		if($remain < 2)
-			print '<a href="/get-started/حضوری" target="_blank">تمدید کنید</a>';
-
-		print '</p></div>';
 	}
 	else{
 		print '
@@ -109,7 +118,7 @@ function user_enrollment($uid){
 function user_enrollment_HTML() {
   ob_start();
 ?>
-  <style>
+<style>
 .course-info {
     background: #fcfcfc;
     padding: 15px;
