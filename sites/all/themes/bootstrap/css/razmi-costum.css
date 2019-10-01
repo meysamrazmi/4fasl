@@ -8483,7 +8483,11 @@ a#edit-new-message-button {
 .view-products .form-type-bef-link {
   text-align: center;
 }
-.view-products .form-type-bef-link a {
+.page-node-5165 .filters {
+  z-index: 1;
+  position: relative;
+}
+.page-node-5165 .filters span {
   padding: 5px 20px;
   border-radius: 30px;
   box-shadow: rgba(0,0,0,0.117647) 0 1px 6px, rgba(0,0,0,0.117647) 0 1px 4px;
@@ -8491,9 +8495,89 @@ a#edit-new-message-button {
   color: #555;
   display: inline-block;
   margin: 10px 0;
-  transition: all 0.2s;
+  transition: box-shadow 0.2s;
+  cursor: pointer;
 }
-.view-products .form-type-bef-link a:hover {
+.page-node-5165 .filters span:hover {
   box-shadow: rgba(0,0,0,0.156863) 0 3px 10px, rgba(0,0,0,0.227451) 0 3px 10px;
   /* background: #eee; */
 }
+.page-node-5165 .filters span.active {
+  border: 2px solid #673AB7;
+  padding: 3px 18px;
+}
+.view-products #views-exposed-form-products-block select{
+  display: none;
+}
+.active-filters i {
+  display: inline-block;
+  line-height: 19px;
+  margin: 2px -15px -2px 10px;
+  vertical-align: middle;
+  font-size: 22px;
+  color: #999;
+}
+.empty-state {
+  width: 420px;
+  height: 420px;
+  margin: 30px auto;
+}
+.page-node-5165 .view-empty {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.empty-view-container {
+  border-radius: 50%;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  flex-direction: column;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+  text-align: center;
+  max-width: 420px;
+  padding: 36px;
+  position: relative;
+  transition: opacity .15s cubic-bezier(0,0,.2,1),transform .3s cubic-bezier(0,0,.2,1),-webkit-transform .3s cubic-bezier(0,0,.2,1);
+  will-change: transform,opacity;
+  background: #eee;
+  width: 420px;
+  height: 420px;
+  margin: 30px auto;
+}
+
+.empty-state-icon {
+  line-height: 160px;
+  width: 160px;
+  min-width: 160px;
+  height: 160px;
+  font-size: 160px!important;
+  margin: 0;
+  color: #aaa;
+}
+.empty-state-label {
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 40px;
+}
+.empty-state-description {
+  margin: 1em 0;
+  font-size: 1.5rem;
+  line-height: 3rem;
+}
+.active-filters {
+  background: #fff;
+  padding: 0 15px;
+  border-radius: 5px;
+  box-shadow: rgba(0,0,0,0.117647) 0 1px 6px, rgba(0,0,0,0.117647) 0 1px 4px;
+  display: inline-block;
+  border-right: 5px solid #42A5F5;
+  width: 100%;
+}
+.active-filters span {
+  margin-left: 10px !important;
+}
+

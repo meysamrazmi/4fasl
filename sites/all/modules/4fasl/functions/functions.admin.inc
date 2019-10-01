@@ -30,11 +30,11 @@ function site_setting(){
 			$row->oid,
       $row->intro_nid,
 			'<a href="/user/'. $row->ostad_uid .'" style="display: inline-flex;align-items: center;">'.
-				theme('image_style', 
+				isset($ostad->picture->uri)? theme('image_style',
 				array(
 					'style_name' => '100x100', 'path' => $ostad->picture->uri, 
 					'attributes' => array('style' =>"border-radius: 50%;width: 80px;height: 80px; margin-left:10px;")
-				)) .
+				)) : ''.
 				$ostad->field_naame['und'][0]['value'] . '</a></div>',	
 			$row->Teacher_OptionId,
 			!is_null($row->teacher_link) ? '<a href="'. $row->teacher_link .'" class="button" target="_blank">فیلم ها</a>' : '',

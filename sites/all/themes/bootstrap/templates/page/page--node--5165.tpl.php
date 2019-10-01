@@ -190,49 +190,70 @@ drupal_add_css(drupal_get_path('theme', 'bootstrap') . '/css/lib/owl.theme.defau
 <script src="/sites/all/themes/bootstrap/js/lib/owl.carousel.min.js"></script>
 <script>
   $(document).ready(function(){
-    initCrousel()
-    Drupal.behaviors.storeCrousel = {attach: function (context, settings) {
-        initCrousel()
-    }};
-    function initCrousel() {
-      $(".view-products .bef-select-as-links > .form-item").addClass('owl-carousel owl-theme')
-      $(".view-products .bef-select-as-links > .form-item > div").addClass('item')
-      $(".view-products .bef-select-as-links > .form-item").owlCarousel({
-        loop:true,
-        margin:10,
-        rtl:true,
-        nav: true,
-        dots:false,
-        autoWidth:true,
-        // slideBy:'page',
-        autoplay: true,
-        autoplayTimeout: 3000,
-        autoplayHoverPause: true,
-        slideTransition: 'linear',
-        // autoplaySpeed: 3000,
-        smartSpeed: 3000,
-        responsive:{
-          0:{
-            items:4
-          },
-          600:{
-            items:6
-          },
-          800:{
-            items:8
-          },
-          1000:{
-            items:10
-          }
+    //make filters links
+    let links = ''
+    $(".view-products #views-exposed-form-products-block select option").each(function(){
+      links += `<span class="item" data-value="${$(this).prop('value')}">${$(this).text()}</span>`
+    })
+
+    $(".view-products").before(`
+      <div class="filters">\
+        <div class="filter-carousel owl-carousel owl-theme"></div>\
+        <div class="active-filters"></div>\
+      </div>`)
+    $(".page-node-5165 .filter-carousel").html(links)
+
+    //set carousel for filters
+    $(".page-node-5165 .filter-carousel").owlCarousel({
+      loop:true,
+      margin:10,
+      rtl:true,
+      nav: false,
+      dots:false,
+      autoWidth:true,
+      // slideBy:'page',
+      autoplay: true,
+      autoplayTimeout: 3000,
+      autoplayHoverPause: true,
+      slideTransition: 'linear',
+      // autoplaySpeed: 3000,
+      smartSpeed: 3000,
+      responsive:{
+        0:{
+          items:4
+        },
+        600:{
+          items:6
+        },
+        800:{
+          items:8
+        },
+        1000:{
+          items:10
         }
-      });
-      $('.view-products .form-type-bef-link').click(function(){
-        console.log($(this).html())
-        $('.store-title').prepend($(this).text())
-      })
-    }
-    $('.page-store').on('click', '.view-products .form-type-bef-link', function(){
-      $('.store-title').prepend($(this).text())
+      }
+    });
+
+    //click handler for filters links
+    $(".page-node-5165 .filter-carousel span.item").click(function(){
+      if($(this).hasClass('active')){
+        $(`.filter-carousel span[data-value="${$(this).data('value')}"]`).removeClass('active')
+        $(`.active-filters span[data-value="${$(this).data('value')}"]`).remove()
+        $(`.view-products select.form-select option[value="${$(this).data('value')}"]`).prop('selected', false);
+      }else{
+        $(`.filter-carousel span[data-value="${$(this).data('value')}"]`).addClass('active')
+        $(`.view-products select.form-select option[value="${$(this).data('value')}"]`).prop('selected', true);
+        $('.active-filters').append(`<span class="item" data-value="${$(this).data('value')}"><i class="mdi mdi-close-circle"></i>${$(this).text()}</span>`)
+      }
+      $('#edit-submit-products').click()
+    })
+
+    $('.active-filters').on('click', 'span i', function () {
+      let span = $(this).parent()
+      $(`.filter-carousel span[data-value="${span.data('value')}"]`).removeClass('active')
+      $(`.view-products select.form-select option[value="${span.data('value')}"]`).prop('selected', false);
+      $('#edit-submit-products').click()
+      span.remove()
     })
   });
 </script>
