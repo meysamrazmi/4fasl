@@ -17,9 +17,9 @@
   <?php endif; ?>
 
   <<?php print $header_wrapper ?> class="group-header<?php print $header_classes; ?>">
-    <?php 
-	$header = str_replace('form-item-attributes-3 form-type-radio radio', 'form-item-attributes-3 form-type-radio radio col-lg-2 col-md-3 col-sm-4 col-xs-6 card-view', $header); 
-	$header = str_replace('attribute attribute-3', 'attribute attribute-3 active', $header); 
+    <?php
+	$header = str_replace('form-item-attributes-3 form-type-radio radio', 'form-item-attributes-3 form-type-radio radio col-lg-2 col-md-3 col-sm-4 col-xs-6 card-view', $header);
+	$header = str_replace('attribute attribute-3', 'attribute attribute-3 active', $header);
 	print $header; ?>
   </<?php print $header_wrapper ?>>
 
@@ -80,7 +80,7 @@ $('div#edit-attributes-3 .form-item').each(function(){
 		$(this).find('label').append('<span class="price">'+ oldtitle[1] +'</span>');
 	}
 	$(this).find('label').append('<span style="text-align: center;color: #f00;display: block;margin: -10px 0 5px 0;">به علاوه 10 هزار تومن هدیه</span><p class="course-link"><a href="/'+ translate_optionsId[$(this).find('input').attr('value')].name +'" target="_blank">معرفی دوره</a></p>');
-});  
+});
 $('div#edit-attributes-7 .form-item').each(function(){
 	$(this).addClass('col-lg-2 col-md-3 col-sm-4 col-xs-6 card-view').css({'display':'none'});
 });
@@ -223,11 +223,11 @@ var SelectingTeacher = function(){
 var TeachersItems = function(key){
 	//به صورت پیش فرض تو تنظیمات دروپال یکی از آیتم ها انتخاب شده که به این صورت برش میدارم
 	$('.attribute-7').find('.form-item input').attr( "checked" , false)
-	
+
 	$item = $('#edit-attributes-7 .form-item input#edit-attributes-7-' + key.Teacher_OptionId).closest('.form-item')
 	$item.css({'display':'block'}).addClass('acrive').append('<div class="teacher-intro">' + key.Teacher_Intro + '\
 	'+ (key.teacher_link != null ? '<p><a href="'+ key.teacher_link +'" target="_blank" class="btn btn-default">مشاهده فیلم های استاد</a></p>' : '') + '</div>');
-	
+
 	if(key.Teacher_OptionId == 56){//فرهاد صفری
 		$item.find('.teacher-intro').prepend('<div class="alert alert-info just-vip" role="alert">ثبت نام در کلاسهای مجازی استاد فرهاد صفری منوط به آشنایی قبلی هنرجو با نوازندگی تنبک بوده و فقط به صورت VIP می باشد. جهت تایید برای شرکت در کلاس آقای صفری میتوانید در بخش تعیین سطح نمونه ای از نوازندگی خود را ارسال کنید.</div>')
 	}
@@ -240,7 +240,9 @@ var TypeSelection = function(){
 			selected.push(parseInt($(this).attr('id').substr(18)));
 		}
 	});
-	if(selected[0] == 44 || selected[0] == 48){
+
+	//handle limited registration in just VIP for avaz
+/*	if(selected[0] == 44 || selected[0] == 48){
 		$('#edit-attributes-5-20')
 			.attr("disabled", true)
 			.prop('checked', false)
@@ -250,8 +252,9 @@ var TypeSelection = function(){
 		$('#edit-attributes-5-21').prop('checked', true).closest('.form-item-attributes-5').addClass('selected');
 	}else{
 		$('#edit-attributes-5-20').attr("disabled", false).closest('.form-item-attributes-5').removeClass('disabled');
-	}
+	}*/
 
+	//handle multiple registration
 	let expires = Drupal.settings.role_expiration
   if(expires.honarjo != 0 && expires.vip == 0){
     $('#edit-attributes-5-20')
