@@ -248,12 +248,10 @@ function privatemsg_mod_init() {
 		elseif($aliases[1] == 'view'){
 			if(isset($aliases[2])){
 				$thread = privatemsg_thread_load($aliases[2]);
-				foreach($thread['participants'] as $participant){
-					if($participant->type == 'user' && $participant->uid == $user->uid){
-						drupal_goto("user/$user->uid/messages/view/$aliases[2]");
-						die();
-					}
-				}
+        if(privatemsg_mod_view_access($user, $thread)){
+          drupal_goto("user/$user->uid/messages/view/$aliases[2]");
+          die();
+        }
 			}
 			else{
 				drupal_goto("user/$user->uid/messages/view");
@@ -312,6 +310,11 @@ function privatemsg_mod_view_access($account, $thread) {
 	}
 	if (privatemsg_user_access('read privatemsg') || privatemsg_user_access('read all private messages')) {
 		global $user;
+
+		//admin sent a message to a role so it's just him
+    if(count($thread['participants']) == 1){
+      return True;
+    }
 		foreach($thread['participants'] as $participant){
 			if((($participant->type == 'user' && $participant->uid == $account->uid) || 
 				($participant->type == 'role' && isset($account->roles[$participant->recipient]))
