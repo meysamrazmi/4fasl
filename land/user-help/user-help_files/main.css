@@ -1363,9 +1363,6 @@ div#edit-support-ticket-upload {
 .has-resumeable .bootstrap-filestyle {
   display: none;
 }
-.has-resumeable .bootstrap-filestyle {
-  display: none;
-}
 .file-resup-wrapper .drop {
   width: 75%;
 }
