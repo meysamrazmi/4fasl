@@ -17,9 +17,9 @@
   <?php endif; ?>
 
   <<?php print $header_wrapper ?> class="group-header<?php print $header_classes; ?>">
-    <?php 
-	$header = str_replace('form-item-attributes-3 form-type-radio radio', 'form-item-attributes-3 form-type-radio radio col-lg-2 col-md-3 col-sm-4 col-xs-6 card-view', $header); 
-	$header = str_replace('attribute attribute-3', 'attribute attribute-3 active', $header); 
+    <?php
+	$header = str_replace('form-item-attributes-3 form-type-radio radio', 'form-item-attributes-3 form-type-radio radio col-lg-2 col-md-3 col-sm-4 col-xs-6 card-view', $header);
+	$header = str_replace('attribute attribute-3', 'attribute attribute-3 active', $header);
 	print $header; ?>
   </<?php print $header_wrapper ?>>
 
@@ -301,7 +301,7 @@ $.ajax({
 });
 
 Drupal.behaviors.myregister = {attach: function (context, settings) {
-	
+
 var translate_optionsId = {};
 Object.keys(translate_options).map(function(objectKey) {
 	var val = translate_options[objectKey];
@@ -328,7 +328,7 @@ $('div#edit-attributes-3 .form-item').each(function(){
 		// }
 	// });
 	//$(this).find('label').append('<p class="course-link"><a href="/'+ translate_optionsId[$(this).find('input').attr('value')].name +'" target="_blank">معرفی دوره</a></p>');
-});  
+});
 $('div#edit-attributes-7 .form-item').each(function(){
 	$(this).addClass('card-view').css({'display':'none'});
 });
@@ -372,7 +372,7 @@ $('.attribute-3 > .form-item-attributes-3').append('<div class="description rule
     '<p>هزینه های پرداختی، بعنوان پیش ثبت نام در دوره های آموزشی در نظر گرفته شده است و پس از حضور در اولین جلسه می توانید ثبت نام خود را کامل کنید.</p>' +
     '<p>در مرحله بعد (انتخاب استاد) میتوانید شرایط برگزاری و هزینه کلاس را مطالعه فرمایید و همچنین از رزومه و برنامه زمانی اساتید مطلع شوید.</p>' +
     '<p>پس از تکمیل ثبت نام، روز و ساعت کلاس آموزشی برای شما اختصاص داده میشود و شما هر هفته در همان زمان اعلام شده از کلاس آموزشی استفاده می کنید.</p>' +
-    '<p>کلاسهای حضوری در محل آموزشگاه موسیقی چهارفصل به نشانی: تهران، بزرگراه ستاری، روبروی مجتمع کوروش، ابتدای پیامبر غربی، ساختمان گلستان برگزار میشود.</p>' +
+    '<p>کلاسهای حضوری در محل آموزشگاه موسیقی چهارفصل به نشانی: تهران - جنت آباد جنوبی - بلوار لاله - تقاطع شاهین (شهید پژوهنده) برگزار میشود.</p>' +
     '<p>برای آشنایی بیشتر می توانید <a href="/faq" class="btn" target="_blank">سوالات متداول</a> و <a href="/node/66" class="btn" target="_blank">نحوه ی کار</a> را مشاهده کنید.</p>' +
 '</div><div class="title"><img src="/sites/all/themes/bootstrap/images/law-book.svg"><span>شرایط و قوانین ثبت نام</span></div></div>');
 $('#uc-product-add-to-cart-form-2597 .attribute.attribute-3').addClass('active');
@@ -492,7 +492,7 @@ var SelectingTeacher = function(){
 var TeachersItems = function(key){
 	//به صورت پیش فرض تو تنظیمات دروپال یکی از آیتم ها انتخاب شده که به این صورت برش میدارم
 	$('.attribute-7').find('.form-item input').attr( "checked" , false)
-	
+
 	var $item = $('#edit-attributes-7 .form-item input#edit-attributes-7-' + key.Teacher_OptionId).closest('.form-item')
     if(key.ostad_uid == 7262 || key.ostad_uid == 1011)
         key.Teacher_Intro = '<p style="border-right: 2px solid #F44335;padding: 10px 15px;background: #eee;">کلاس های این استاد به صورت گروهی و ترمی می باشد و هزینه پرداختی بابت ثبت نام اولیه می باشد.</p>' + key.Teacher_Intro
@@ -534,7 +534,7 @@ $('#edit-attributes-7').on('click', '.teacher-intro button', function(){
 		}
 	});
 	$('.modal-title').text('برنامه زمانی اساتید آموزشگاه - ' + $(this).closest('.form-item').find('.oldtitle').text())
-})	
+})
 
 $('#edit-attributes-4 label').append('<span class="register-rules">شرایط و قوانین سایت را می پذیرم.<span>');
 $('#edit-attributes-4 input').change(function(){
@@ -550,7 +550,7 @@ $('#edit-attributes-4 input').change(function(){
 }};
 
 }(jQuery));
-window.onload = function () { 
+window.onload = function () {
 
 }
 
