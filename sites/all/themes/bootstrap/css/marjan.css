@@ -574,6 +574,14 @@ form#user-login {
 .page-node.node-type-course .field-name-field-attachment .file img{
 	display:none;
 }
+.page-node.node-type-course .field-name-field-attachment .file img.file-icon[alt~="Audio"] {
+  display: inline-block;
+  position: absolute;
+  left: 12px;
+  width: 21px;
+  background: #fff;
+  margin-top: 5px;
+}
 .page-node.node-type-course .field-name-field-attachment .file:before{
 	content: "\f1c1";
     font-size: 19px;

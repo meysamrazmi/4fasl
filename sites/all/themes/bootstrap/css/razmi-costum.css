@@ -1329,6 +1329,9 @@ div[id*="edit-support-ticket-upload"] {
   /*display: none;*/
   margin: 15px 0 15px 0;
 }
+.has-resumeable .bootstrap-filestyle {
+  display: none;
+}
 .file-resup-wrapper .drop {
   width: 75%;
 }

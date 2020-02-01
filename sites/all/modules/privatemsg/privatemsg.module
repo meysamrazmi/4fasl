@@ -274,6 +274,7 @@ function privatemsg_menu() {
     'page callback'    => 'privatemsg_list_page',
     'page arguments'   => array('list', 1),
     'file'             => 'privatemsg.pages.inc',
+    'access arguments' => array('read privatemsg'),
     'type' => MENU_LOCAL_TASK,
   );
 
