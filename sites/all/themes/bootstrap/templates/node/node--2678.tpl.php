@@ -87,6 +87,12 @@
   justify-content: center;
   margin: 50px auto 20px;
 }
+@media all and (max-width: 600px){
+  .links{
+    flex-direction: column;
+  }
+  .links a {  margin: 10px;}
+}
 .links img {
   width: auto;
   max-height: 100%;

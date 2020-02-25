@@ -1144,11 +1144,14 @@ function functions_entityreference_autocomplete_matches_alter(&$matches, $contex
 }
 
 function get_site_rules(){
-  $rules = array(
-    'offline_rules' => variable_get('offline_rules', ''),
-    'online_rules' => variable_get('online_rules', ''),
-    'practice_rules' => variable_get('practice_rules', '')
-  );
+  $result = db_select('site_rules', 's')
+    ->fields('s', array())
+    ->execute()->fetchAll();
+
+  $rules = [];
+  foreach ($result as $row){
+    $rules[$row->name] = $row->body;
+  }
 
   drupal_json_output($rules);
   drupal_exit();
