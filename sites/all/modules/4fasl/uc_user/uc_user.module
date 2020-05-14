@@ -9,7 +9,7 @@ function uc_user_uc_order($op, $order, $status) {
       if ($order->order_status != 'completed' && ($status == 'completed' && $order->uid > 0) && ($order_user = user_load($order->uid)) !== FALSE) {
         if (is_array($order->products) && count($order->products)) {
 			foreach ($order->products as $product) {
-			
+
 				if ($product->nid == 139){// for renew registration
 					$expires = timetoexpire($order->uid);
 					if(isset($product->data['attributes']['roles'])){
@@ -39,32 +39,32 @@ function uc_user_uc_order($op, $order, $status) {
 					}
 				}
 				// mdump($product, true);
-				
+
 				if($product->nid == 1086 ){ // registration in online courses
 					foreach ($product->data['attributes']['instrument'] as $key=> $value) {
 
+					  if(isset($product->data['attributes']['teacher']) && key($product->data['attributes']['teacher']) ){
+              $teacher_oid = key($product->data['attributes']['teacher']);
+              $teacher_uid = instrument_info('Teacher_OptionId', $teacher_oid, array('ostad_uid'), 'online');
+              if($teacher_uid == false){
+                continue; //skip the rest
+              }
+            } else{
+              drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 6 , '@val' => $value ,)), 'error');
+              continue; //skip the rest
+            }
+
 						if(instrument_info('oid', $key, array('name'), 'online') != false){
               if(!isset($product->data['attributes']['level'][21]) ){ //vip registration
-                add_collection($order_user , instrument_info('oid', $key, array('name'), 'online') , 'l1' , '1');
-                add_collection($order_user , instrument_info('oid', $key, array('name'), 'online') , 'l1' , '2');
-                add_collection($order_user , instrument_info('oid', $key, array('name'), 'online') , 'l1' , '3');
+                add_collection($order_user , instrument_info('oid', $key, array('name'), 'online') , 'l1' , '1', $teacher_uid);
+                add_collection($order_user , instrument_info('oid', $key, array('name'), 'online') , 'l1' , '2', $teacher_uid);
+                add_collection($order_user , instrument_info('oid', $key, array('name'), 'online') , 'l1' , '3', $teacher_uid);
               }
 							$field_favorite['und'][0]['value'] =  instrument_info('oid', $key, array('name'), 'online');
 							$order_user = user_save($order_user, array('field_favorite' => $field_favorite));
 						} else{
 							drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 4 , '@val' => $value ,)), 'error');
 						}
-						
-						if(isset($product->data['attributes']['teacher']) && key($product->data['attributes']['teacher']) ){
-							$teacher_oid = key($product->data['attributes']['teacher']);
-							$teacher_uid = instrument_info('Teacher_OptionId', $teacher_oid, array('ostad_uid'), 'online');
-							if($teacher_uid == false){
-								continue; //skip the rest
-							}
-						} else{
-							drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 6 , '@val' => $value ,)), 'error');
-							continue; //skip the rest
-						}	
 
 						$type = 1; //for student relationship type for default
 						$role = 4;
@@ -73,7 +73,7 @@ function uc_user_uc_order($op, $order, $status) {
 							$type = 3; //for vip relationship type
 							$role = 6;
 						}
-						
+
 						//im not sure this is the best idea to not give user role in his first week
 				        uc_roles_grant($order_user, $role, time() + (7 * 24 * 60 * 60));
 
@@ -87,7 +87,7 @@ function uc_user_uc_order($op, $order, $status) {
 						if($relationship === FALSE){
 							drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 5 , '@val' => $value ,)), 'error');
 						}
-						
+
 						$params = array(
 						  'uid' => $order_user->uid,
 						  'points' => ($order->order_total * 1), /* ($price * 1.2) شارژ اضافه برای جشنواره*/
@@ -98,11 +98,11 @@ function uc_user_uc_order($op, $order, $status) {
 						drupal_goto('/user/'. $order_user->uid);
 					}
 				}
-				
+
 				if ($product->nid == 2597){// for offline registration
 					drupal_goto('enrollment/time-selection');
 				}
-            }  
+            }
         }
       }
   }
@@ -113,8 +113,8 @@ function uc_user_forms($form_id, $args) {
 //  $users = entity_load('user');
   $users = db_query("SELECT uid from users where uid != 0")->fetchAll();
   foreach($users as $user){
-	$forms['student_confirmation_form_'. $user->uid]['callback'] = 'student_confirmation_form';  
-	$forms['student_node_refrence_form_'. $user->uid]['callback'] = 'student_node_refrence_form';  
+	$forms['student_confirmation_form_'. $user->uid]['callback'] = 'student_confirmation_form';
+	$forms['student_node_refrence_form_'. $user->uid]['callback'] = 'student_node_refrence_form';
   }
   return $forms;
 }
@@ -124,7 +124,7 @@ function student_confirmation_form($form, &$form_state, $uid) {
 		$form = array();
 	}
 	$form['approval'] = array(
-		'#type' => 'checkbox', 
+		'#type' => 'checkbox',
 		'#required' => true,
 		'#title' => t('accept this student for watching next episode'),
 		'#description' => t('Required. if this student has done his/her homeworks, check this option.'),
@@ -148,25 +148,33 @@ function student_confirmation_form_submit($form, &$form_state) {
         INNER JOIN field_data_field_instrument ins
         INNER JOIN field_data_field_levelnumber levn
         INNER JOIN field_data_field_sessionnumber sn
+        LEFT JOIN field_data_field_ostad ostad
         ON main.field_siteinfo_stu_value = ins.entity_id
         AND main.field_siteinfo_stu_value = levn.entity_id
         AND main.field_siteinfo_stu_value = sn.entity_id
+        AND main.field_siteinfo_stu_value = ostad.entity_id
         WHERE main.entity_type = 'node'
         AND ins.field_instrument_value = :instrument
         AND levn.field_levelnumber_value = :level ";
-		
-	$user_query ="SELECT main.field_siteinfo_stu_value as field_id, ins.field_instrument_value as instrument, levn.field_levelnumber_value as level, sn.field_sessionnumber_value as session
+
+	$user_query ="SELECT main.field_siteinfo_stu_value as field_id,
+                        ins.field_instrument_value as instrument,
+                        levn.field_levelnumber_value as level,
+                        sn.field_sessionnumber_value as session,
+                        ostad.field_ostad_uid as ostad
         FROM field_data_field_siteinfo_stu main
         INNER JOIN field_data_field_instrument ins
         INNER JOIN field_data_field_levelnumber levn
         INNER JOIN field_data_field_sessionnumber sn
+        LEFT JOIN field_data_field_ostad ostad
         ON main.field_siteinfo_stu_value = ins.entity_id
         AND main.field_siteinfo_stu_value = levn.entity_id
         AND main.field_siteinfo_stu_value = sn.entity_id
+        AND main.field_siteinfo_stu_value = ostad.entity_id
         WHERE main.entity_type = 'user'
-        AND main.entity_id = :uid  
+        AND main.entity_id = :uid
 		ORDER BY `main`.`field_siteinfo_stu_value` DESC";
-	
+
 	$user_result = db_query($user_query, array(':uid' => $user->uid))->fetchObject();
 	$node_result = db_query($node_query, array(':instrument' => $user_result->instrument, ':level' => $user_result->level))->fetchObject();
 
@@ -181,13 +189,13 @@ function student_confirmation_form_submit($form, &$form_state) {
 		}
 		$user_result->session = 1;
 	}else{
-		$user_result->session = intval($user_result->session) + 1;		
+		$user_result->session = intval($user_result->session) + 1;
 	}
-	add_collection($user , $user_result->instrument , $user_result->level , $user_result->session);
+	add_collection($user , $user_result->instrument , $user_result->level , $user_result->session, $user_result->ostad ? $user_result->ostad: null);
 	drupal_set_message(t('Your approval successfully saved for student ') . $user->name, 'status');
 }
 
-function add_collection($user, $instrument , $level , $session) {
+function add_collection($user, $instrument , $level , $session, $ostad = null) {
   module_load_include('inc', 'entity', 'includes/entity.controller');
   $values = array(
 		'field_name' => 'field_siteinfo_stu',
@@ -201,22 +209,27 @@ function add_collection($user, $instrument , $level , $session) {
 			LANGUAGE_NONE => array(array('value' => $session)),
 		),
   );
+  if(!is_null($ostad))
+    $values['field_ostad'] = array(
+      LANGUAGE_NONE => array(array('value' => $ostad))
+    );
+
   $entity = entity_create('field_collection_item', $values);
   $entity->setHostEntity('user', $user);
   $entity->save();
-  
-  //for giving user file access 
+
+  //for giving user file access
   if (!defined('FILE_ACCESS_USER')) {
     define('FILE_ACCESS_USER', 1);
   }
 
 	$sql = "
-		SELECT main.entity_id as nid 
+		SELECT main.entity_id as nid
         FROM field_data_field_siteinfo_stu main
         INNER JOIN field_data_field_instrument ins ON main.field_siteinfo_stu_value = ins.entity_id
         INNER JOIN field_data_field_levelnumber levn ON main.field_siteinfo_stu_value = levn.entity_id
         INNER JOIN field_data_field_sessionnumber sn ON main.field_siteinfo_stu_value = sn.entity_id
-        WHERE main.entity_type = 'node' 
+        WHERE main.entity_type = 'node'
         AND ins.field_instrument_value = :instrument
         AND levn.field_levelnumber_value = :level
         AND sn.field_sessionnumber_value = :session" ;
@@ -225,7 +238,7 @@ function add_collection($user, $instrument , $level , $session) {
 		':level' =>$level,
 		':session' =>$session
 	));
-	
+
 	if($rows = $result->fetchAll()){
 		foreach($rows as $row){
 			$node = node_load($row->nid);
@@ -286,7 +299,7 @@ function student_node_refrence_form($form, &$form_state, $uid) {
 	global $user;
 	if(!isset($user->roles[3])){ //admin role id
 		if($user->uid == 164 || $user->uid == 111){
-			$era_query_settings[] = array('uid', array(111,164), 'IN');			
+			$era_query_settings[] = array('uid', array(111,164), 'IN');
 		}else{
 		  $era_query_settings[] = array('uid', $user->uid, '=');
 		}
@@ -301,7 +314,7 @@ function student_node_refrence_form($form, &$form_state, $uid) {
     $era_query_settings[] = array('nid', $nids, 'NOT IN');
 //  mdump($era_query_settings);
 	$form['refrenced_node'] = array(
-		'#type' => 'entityreference', 
+		'#type' => 'entityreference',
 		'#required' => true,
 		'#title' => 'تیتر محتوا',
 		'#era_entity_type' => 'node',
@@ -310,7 +323,7 @@ function student_node_refrence_form($form, &$form_state, $uid) {
             'property_conditions' => $era_query_settings,
 /*          'field_conditions' => array(
 				array('nid', 'title'),
-            ),	 */		
+            ),	 */
 		),
 	);
 	$form['uid'] = array(
@@ -336,7 +349,8 @@ function student_node_refrence_form_submit($form, &$form_state) {
       $user,
       $collection_item->field_instrument['und'][0]['value'],
       $collection_item->field_levelnumber['und'][0]['value'],
-      $collection_item->field_sessionnumber['und'][0]['value']
+      $collection_item->field_sessionnumber['und'][0]['value'],
+      $collection_item->field_ostad['und'][0]['value']
     );
     drupal_set_message('فیلم مورد نظر به کاربر ارسال شد');
     return;
@@ -387,7 +401,7 @@ function user_nodes($uid){
         AND main.field_siteinfo_stu_value = levn.entity_id
         AND main.field_siteinfo_stu_value = sn.entity_id
         WHERE main.entity_type = 'user'
-        AND main.entity_id = :uid  
+        AND main.entity_id = :uid
 		ORDER BY `main`.`field_siteinfo_stu_value` DESC";
 
   $user_result = db_query($user_query, array(':uid' => $uid))->fetchAll();

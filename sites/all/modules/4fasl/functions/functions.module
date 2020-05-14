@@ -31,8 +31,8 @@ function unread_tickets($user){
 
  	$history_query=	"SELECT DISTINCT node.nid AS nid, history.timestamp AS history_timestamp, node.changed AS node_changed	FROM node node LEFT JOIN history history ON node.nid = history.nid AND history.uid = :uid	WHERE node.nid = :nid";
 
-	$nodecounter = 'SELECT max(viewc.timestamp) AS viewc_timestamp, node.changed AS node_changed   
-		FROM node node 
+	$nodecounter = 'SELECT max(viewc.timestamp) AS viewc_timestamp, node.changed AS node_changed
+		FROM node node
 		LEFT JOIN nodeviewcount viewc ON node.nid = viewc.nid
 		WHERE node.nid = :nid AND viewc.uid = :uid';
 
@@ -67,44 +67,57 @@ function unread_tickets_count($user){
 }
 
 function student_films($uid , $detail = false){
-	$user_q = "SELECT instrument.field_instrument_value AS instrument , _level.field_levelnumber_value AS level, _session.field_sessionnumber_value AS session
+	$user_q =
+	"SELECT instrument.field_instrument_value AS instrument,
+	_level.field_levelnumber_value AS level,
+	_session.field_sessionnumber_value AS session,
+	_ostad.field_ostad_uid AS ostad
+
     FROM field_data_field_siteinfo_stu field_stu
-    INNER JOIN field_data_field_instrument instrument
-    INNER JOIN field_data_field_levelnumber _level
-    INNER JOIN field_data_field_sessionnumber _session
-    ON field_stu.field_siteinfo_stu_value = instrument.entity_id
-    AND field_stu.field_siteinfo_stu_value = _level.entity_id
-    AND field_stu.field_siteinfo_stu_value = _session.entity_id
-    WHERE field_stu.entity_type = 'user' AND field_stu.entity_id = :uid 
-	AND instrument.entity_type = 'field_collection_item' 
-	AND _level.entity_type = 'field_collection_item' 
-	AND _session.entity_type = 'field_collection_item'";
+    INNER JOIN field_data_field_instrument instrument ON field_stu.field_siteinfo_stu_value = instrument.entity_id AND instrument.entity_type = 'field_collection_item'
+    INNER JOIN field_data_field_levelnumber _level    ON field_stu.field_siteinfo_stu_value = _level.entity_id AND _level.entity_type = 'field_collection_item'
+    INNER JOIN field_data_field_sessionnumber _session ON field_stu.field_siteinfo_stu_value = _session.entity_id AND _session.entity_type = 'field_collection_item'
+    LEFT JOIN field_data_field_ostad _ostad           ON field_stu.field_siteinfo_stu_value = _ostad.entity_id AND _ostad.entity_type = 'field_collection_item'
+
+    WHERE field_stu.entity_type = 'user' AND field_stu.entity_id = :uid";
 
 	$nid_q = "SELECT field_stu.entity_id AS nid
     FROM field_data_field_siteinfo_stu field_stu
-    INNER JOIN field_data_field_instrument instrument
-    INNER JOIN field_data_field_levelnumber _level
-    INNER JOIN field_data_field_sessionnumber _session
-    ON field_stu.field_siteinfo_stu_value = instrument.entity_id
-    AND field_stu.field_siteinfo_stu_value = _level.entity_id
-    AND field_stu.field_siteinfo_stu_value = _session.entity_id
-    WHERE field_stu.entity_type = 'node' 
-	AND instrument.field_instrument_value = :instrument 
-	AND _level.field_levelnumber_value = :level 
-	AND _session.field_sessionnumber_value = :session";
+    INNER JOIN field_data_field_instrument instrument ON field_stu.field_siteinfo_stu_value = instrument.entity_id
+    INNER JOIN field_data_field_levelnumber _level ON field_stu.field_siteinfo_stu_value = _level.entity_id
+    INNER JOIN field_data_field_sessionnumber _session ON field_stu.field_siteinfo_stu_value = _session.entity_id
+    LEFT JOIN field_data_field_ostad _ostad ON field_stu.field_siteinfo_stu_value = _ostad.entity_id
+
+    WHERE field_stu.entity_type = 'node'
+      AND instrument.field_instrument_value = :instrument
+      AND _level.field_levelnumber_value = :level
+      AND _session.field_sessionnumber_value = :session
+      AND (_ostad.field_ostad_uid IS NULL OR _ostad.field_ostad_uid = :ostad)";
 
 	$output = array();
 	$rows = db_query($user_q , array(':uid' => $uid))->fetchAll();
 	if($detail){
 		foreach($rows as $row){
-			$result = db_query($nid_q , array(':instrument' => $row->instrument , ':level' => $row->level , ':session' => $row->session))->fetchAll();
+			$result = db_query($nid_q ,
+        array(
+          ':instrument' => $row->instrument,
+          ':level' => $row->level,
+          ':session' => $row->session,
+          ':ostad' => $row->ostad ? $row->ostad : 1)
+        )->fetchAll();
 			foreach($result as $nid){
 				$output[$row->instrument][$row->level][] = $nid->nid;
 			}
 		}
 	}else{
 		foreach($rows as $row){
-			$result = db_query($nid_q , array(':instrument' => $row->instrument , ':level' => $row->level , ':session' => $row->session))->fetchAll();
+			$result = db_query($nid_q ,
+              array(
+                ':instrument' => $row->instrument,
+                ':level' => $row->level,
+                ':session' => $row->session,
+                ':ostad' => $row->ostad ? $row->ostad : 1)
+              )->fetchAll();
 			foreach($result as $nid){
 				$output[] = $nid->nid;
 			}
@@ -301,12 +314,12 @@ function update_file_access(){
 
 		//for giving user file access
 		$sql = "
-			SELECT main.entity_id as nid 
+			SELECT main.entity_id as nid
 			FROM field_data_field_siteinfo_stu main
 			INNER JOIN field_data_field_instrument ins ON main.field_siteinfo_stu_value = ins.entity_id
 			INNER JOIN field_data_field_levelnumber levn ON main.field_siteinfo_stu_value = levn.entity_id
 			INNER JOIN field_data_field_sessionnumber sn ON main.field_siteinfo_stu_value = sn.entity_id
-			WHERE main.entity_type = 'node' 
+			WHERE main.entity_type = 'node'
 			AND ins.field_instrument_value = :instrument
 			AND levn.field_levelnumber_value = :level
 			AND sn.field_sessionnumber_value = :session" ;
@@ -394,25 +407,25 @@ function functions_user_presave(&$edit, $account, $category) {
 
   // Grant a new role if a new temporary role is added.
   if (isset($edit['new_role']) && $edit['new_role'] && $category == 'account') {
-	$type = 1; //شاگرد relationship id
+	  $type = 1; //شاگرد relationship id
+    $teacher_uid = which_teacher_name($account->field_favorite['und'][0]['value']);
+    if($edit['new_role_add'] == 4){//honarjo role id
 
-	if($edit['new_role_add'] == 4){//honarjo role id
+      //update the user 'field_collection' data
+      $expires = timetoexpire($account->uid);
+      if($expires['honarjo'] == 0){
+        add_collection($account , $account->field_favorite['und'][0]['value'] , 'l1' , '1', $teacher_uid);
+        add_collection($account , $account->field_favorite['und'][0]['value'] , 'l1' , '2', $teacher_uid);
+        add_collection($account , $account->field_favorite['und'][0]['value'] , 'l1' , '3', $teacher_uid);
+      }
+    }elseif($edit['new_role_add'] == 6){//vip role id
+      $type = 3; //vip relationship id
+    }
 
-		//update the user 'field_collection' data
-		$expires = timetoexpire($account->uid);
-		if($expires['honarjo'] == 0){
-			add_collection($account , $account->field_favorite['und'][0]['value'] , 'l1' , '1');
-      add_collection($account , $account->field_favorite['und'][0]['value'] , 'l1' , '2');
-      add_collection($account , $account->field_favorite['und'][0]['value'] , 'l1' , '3');
-		}
-	}elseif($edit['new_role_add'] == 6){//vip role id
-		$type = 3; //vip relationship id
-	}
-
-	$relationship = user_relationships_request_relationship($account->uid, which_teacher_name($account->field_favorite['und'][0]['value']) , $type , true);
-	if($relationship === FALSE){
-		drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 5 , '@val' => '' ,)), 'error');
-	}
+    $relationship = user_relationships_request_relationship($account->uid, $teacher_uid , $type , true);
+    if($relationship === FALSE){
+      drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 5 , '@val' => '' ,)), 'error');
+    }
   }
 
   // Check if any temporary role actions were taken.
@@ -513,22 +526,22 @@ function parse($v, $r, $max_d = 1, $d = 0) {
 }
 
 function time_selection($ostad_uid){
-	$query = "SELECT 
+	$query = "SELECT
 					f.delta as delta,
-					days.field_days_value as days, 
-					times.field_time_value as times, 
-					en.field_enable_value as enabled, 
+					days.field_days_value as days,
+					times.field_time_value as times,
+					en.field_enable_value as enabled,
 					stu.field_user_uid as stu,
-					vip.field_vip_value as grp 
-					
+					vip.field_vip_value as grp
+
 					FROM `field_data_field_classes_timing` f
-					
+
 					LEFT JOIN field_data_field_enable en ON en.entity_id = f.field_classes_timing_value and en.bundle = 'field_classes_timing'
 					LEFT JOIN field_data_field_time times  ON times.entity_id = f.field_classes_timing_value and times.bundle = 'field_classes_timing'
 					LEFT JOIN field_data_field_days days ON days.entity_id = f.field_classes_timing_value and days.bundle = 'field_classes_timing'
 					LEFT JOIN field_data_field_vip vip ON vip.entity_id = f.field_classes_timing_value and vip.bundle = 'field_classes_timing'
 					LEFT JOIN field_data_field_user stu ON stu.entity_id = f.field_classes_timing_value and stu.bundle = 'field_classes_timing'
-					
+
 					WHERE f.entity_type = 'user' and f.entity_id = :uid
 					ORDER BY delta";
 	$result = db_query($query, array(':uid' => $ostad_uid))->fetchAll();
@@ -1172,8 +1185,8 @@ function functions_cron() {
  * */
 function delete_stars(){
   $q = "SELECT * FROM (
-          SELECT uid, max(description) as last 
-          FROM `pay_practice` 
+          SELECT uid, max(description) as last
+          FROM `pay_practice`
           GROUP BY uid
         ) last_practices
         WHERE last < :time";
@@ -1209,8 +1222,8 @@ function delete_stars(){
  * */
 function notify_about_stars(){
   $q = "SELECT * FROM (
-          SELECT uid, max(description) as last 
-          FROM `pay_practice` 
+          SELECT uid, max(description) as last
+          FROM `pay_practice`
           GROUP BY uid
         ) last_practices
         WHERE last < :start_time AND last > :end_time";
