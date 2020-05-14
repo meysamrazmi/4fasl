@@ -129,7 +129,7 @@ if(getCookie('vip') && getCookie('vip-user') == window.location.href){
 	$('body').addClass('vip-en').removeClass('honarjo-en');
 	console.log(window.location.href);
 }
-// change_role();
+change_role();
 if($('body').hasClass('has-vip')){
 	if(!$('body').hasClass('has-honarjo')){
 		$('body').addClass('vip-en');

@@ -79,13 +79,6 @@ span.telegram:before {
     </div> <!-- /header -->
 
     <div id="container" class="clearfix">
-
-      <?php if (!empty($sidebar_first)): ?>
-        <div id="sidebar-first" class="column sidebar">
-          <?php print $sidebar_first; ?>
-        </div> <!-- /sidebar-first -->
-      <?php endif; ?>
-
       <div id="main" class="column"><div id="main-squeeze">
 
         <div id="content">
@@ -93,7 +86,7 @@ span.telegram:before {
           <?php if (!empty($messages)): print $messages; endif; ?>
           <div id="content-content" class="clearfix">جهت پشتیبانی و ارائه ی تمرینات توسط هنرجویان از طریق ID تلگرام و یا ایمیل اقدام نمایید.</div> <!-- /content-content -->
           <div class="contains"><span class="telegram"><a href="//t.me/ad4fasl" target="_blank" class="rr">telegram.me/ad4fasl</a></span><span class="rr">support@4faslmusic.ir</span></div>
-          
+
         </div> <!-- /content -->
 
       </div></div> <!-- /main-squeeze /main -->

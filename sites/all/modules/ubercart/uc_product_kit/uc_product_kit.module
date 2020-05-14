@@ -136,6 +136,14 @@ function uc_product_kit_insert(&$node) {
 
   $values = array();
   $placeholders = array();
+
+  //  mdump($node);
+    foreach ($node->products as $key => $nid) {
+      if($nid == 0){
+        unset($node->products[$key]);
+      }
+    }
+
   foreach ($node->products as $product) {
     if (is_numeric($product)) {
       $product = node_load($product);
