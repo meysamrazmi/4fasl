@@ -540,8 +540,8 @@ function uc_product_kit_form(&$node, $form_state) {
     '#default_value' => $node->mutable,
   );
   $form['base']['products'] = array(
-    '#type' => 'checkboxes',
-//    '#multiple' => TRUE,
+    '#type' => 'select',
+    '#multiple' => TRUE,
     '#required' => TRUE,
     '#title' => t('Products'),
     '#options' => $products,
