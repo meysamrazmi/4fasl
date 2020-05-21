@@ -8,101 +8,101 @@ function uc_user_uc_order($op, $order, $status) {
       // We might want to add the "Order Status" to the Userpoints Ubercart options...
       if ($order->order_status != 'completed' && ($status == 'completed' && $order->uid > 0) && ($order_user = user_load($order->uid)) !== FALSE) {
         if (is_array($order->products) && count($order->products)) {
-			foreach ($order->products as $product) {
+          foreach ($order->products as $product) {
 
-				if ($product->nid == 139){// for renew registration
-					$expires = timetoexpire($order->uid);
-					if(isset($product->data['attributes']['roles'])){
-						foreach ($product->data['attributes']['roles'] as $key => $value) {
-							switch($key){
-								case 20: //honarjo option ID
-									$rid = 4;
-									if ($expires['honarjo'] < 1){
-										db_update('uc_roles_expirations')->fields(array('expiration' => time()))->condition('uid', $order->uid)->condition('rid', $rid)->execute();
-										// Punch the role into the user object.
-										$roles_list = $order_user->roles + array($rid => _uc_roles_get_name($rid));
-										$order_user = user_save($order_user, array('roles' => $roles_list));
-									}
-									break;
-								case 21: //vip option ID
-									$rid = 6;
-									if ($expires['vip'] < 1){
-										db_update('uc_roles_expirations')->fields(array('expiration' => time()))->condition('uid', $order->uid)->condition('rid', $rid)->execute();
-										// Punch the role into the user object.
-										$roles_list = $order_user->roles + array($rid => _uc_roles_get_name($rid));
-										$order_user = user_save($order_user, array('roles' => $roles_list));
-									}
-									break;
-								default:
-							}
-						}
-					}
-				}
-				// mdump($product, true);
-
-				if($product->nid == 1086 ){ // registration in online courses
-					foreach ($product->data['attributes']['instrument'] as $key=> $value) {
-
-					  if(isset($product->data['attributes']['teacher']) && key($product->data['attributes']['teacher']) ){
-              $teacher_oid = key($product->data['attributes']['teacher']);
-              $teacher_uid = instrument_info('Teacher_OptionId', $teacher_oid, array('ostad_uid'), 'online');
-              if($teacher_uid == false){
-                continue; //skip the rest
+            if ($product->nid == 139){// for renew registration
+              $expires = timetoexpire($order->uid);
+              if(isset($product->data['attributes']['roles'])){
+                foreach ($product->data['attributes']['roles'] as $key => $value) {
+                  switch($key){
+                    case 20: //honarjo option ID
+                      $rid = 4;
+                      if ($expires['honarjo'] < 1){
+                        db_update('uc_roles_expirations')->fields(array('expiration' => time()))->condition('uid', $order->uid)->condition('rid', $rid)->execute();
+                        // Punch the role into the user object.
+                        $roles_list = $order_user->roles + array($rid => _uc_roles_get_name($rid));
+                        $order_user = user_save($order_user, array('roles' => $roles_list));
+                      }
+                      break;
+                    case 21: //vip option ID
+                      $rid = 6;
+                      if ($expires['vip'] < 1){
+                        db_update('uc_roles_expirations')->fields(array('expiration' => time()))->condition('uid', $order->uid)->condition('rid', $rid)->execute();
+                        // Punch the role into the user object.
+                        $roles_list = $order_user->roles + array($rid => _uc_roles_get_name($rid));
+                        $order_user = user_save($order_user, array('roles' => $roles_list));
+                      }
+                      break;
+                    default:
+                  }
+                }
               }
-            } else{
-              drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 6 , '@val' => $value ,)), 'error');
-              continue; //skip the rest
+            }
+            // mdump($product, true);
+
+            if($product->nid == 1086 ){ // registration in online courses
+              foreach ($product->data['attributes']['instrument'] as $key=> $value) {
+
+                if(isset($product->data['attributes']['teacher']) && key($product->data['attributes']['teacher']) ){
+                  $teacher_oid = key($product->data['attributes']['teacher']);
+                  $teacher_uid = instrument_info('Teacher_OptionId', $teacher_oid, array('ostad_uid'), 'online');
+                  if($teacher_uid == false){
+                    continue; //skip the rest
+                  }
+                } else{
+                  drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 6 , '@val' => $value ,)), 'error');
+                  continue; //skip the rest
+                }
+
+                if(instrument_info('oid', $key, array('name'), 'online') != false){
+                  if(!isset($product->data['attributes']['level'][21]) ){ //vip registration
+                    add_collection($order_user , instrument_info('oid', $key, array('name'), 'online') , 'l1' , '1', $teacher_uid);
+                    add_collection($order_user , instrument_info('oid', $key, array('name'), 'online') , 'l1' , '2', $teacher_uid);
+                    add_collection($order_user , instrument_info('oid', $key, array('name'), 'online') , 'l1' , '3', $teacher_uid);
+                  }
+                  $field_favorite['und'][0]['value'] =  instrument_info('oid', $key, array('name'), 'online');
+                  $order_user = user_save($order_user, array('field_favorite' => $field_favorite));
+                } else{
+                  drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 4 , '@val' => $value ,)), 'error');
+                }
+
+                $type = 1; //for student relationship type for default
+                $role = 4;
+                $approved = true ;
+                if(isset($product->data['attributes']['level'][21]) ){ //vip registration
+                  $type = 3; //for vip relationship type
+                  $role = 6;
+                }
+
+                //im not sure this is the best idea to not give user role in his first week
+                    uc_roles_grant($order_user, $role, time() + (7 * 24 * 60 * 60));
+
+                //sending message to user
+                $node = node_load(4887);
+                $body = isset($node->body['und'][0])? $node->body['und'][0]['value'] : '';
+                privatemsg_new_thread(array(user_load($order_user->uid)), 'راهنمای بعد از ثبت نام', $body, array('author' => user_load(86) , 'format' => 'full_html'));
+
+
+                $relationship = user_relationships_request_relationship($order->uid, $teacher_uid , $type , $approved);
+                if($relationship === FALSE){
+                  drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 5 , '@val' => $value ,)), 'error');
+                }
+
+                $params = array(
+                  'uid' => $order_user->uid,
+                  'points' => ($order->order_total * 1), /* ($price * 1.2) شارژ اضافه برای جشنواره*/
+                  'operation' => 'ثبت نام اولیه',
+                );
+                userpoints_userpointsapi($params);
+                drupal_set_message('حساب کاربری شما بابت افزودن تمرین شارژ شد.', 'status');
+                drupal_goto('/user/'. $order_user->uid);
+              }
             }
 
-						if(instrument_info('oid', $key, array('name'), 'online') != false){
-              if(!isset($product->data['attributes']['level'][21]) ){ //vip registration
-                add_collection($order_user , instrument_info('oid', $key, array('name'), 'online') , 'l1' , '1', $teacher_uid);
-                add_collection($order_user , instrument_info('oid', $key, array('name'), 'online') , 'l1' , '2', $teacher_uid);
-                add_collection($order_user , instrument_info('oid', $key, array('name'), 'online') , 'l1' , '3', $teacher_uid);
-              }
-							$field_favorite['und'][0]['value'] =  instrument_info('oid', $key, array('name'), 'online');
-							$order_user = user_save($order_user, array('field_favorite' => $field_favorite));
-						} else{
-							drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 4 , '@val' => $value ,)), 'error');
-						}
-
-						$type = 1; //for student relationship type for default
-						$role = 4;
-						$approved = true ;
-						if(isset($product->data['attributes']['level'][21]) ){ //vip registration
-							$type = 3; //for vip relationship type
-							$role = 6;
-						}
-
-						//im not sure this is the best idea to not give user role in his first week
-				        uc_roles_grant($order_user, $role, time() + (7 * 24 * 60 * 60));
-
-						//sending message to user
-						$node = node_load(4887);
-						$body = isset($node->body['und'][0])? $node->body['und'][0]['value'] : '';
-            privatemsg_new_thread(array(user_load($order_user->uid)), 'راهنمای بعد از ثبت نام', $body, array('author' => user_load(86) , 'format' => 'full_html'));
-
-
-            $relationship = user_relationships_request_relationship($order->uid, $teacher_uid , $type , $approved);
-						if($relationship === FALSE){
-							drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 5 , '@val' => $value ,)), 'error');
-						}
-
-						$params = array(
-						  'uid' => $order_user->uid,
-						  'points' => ($order->order_total * 1), /* ($price * 1.2) شارژ اضافه برای جشنواره*/
-						  'operation' => 'ثبت نام اولیه',
-						);
-						userpoints_userpointsapi($params);
-						drupal_set_message('حساب کاربری شما بابت افزودن تمرین شارژ شد.', 'status');
-						drupal_goto('/user/'. $order_user->uid);
-					}
-				}
-
-				if ($product->nid == 2597){// for offline registration
-					drupal_goto('enrollment/time-selection');
-				}
+            if ($product->nid == 2597){// for offline registration
+              drupal_goto('enrollment/time-selection');
             }
+          }
         }
       }
   }

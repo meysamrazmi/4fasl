@@ -3,10 +3,10 @@
 /**
  * @file Provides Zarinpal Payment Gateway for Ubercart 3.x
  * @author "Ahmad Hejazee" <mngafa@gmail.com>
- * 
+ *
  * @see http://www.hejazee.ir/
  * @see http://www.tolooco.com/
- * 
+ *
  * Copyright 2014-2015 - Tolooco.Com - All rights reserved.
  * For Licence, see README.txt and README.fa.txt
  */
@@ -43,10 +43,10 @@ function uc_zarinpal_complete_page($order_id) {
   // Although Drupal has a built-in class autoloader, It's not compatible with ioncube.
   // So we load the class manually to make sure.
   require_once dirname(__FILE__) . '/zarinpal.class.inc';
-  
+
   // Check if $order_id is valid
   $order = NULL;
-  
+
   if (is_numeric($order_id)) {
     // Load order object
     $order_id = (int) $order_id;
@@ -57,7 +57,7 @@ function uc_zarinpal_complete_page($order_id) {
     $msg = t('Order invalid.');
     drupal_set_message($msg, 'error');
     watchdog('zarinpal', 'Invalid order id passed to uc_zarinpal_complete_page()', WATCHDOG_ERROR);
-    
+
     return $msg;
   }
 
@@ -66,10 +66,10 @@ function uc_zarinpal_complete_page($order_id) {
   if (empty($merchantID)) {
     $msg = t('Zarinpal is not configured properly.');
     drupal_set_message($msg, 'error');
-    
+
     return $msg;
   }
-  
+
   // Build parameters for Zarinpal class constructor
   // Actually we only need $merchantID, $order_total for verifyTransaction() method
   $order_total = $order->order_total;
@@ -96,8 +96,10 @@ function uc_zarinpal_complete_page($order_id) {
     $msg = 'Transaction not successful or cancelled by user.';
     drupal_set_message(t($msg), 'error');
     watchdog('zarinpal', $msg, array(), WATCHDOG_ERROR);
-
-    return $msg;
+    $output = '<div class="text-center"><i class="mdi mdi-information-outline" style=" font-size: 100px; color: #FF5722;"></i>';
+    $output .= '<p>'. t($msg) .'</p><p><a href="/cart/checkout" class="btn btn-default">بازگشت</a></p></div>';
+    drupal_goto('/cart/checkout');
+    return $output;
   }
   catch (ZarinpalExceptionVerification $e) {
     // Verification failed.
@@ -123,6 +125,22 @@ function uc_zarinpal_complete_page($order_id) {
 
   $output = uc_cart_complete_sale($order, variable_get('uc_new_customer_login', FALSE));
 
+  //handling shop courses to redirect to its pages after shopping
+  foreach ($order->products as $product){
+    $node = node_load($product->nid);
+    if($node->type == 'product_kit'){
+      drupal_goto('/node/'. $node->nid);
+    }
+    else if($node->type == 'prod'){
+      $result = db_query("SELECT nid FROM `uc_product_kits` where product_id = :pid", array(':pid'=> $node->nid))->fetchObject();
+
+      if(isset($result->nid))
+        drupal_goto('/node/'. $result->nid);
+      drupal_goto('/node/'. $node->nid);
+    }
+  }
+
+
   $page = variable_get('uc_cart_checkout_complete_page', '');
   if (!empty($page)) {
     drupal_goto($page);
@@ -144,7 +162,7 @@ function uc_zarinpal_uc_payment_method() {
     'attributes' => array(
       'style' => 'margin-bottom: -5px; position: relative; top: 2px;',
     ),
-  ));  
+  ));
 
   $title .= t('Zarinpal Gateway');
 
@@ -213,7 +231,7 @@ function uc_zarinpal_pay_submission_form($form_state, $order) {
   // Although Drupal has a built-in class autoloader, It's not compatible with ioncube.
   // So we load the class manually to make sure.
   require_once dirname(__FILE__) . '/zarinpal.class.inc';
-  
+
   $merchantID = variable_get('uc_zarinpal_MerchantID', '');
 
   if (empty($merchantID)) {

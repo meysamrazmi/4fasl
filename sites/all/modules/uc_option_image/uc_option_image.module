@@ -120,11 +120,12 @@ function uc_option_image_add_to_cart_prerender($element) {
 }
 
 function uc_option_image_kit_add_to_cart_prerender($element) {
-  foreach($element['products'] as $key => $product) {
-    if (is_numeric($key)) {
-      _uc_option_image_modify_attributes($element['products'][$key]);
+  if(isset($element['products']))
+    foreach($element['products'] as $key => $product) {
+      if (is_numeric($key)) {
+        _uc_option_image_modify_attributes($element['products'][$key]);
+      }
     }
-  }
   return $element;
 }
 
@@ -147,7 +148,7 @@ function _uc_option_image_modify_attributes(&$element) {
           $oldtitle = $element['attributes'][$aid][$oid]['#title'];
           $extratitle = theme('uc_option_image_inline', array('values' => $values));
           $newtitle = $extratitle . "<span id='oldtitle_$oid' class='oldtitle'>$oldtitle</span>";
-		  
+
 		  $prices = db_query('SELECT opt.cost AS cost, opt.price AS price FROM uc_product_options opt WHERE (nid = :nid) AND (oid = :oid)', array(':nid' => $nid, ':oid' => $oid))->fetchobject();
 		  if($prices->cost > $prices->price)
 			$newtitle .= '<span class="old-price">'. number_format($prices->cost) .' تومان</span>';
@@ -292,7 +293,7 @@ function uc_option_image_form(&$form, &$form_state, $type) {
     ),
 
     'uc_option_image_fid' => uc_option_image_file_form($type, $object, $values),
-      
+
     uc_option_image_display_form($type, $object, $values)
   );
 

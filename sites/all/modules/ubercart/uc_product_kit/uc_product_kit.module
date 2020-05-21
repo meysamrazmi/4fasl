@@ -211,7 +211,7 @@ function uc_product_kit_update(&$node) {
   $product_count = count($node->products);
 //  mdump($node);
   foreach ($node->products as $key => $nid) {
-    if($nid == 0){
+    if(is_numeric($nid) && $nid == 0){
       unset($node->products[$key]);
     }
   }

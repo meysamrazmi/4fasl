@@ -1261,7 +1261,7 @@ function is_bought_product($nid){
     ->fields('p', array('qty', 'data'))
     ->condition('o.uid', $user->uid)
     ->condition('p.nid', $nid)
-    ->condition('o.order_status', array('completed', 'pending'), 'IN')
+    ->condition('o.order_status', array('completed', 'payment_received'), 'IN')
     ->execute()->fetchAll();
   return count($results) > 0 ;
 }
