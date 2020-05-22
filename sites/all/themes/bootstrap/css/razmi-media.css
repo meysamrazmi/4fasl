@@ -41,7 +41,7 @@
   box-shadow: 0 1px 6px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.12);
 }
 .opened #block-panels-mini-right-side h2.block-title img {
-  opacity: 0; 
+  opacity: 0;
   right: -232px;
   width: 65px;
   max-width: none;
@@ -54,13 +54,13 @@
 .page-user.has-side.right-sides .main-container ,
 .page-user.has-side.right-sides .footer{
 	width:100%;
-	/*be jaye in bayad inbarash ejra beshe 
+	/*be jaye in bayad inbarash ejra beshe
 	$('.main-container , footer.footer').removeClass('col-lg-10');
 	$('.main-container , footer.footer').removeClass('col-xs-9');
 	*/
 	transition: all 0.4s ease;
     -webkit-transition: all 0.4s ease;
-	/*nemidoonam in niyaz hast ya na ama oon varesho natoonetam bezaram chon 75% col-xs-9*/	
+	/*nemidoonam in niyaz hast ya na ama oon varesho natoonetam bezaram chon 75% col-xs-9*/
 }
 .user-profile.view-mode-full > div > .field-name-user-help {
 	margin: -25px 0 50px;
@@ -95,6 +95,10 @@
     position: absolute;
     cursor: pointer;
 }
+.page-store #block-system-main-menu .block-title,
+.page-gallery #block-system-main-menu .block-title {
+  margin-top: 15px;
+}
 #block-system-main-menu.opened .block-title {
     margin-right: -50px;
 }
@@ -111,9 +115,11 @@
     overflow: overlay;
 }
 #block-system-main-menu .menu.nav > li a, #block-system-main-menu .menu.nav > li >span {
-    color: #555;
+  color: #555;
 	display: block;
-    background: #fff;
+  background: #fff;
+  height: 50px !important;
+  line-height: 50px !important;
 }
 #block-system-main-menu .menu.nav > li a:hover, #block-system-main-menu .menu.nav > li >span:hover {
     background: #eee;
@@ -262,7 +268,6 @@ div#metro-section .item {
 }
 #block-block-3 {
   width: 50% !important;
-  display: block;
   float: right !important;
 }
 a.get_started {
@@ -275,10 +280,10 @@ a.get_started {
 div#admin-menu {
   overflow: visible;
 }
-#user-profile-form, 
-.page-user .view-uc-orders-user, 
-.page-user .order-pane, 
-.user-profile.view-mode-full .field-collection-container, 
+#user-profile-form,
+.page-user .view-uc-orders-user,
+.page-user .order-pane,
+.user-profile.view-mode-full .field-collection-container,
 .node-form, .user-profile.view-mode-full > div > .field.open {
   padding: 15px;
 }
@@ -288,7 +293,7 @@ div#admin-menu {
 .file-resup-wrapper {
   display: flex;
 }
-form#comment-form input[id*="edit-support-ticket-upload"]-und-0-upload, 
+form#comment-form input[id*="edit-support-ticket-upload"]-und-0-upload,
 div[id*="edit-support-ticket-upload"] .form-control.form-file,
 div[id*="edit-field-hw-video"] .form-control.form-file {
   display: none !important;
@@ -300,8 +305,8 @@ div[id*="edit-field-hw-video"] .form-type-managed-file:before{
 .page-node-41 .main-container, .page-user .main-container {
   padding: 0 10px;
 }
-.user-profile.view-mode-full .group-profile, 
-.user-profile.view-mode-full .field-name-field-naame, 
+.user-profile.view-mode-full .group-profile,
+.user-profile.view-mode-full .field-name-field-naame,
 .user-profile.view-mode-full .field-collection-container {
   width: 49%;
 }
@@ -381,8 +386,8 @@ div#main-saaz .field-name-field-first-row {
   width: calc(23% - 3px);
   margin: 1%;
 }
-form#user-pass .form-item, 
-form#user-login .form-item, 
+form#user-pass .form-item,
+form#user-login .form-item,
 form#user-register-form .form-item {
   width: 40%;
   margin: 0px auto 10px;
@@ -390,7 +395,7 @@ form#user-register-form .form-item {
 }
 div#views_slideshow_cycle_teaser_section_main_slideshow-block, div#views_slideshow_cycle_teaser_section_main_slideshow-block>div {
  /* padding-top: 120px;*/
-   min-height: 60vh; 
+   min-height: 60vh;
 }
 .new-4 .pane-content > div {
 	width: 23.5%;
@@ -468,7 +473,7 @@ div#metro-section .item {
   height: 160px;
 }
 div#metro-section {
-   padding: 60px 100px; 
+   padding: 60px 100px;
 }
 .row1 .item-2 h2 {
   font-size: 30px;
@@ -492,7 +497,7 @@ div#metro-section {
 #block-block-3 {
   width: 40% !important;
 }
-.one-sides header#navbar > div, 
+.one-sides header#navbar > div,
 .one-sides header#navbar > .container {
   width: 83.3333%;
 }
@@ -539,7 +544,7 @@ div#views_slideshow_cycle_teaser_section_main_slideshow-block, div#views_slidesh
   max-width: 1100px;
   margin: auto;
 }
-#block-system-main-menu .menu.nav > li a, 
+#block-system-main-menu .menu.nav > li a,
 #block-system-main-menu .menu.nav > li >span {
     font-size: 14px;
     padding: 0 15px;
@@ -733,7 +738,20 @@ div#edit-attributes-5 .form-item > label {
 .page-gallery.page-node .main-container {
     padding: 0;
 }
-
+  .node-product-kit .product-qty {
+    padding: 15px 5px 15px 0px;
+  }
+  .node-prod.view-mode-special_case {
+    flex-wrap: wrap;
+  }
+  .node-product-kit .products .group-middle {
+    order: 1;
+    width: 100%;
+    margin-top: 15px;
+  }
+  .node-product-kit .products .group-left {
+    margin-left: auto;
+  }
 }
 @media (max-width: 425px){
 .col-ss-12 {
@@ -779,8 +797,8 @@ a.footer-name {
   left: 15px;
   margin-top: -25px;
 }
-.front-news-block .views-field-field-image, 
-front-news-block .views-field-title, 
+.front-news-block .views-field-field-image,
+front-news-block .views-field-title,
 .front-news-block .views-field-body {
   float: none;
   width: 100%;
@@ -837,7 +855,7 @@ div#views_slideshow_cycle_teaser_section_user-block_1, .ostadan .views_slideshow
   max-width: 270px;
   margin: auto;
 }
-.node-instrument .field-name-field-firstclass .group-left .field-name-title, 
+.node-instrument .field-name-field-firstclass .group-left .field-name-title,
 .node-instrument .field-name-field-ostad .field-name-field-naame .field-item {
   margin: 40px auto 20px;
   text-align: center;
@@ -905,6 +923,32 @@ fieldset#payment-pane div#line-items-div table {
 .page-gallery aside.col-sm-3 {
     padding: 0;
 }
+  #block-system-main > .node-product-kit {
+    padding: 0;
+  }
+  .user-profile.view-mode-special_case {
+    flex-direction: column-reverse;
+  }
+  .node-product-kit .user-profile.view-mode-special_case > * {
+    width: 100%;
+  }
+  .node-product-kit .products .group-left{
+    display: none;
+  }
+  .node-product-kit .products .group-right {
+    order: 1;
+    width: 100%;
+    margin: 10px 0;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .products .field-name-field-duration {
+    margin-right: auto;
+  }
+  .node-product-kit .products .group-right .add-to-cart,
+  .node-product-kit .products .group-right .field-name-product-film {
+    margin-right: auto;
+  }
 
 
 }

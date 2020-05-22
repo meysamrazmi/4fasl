@@ -98,7 +98,7 @@ background-color: #36134e;
 .user_nam  a {
   color: white !important;
 }
-.user_karbari, 
+.user_karbari,
 #mini-panel-right_side .pane-content a {
   color: black;
   padding: 15px 5px 13px;
@@ -325,7 +325,6 @@ a.user_register{
 #block-block-3 .no_user{
 	text-align: right;
     color: #525050;
-    padding-top: 13px;
 }
 /*baraye baghyeye media ha ham age khoobe bezaresh */
 .tb-megamenu .nav.level-0 > li > a {
@@ -691,7 +690,7 @@ form#user-login {
   position: relative;
   margin-top: 40px;
 }
-.node-instrument .field-name-field-ostad .field-name-field-naame .field-item:before, 
+.node-instrument .field-name-field-ostad .field-name-field-naame .field-item:before,
 .node-instrument .field-name-field-firstclass .group-left .field-name-title:before {
   content: "";
   position: absolute;
@@ -823,7 +822,7 @@ form#user-login {
 .node-instrument .field-name-field-firstclass .group-right{
   float: right;
   position: absolute;
-  max-width: 150px;  
+  max-width: 150px;
 }
 .node-instrument .field-name-field-firstclass .group-right a:before {
   /*content: "";
@@ -890,7 +889,7 @@ form#user-login {
 	margin-top: 40px;
 }
 .node.node-promoted.view-mode-full.node-instrument {
-    margin-bottom: 0px !important; 
+    margin-bottom: 0px !important;
 }
 /*------------------------------------------------------------- */
 .typed-cursor{
@@ -975,7 +974,7 @@ body ::-webkit-scrollbar-thumb {
 	display:none !important;
 }
 /*--------------------contact-us------------------------*/
-form#webform-client-form-40{	
+form#webform-client-form-40{
     max-width: 600px;
     margin: 0px auto 20px;
     box-shadow: 0 1px 6px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.12);

@@ -1242,7 +1242,7 @@ function functions_uc_order($op, $order, $status) {
     case 'update':
       if ($order->order_status != 'completed' && ($status == 'completed' && $order->uid > 0) && (is_array($order->products) && count($order->products)) ) {
         foreach ($order->products as $product) {
-          if ($product->type == 'prod') {
+          if (isset($product->type) && $product->type == 'prod') {
             $node = node_load($product->nid);
             if(function_exists('file_access_set_file_access')){
               file_access_set_file_access($node->field_course_film['und'][0]['fid'] , $order->uid , NULL , FILE_ACCESS_USER);

@@ -235,10 +235,10 @@ body.admin-menu header#navbar > .container {
 }
 .logo img,
 .logo {
-  margin: 2px auto !important;
+  margin: 0px auto !important;
   float: none !important;
   display: block;
-  height: 65px;
+  height: 50px;
   width: auto;
 }
 .lead {
@@ -5562,7 +5562,6 @@ tbody > tr:last-child {
 .page-store .navbar-header{
   width: 150px;
   right: calc(50% - 75px);
-  top: 10px;
 }
 .page-gallery .navbar-header {
   display: none;
@@ -6242,6 +6241,8 @@ h4.notification-title {
 #block-block-3{
 	float: right;
     width: 37%;
+  display: flex;
+  align-items: center;
 }
 #block-block-3 div.user_pic_header img {
     border-radius: 50%;
@@ -7421,7 +7422,6 @@ label:hover .course-link {
 #block-system-main-menu .logo img {
     margin: 0 auto !important;
     height: auto;
-    filter: brightness(0) invert(1);
     opacity: 1;
 }
 
@@ -7710,6 +7710,25 @@ div#smile {
 .page-store .get_started,
 .page-gallery .get_started {
   margin-top: 22px;
+}
+.page-store #block-block-3,
+.page-gallery #block-block-3 {
+  height: 80px;
+}
+.page-store a.user_login,
+.page-gallery a.user_login{
+  color: #888;
+}
+.page-store #block-system-main-menu .block-title:before,
+.page-gallery #block-system-main-menu .block-title:before {
+  color: #666;
+}
+.page-store .logo img,
+.page-store .logo img,
+.page-store .logo,
+.page-store .logo {
+  margin: 5px auto !important;
+  height: 70px;
 }
 
 
