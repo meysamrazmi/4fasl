@@ -32,6 +32,9 @@ function uc_attribute_rules_condition_info() {
  */
 function uc_attribute_condition_ordered_product_option($order, $oid) {
   $option = uc_attribute_option_load($oid);
+  if(!isset($option->aid)){
+    return FALSE;
+  }
   $attribute = uc_attribute_load($option->aid);
 
   foreach ($order->products as $product) {

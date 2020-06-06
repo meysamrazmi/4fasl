@@ -364,7 +364,7 @@ if(getCookie('vip') && getCookie('vip-user') == window.location.href){
 	$('body').addClass('vip-en').removeClass('honarjo-en');
 	console.log(window.location.href);
 }
-change_role();
+// change_role();
 if($('body').hasClass('has-vip')){
 	if(!$('body').hasClass('has-honarjo')){
 		$('body').addClass('vip-en');
@@ -627,6 +627,7 @@ function change_role(){
 		$('body').addClass('vip-en').removeClass('honarjo-en');
 	}
 	$('.change-role').click(function(){
+	  console.log('clicked')
 		$(this).toggleClass('right left');
 		$('body').addClass('changing');
 		if($(this).hasClass('left')){
@@ -647,7 +648,7 @@ function change_role(){
 			}
 			setTimeout(function(){$('body').removeClass('changing');}, 500);
 
-		}, 500);
+		}, 1000);
 	});
 
 }

@@ -11,7 +11,7 @@ function _uc_field_attribute_nodeapi($node, $mode = NULL) {
     return;
   }
   $attribute_settings = uc_field_attribute_load_settings($node->type);
-  if (isset($attribute_settings->fields) && empty($attribute_settings->fields)) {
+  if (!isset($attribute_settings->fields) && empty($attribute_settings->fields)) {
     return;
   }
   foreach($attribute_settings->fields as $fiid => $enabled) {

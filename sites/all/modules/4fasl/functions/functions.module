@@ -297,11 +297,16 @@ function functions_theme() {
 
 function update_file_access(){
   $fails = $success = array();
-	$values = db_query("SELECT main.entity_id AS uid , ins.field_instrument_value AS instrument, levn.field_levelnumber_value AS level, sn.field_sessionnumber_value AS session
+	$values = db_query("SELECT main.entity_id AS uid ,
+        ins.field_instrument_value AS instrument,
+        levn.field_levelnumber_value AS level,
+        sn.field_sessionnumber_value AS session,
+        ostad.field_ostad_uid AS ostad
         FROM field_data_field_siteinfo_stu main
         INNER JOIN field_data_field_instrument ins ON main.field_siteinfo_stu_value = ins.entity_id
         INNER JOIN field_data_field_levelnumber levn ON main.field_siteinfo_stu_value = levn.entity_id
         INNER JOIN field_data_field_sessionnumber sn ON main.field_siteinfo_stu_value = sn.entity_id
+        LEFT JOIN field_data_field_ostad ostad ON main.field_siteinfo_stu_value = ostad.entity_id AND ostad.entity_type = 'field_collection_item'
         WHERE main.entity_type = 'user' ORDER BY `uid` DESC");
 
 	foreach($values as $row){
@@ -309,7 +314,7 @@ function update_file_access(){
 		$instrument = $row->instrument;
 		$level = $row->level;
 		$session = $row->session;
-
+    $ostad = $row->ostad;
 
 
 		//for giving user file access
@@ -319,14 +324,17 @@ function update_file_access(){
 			INNER JOIN field_data_field_instrument ins ON main.field_siteinfo_stu_value = ins.entity_id
 			INNER JOIN field_data_field_levelnumber levn ON main.field_siteinfo_stu_value = levn.entity_id
 			INNER JOIN field_data_field_sessionnumber sn ON main.field_siteinfo_stu_value = sn.entity_id
+      LEFT JOIN field_data_field_ostad ostad ON main.field_siteinfo_stu_value = ostad.entity_id AND ostad.entity_type = 'field_collection_item'
 			WHERE main.entity_type = 'node'
 			AND ins.field_instrument_value = :instrument
 			AND levn.field_levelnumber_value = :level
-			AND sn.field_sessionnumber_value = :session" ;
+			AND sn.field_sessionnumber_value = :session
+      AND (ostad.field_ostad_uid IS NULL OR ostad.field_ostad_uid = :ostad)" ;
 		$result = db_query($sql, array(
 			':instrument' =>$instrument,
 			':level' =>$level,
-			':session' =>$session
+			':session' =>$session,
+      ':ostad' => !is_null($ostad) ? $ostad : 1
 		));
 
 		if($rows = $result->fetchAll()){
@@ -358,7 +366,30 @@ function update_file_access(){
 		}
 	}
 
-	$resault = array('success' => $success, 'fail' => $fails);
+  //adding accesses to files based on bought courses
+  $query = db_select('uc_orders', 'o');
+  $query->join('uc_order_products', 'p', 'o.order_id = p.order_id');
+  $query->join('node', 'n', 'n.nid = p.nid');
+  $boughts = $query->fields('o', array('order_id'))
+    ->fields('p', array('nid'))
+    ->fields('o', array('uid'))
+    ->condition('n.type', 'prod')
+    ->condition('o.order_status', array('completed', 'payment_received'), 'IN')
+    ->execute()->fetchAll();
+  foreach($boughts as $bought){
+    $uid = $bought->uid;
+    $node = node_load($bought->nid);
+
+    if(isset($node->field_course_film['und'][0])){
+      if(file_access_set_file_access($node->field_course_film['und'][0]['fid'] , $uid , NULL , FILE_ACCESS_USER)){
+        $success[] = 'uid: '. $uid . ' | nid: '. $node->nid . ' | fid: '. $node->field_course_film['und'][0]['fid'] . '<br>';
+      }else{
+        $fails[] = 'uid: '. $uid . ' | nid: '. $node->nid . ' | fid: '. $node->field_course_film['und'][0]['fid'] . '<br>';
+      }
+    }
+  }
+
+  $resault = array('success' => $success, 'fail' => $fails);
 	mdump($resault ,true);
 }
 
@@ -1240,9 +1271,9 @@ function notify_about_stars(){
 function functions_uc_order($op, $order, $status) {
   switch ($op) {
     case 'update':
-      if ($order->order_status != 'completed' && ($status == 'completed' && $order->uid > 0) && (is_array($order->products) && count($order->products)) ) {
+      if ($order->order_status != 'completed' && (($status == 'completed' || $status == 'payment_received') && $order->uid > 0) && (is_array($order->products) && count($order->products)) ) {
         foreach ($order->products as $product) {
-          if (isset($product->type) && $product->type == 'prod') {
+          if (isset($product->data['type']) && $product->data['type'] == 'prod') {
             $node = node_load($product->nid);
             if(function_exists('file_access_set_file_access')){
               file_access_set_file_access($node->field_course_film['und'][0]['fid'] , $order->uid , NULL , FILE_ACCESS_USER);
@@ -1255,7 +1286,7 @@ function functions_uc_order($op, $order, $status) {
 
 function is_bought_product($nid){
   global $user;
- $query = db_select('uc_orders', 'o');
+  $query = db_select('uc_orders', 'o');
   $query->join('uc_order_products', 'p', 'o.order_id = p.order_id');
   $results = $query->fields('o', array('order_id'))
     ->fields('p', array('qty', 'data'))

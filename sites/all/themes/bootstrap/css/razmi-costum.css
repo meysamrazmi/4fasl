@@ -4291,7 +4291,6 @@ span.jwmain {
 .role-\E5\E4\D1\CC\E6 #mini-panel-right_side .pane-block-2 .pane-content .user-register,
 .role-ostad:not(.role-administrator) .attribute-4,
 .role-\C7\D3\CA\C7\CF:not(.role-administrator) .attribute-4,
-.has-honarjo:not(.role-administrator) .attribute-4,
 .role-\E5\E4\D1\CC\E6:not(.role-administrator) .attribute-4,
 .role-ostad:not(.role-administrator) .add-to-cart div#edit-actions ,
 .role-\C7\D3\CA\C7\CF:not(.role-administrator) .add-to-cart div#edit-actions ,
@@ -7706,11 +7705,6 @@ div#smile {
   top: 17px;
   color: #fff !important;
 }
-
-.page-store .get_started,
-.page-gallery .get_started {
-  margin-top: 22px;
-}
 .page-store #block-block-3,
 .page-gallery #block-block-3 {
   height: 80px;
@@ -8306,6 +8300,7 @@ a#edit-new-message-button {
   transition: all 0.2s;
   outline: none;
   box-shadow: rgba(86, 101, 239, 0.45) -4px 4px 13px, rgba(125, 54, 223, 0.51) 4px -2px 13px;
+  white-space: nowrap;
 }
 .node-product-kit .group-header .node-add-to-cart:hover {
   box-shadow: rgba(86, 101, 239, 0.45) -2px 4px 23px, rgba(125, 54, 223, 0.51) 4px -2px 23px;

@@ -107,7 +107,10 @@ function uc_zarinpal_complete_page($order_id) {
     $msg = $e->getMessage();
     drupal_set_message($msg, 'error');
 
-    return $msg;
+    $output = '<div class="text-center"><i class="mdi mdi-information-outline" style=" font-size: 100px; color: #FF5722;"></i>';
+    $output .= '<p>'. t($msg) .'</p><p><a href="/cart/checkout" class="btn btn-default">بازگشت</a></p></div>';
+//    drupal_goto('/cart/checkout');
+    return $output;
   }
   catch (\Exception $e) {
     $msg = t('An unexpected error occured.');

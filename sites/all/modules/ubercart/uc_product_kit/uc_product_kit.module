@@ -662,7 +662,7 @@ function uc_product_kit_view($node, $view_mode) {
   // Calculate the display price.
   $display_price = 0;
   $suffixes = array();
-  if ($node->mutable != UC_PRODUCT_KIT_MUTABLE) {
+  if (isset($node->mutable) && isset($variant->products) && $node->mutable != UC_PRODUCT_KIT_MUTABLE) {
     // If this is a non-mutable kit, then sum the display price of each of the
     // component products.
     foreach ($variant->products as $product) {
@@ -734,7 +734,7 @@ function uc_product_kit_view($node, $view_mode) {
     '#view_mode' => $view_mode,
   );
 
-  if ($node->mutable != UC_PRODUCT_KIT_UNMUTABLE_NO_LIST) {
+  if (isset($node->mutable) && isset($node->products) && $node->mutable != UC_PRODUCT_KIT_UNMUTABLE_NO_LIST) {
     $node->content['products'] = array('#weight' => 6);
 
     $i = 0;
@@ -773,10 +773,12 @@ function uc_product_kit_view($node, $view_mode) {
 function uc_product_kit_add_to_cart_form($form, &$form_state, $node) {
   $form['nid'] = array('#type' => 'value', '#value' => $node->nid);
   $form['products'] = array('#tree' => TRUE);
-  foreach ($node->products as $i => $product) {
-    $form['products'][$i] = array('#title' => check_plain($product->title));
-    $form['products'][$i]['nid'] = array('#type' => 'hidden', '#value' => $product->nid);
-    $form['products'][$i]['qty'] = array('#type' => 'hidden', '#value' => $product->qty);
+  if(isset($node->products)){
+    foreach ($node->products as $i => $product) {
+      $form['products'][$i] = array('#title' => check_plain($product->title));
+      $form['products'][$i]['nid'] = array('#type' => 'hidden', '#value' => $product->nid);
+      $form['products'][$i]['qty'] = array('#type' => 'hidden', '#value' => $product->qty);
+    }
   }
   if ($node->default_qty > 0 && variable_get('uc_product_add_to_cart_qty', FALSE)) {
     $form['qty'] = array(

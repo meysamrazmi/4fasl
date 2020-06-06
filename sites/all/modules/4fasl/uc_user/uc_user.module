@@ -38,7 +38,7 @@ function uc_user_uc_order($op, $order, $status) {
                 }
               }
             }
-            // mdump($product, true);
+//            mdump($product);
 
             if($product->nid == 1086 ){ // registration in online courses
               foreach ($product->data['attributes']['instrument'] as $key=> $value) {
@@ -54,13 +54,14 @@ function uc_user_uc_order($op, $order, $status) {
                   continue; //skip the rest
                 }
 
-                if(instrument_info('oid', $key, array('name'), 'online') != false){
-                  if(!isset($product->data['attributes']['level'][21]) ){ //vip registration
-                    add_collection($order_user , instrument_info('oid', $key, array('name'), 'online') , 'l1' , '1', $teacher_uid);
-                    add_collection($order_user , instrument_info('oid', $key, array('name'), 'online') , 'l1' , '2', $teacher_uid);
-                    add_collection($order_user , instrument_info('oid', $key, array('name'), 'online') , 'l1' , '3', $teacher_uid);
+                $instrument_name = instrument_info('oid', $key, array('name'), 'online');
+                if($instrument_name != false){
+                  if(isset($product->data['attributes']['level'][21])){ //vip registration
+                    add_collection($order_user , $instrument_name , 'l1' , '1', $teacher_uid);
+                    add_collection($order_user , $instrument_name , 'l1' , '2', $teacher_uid);
+                    add_collection($order_user , $instrument_name , 'l1' , '3', $teacher_uid);
                   }
-                  $field_favorite['und'][0]['value'] =  instrument_info('oid', $key, array('name'), 'online');
+                  $field_favorite['und'][0]['value'] =  $instrument_name;
                   $order_user = user_save($order_user, array('field_favorite' => $field_favorite));
                 } else{
                   drupal_set_message(t('there is a problem. please contact to support for detail.<br>code : @id , value : @val', array('@id'=> 4 , '@val' => $value ,)), 'error');
@@ -101,6 +102,13 @@ function uc_user_uc_order($op, $order, $status) {
 
             if ($product->nid == 2597){// for offline registration
               drupal_goto('enrollment/time-selection');
+            }
+
+            if (isset($product->type) && $product->type == 'prod') {
+              $node = node_load($product->nid);
+              if(function_exists('file_access_set_file_access')){
+                file_access_set_file_access($node->field_course_film['und'][0]['fid'] , $order->uid , NULL , FILE_ACCESS_USER);
+              }
             }
           }
         }
@@ -145,17 +153,15 @@ function student_confirmation_form_submit($form, &$form_state) {
 
 	$node_query = "SELECT max(sn.field_sessionnumber_value) as session
         FROM field_data_field_siteinfo_stu main
-        INNER JOIN field_data_field_instrument ins
-        INNER JOIN field_data_field_levelnumber levn
-        INNER JOIN field_data_field_sessionnumber sn
-        LEFT JOIN field_data_field_ostad ostad
-        ON main.field_siteinfo_stu_value = ins.entity_id
-        AND main.field_siteinfo_stu_value = levn.entity_id
-        AND main.field_siteinfo_stu_value = sn.entity_id
-        AND main.field_siteinfo_stu_value = ostad.entity_id
+        INNER JOIN field_data_field_instrument ins ON main.field_siteinfo_stu_value = ins.entity_id
+        INNER JOIN field_data_field_levelnumber levn ON main.field_siteinfo_stu_value = levn.entity_id
+        INNER JOIN field_data_field_sessionnumber sn ON main.field_siteinfo_stu_value = sn.entity_id
+        LEFT JOIN field_data_field_ostad ostad ON main.field_siteinfo_stu_value = ostad.entity_id
+
         WHERE main.entity_type = 'node'
         AND ins.field_instrument_value = :instrument
-        AND levn.field_levelnumber_value = :level ";
+        AND levn.field_levelnumber_value = :level
+        AND (ostad.field_ostad_uid IS NULL OR ostad.field_ostad_uid = :ostad)";
 
 	$user_query ="SELECT main.field_siteinfo_stu_value as field_id,
                         ins.field_instrument_value as instrument,
@@ -163,20 +169,22 @@ function student_confirmation_form_submit($form, &$form_state) {
                         sn.field_sessionnumber_value as session,
                         ostad.field_ostad_uid as ostad
         FROM field_data_field_siteinfo_stu main
-        INNER JOIN field_data_field_instrument ins
-        INNER JOIN field_data_field_levelnumber levn
-        INNER JOIN field_data_field_sessionnumber sn
-        LEFT JOIN field_data_field_ostad ostad
-        ON main.field_siteinfo_stu_value = ins.entity_id
-        AND main.field_siteinfo_stu_value = levn.entity_id
-        AND main.field_siteinfo_stu_value = sn.entity_id
-        AND main.field_siteinfo_stu_value = ostad.entity_id
+        INNER JOIN field_data_field_instrument ins ON main.field_siteinfo_stu_value = ins.entity_id
+        INNER JOIN field_data_field_levelnumber levn ON main.field_siteinfo_stu_value = levn.entity_id
+        INNER JOIN field_data_field_sessionnumber sn ON main.field_siteinfo_stu_value = sn.entity_id
+        LEFT JOIN field_data_field_ostad ostad ON main.field_siteinfo_stu_value = ostad.entity_id
+
         WHERE main.entity_type = 'user'
         AND main.entity_id = :uid
 		ORDER BY `main`.`field_siteinfo_stu_value` DESC";
 
 	$user_result = db_query($user_query, array(':uid' => $user->uid))->fetchObject();
-	$node_result = db_query($node_query, array(':instrument' => $user_result->instrument, ':level' => $user_result->level))->fetchObject();
+	$node_result = db_query($node_query,
+    array(
+      ':instrument' => $user_result->instrument,
+      ':level' => $user_result->level,
+      ':ostad' => $user_result->ostad ? $user_result->ostad : 1)
+  )->fetchObject();
 
 	if($user_result->session == $node_result->session){
 		switch($user_result->level){
@@ -211,9 +219,8 @@ function add_collection($user, $instrument , $level , $session, $ostad = null) {
   );
   if(!is_null($ostad))
     $values['field_ostad'] = array(
-      LANGUAGE_NONE => array(array('value' => $ostad))
+      LANGUAGE_NONE => array(array('uid' => $ostad))
     );
-
   $entity = entity_create('field_collection_item', $values);
   $entity->setHostEntity('user', $user);
   $entity->save();
@@ -229,14 +236,17 @@ function add_collection($user, $instrument , $level , $session, $ostad = null) {
         INNER JOIN field_data_field_instrument ins ON main.field_siteinfo_stu_value = ins.entity_id
         INNER JOIN field_data_field_levelnumber levn ON main.field_siteinfo_stu_value = levn.entity_id
         INNER JOIN field_data_field_sessionnumber sn ON main.field_siteinfo_stu_value = sn.entity_id
+        LEFT JOIN field_data_field_ostad ostad ON main.field_siteinfo_stu_value = ostad.entity_id AND ostad.entity_type = 'field_collection_item'
         WHERE main.entity_type = 'node'
         AND ins.field_instrument_value = :instrument
         AND levn.field_levelnumber_value = :level
-        AND sn.field_sessionnumber_value = :session" ;
+        AND sn.field_sessionnumber_value = :session
+        AND (ostad.field_ostad_uid IS NULL OR ostad.field_ostad_uid = :ostad)" ;
 	$result = db_query($sql, array(
 		':instrument' =>$instrument,
 		':level' =>$level,
-		':session' =>$session
+		':session' =>$session,
+    ':ostad' => !is_null($ostad) ? $ostad : 1
 	));
 
 	if($rows = $result->fetchAll()){
