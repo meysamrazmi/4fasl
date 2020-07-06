@@ -1,5 +1,5 @@
 <?php
-function print_result($uid){
+function practice_for_teacher($uid){
   $students = db_select('user_relationships', 'ur')
     ->fields('ur', array('requester_id' , 'rtid'))
     ->condition('requestee_id', $uid,'=')
@@ -120,13 +120,13 @@ function no_practice($uid){
     $output .= '<img src="/sites/all/themes/bootstrap/images/user-100.png" width="100px" height=100px">';
   }
   $output .= '</a>
-											</div>  
-										</div>  
+											</div>
+										</div>
 									<div class="views-field views-field-field-naame" title="هنوز تمرینی آپلود نکرده است">';
   if (isset($user1->field_naame['und'][0])) {
     $output .= '<div class="field-content">' . $user1->field_naame['und'][0]['value'] . '</div>';
   }
-  $output .= '</div> 
+  $output .= '</div>
 									</div>
 								</div>
 							</div>

@@ -56,7 +56,7 @@ function uc_user_uc_order($op, $order, $status) {
 
                 $instrument_name = instrument_info('oid', $key, array('name'), 'online');
                 if($instrument_name != false){
-                  if(isset($product->data['attributes']['level'][21])){ //vip registration
+                  if(isset($product->data['attributes']['level'][20])){ //vip registration
                     add_collection($order_user , $instrument_name , 'l1' , '1', $teacher_uid);
                     add_collection($order_user , $instrument_name , 'l1' , '2', $teacher_uid);
                     add_collection($order_user , $instrument_name , 'l1' , '3', $teacher_uid);
@@ -185,7 +185,7 @@ function student_confirmation_form_submit($form, &$form_state) {
       ':level' => $user_result->level,
       ':ostad' => $user_result->ostad ? $user_result->ostad : 1)
   )->fetchObject();
-
+  mdump($user_result);
 	if($user_result->session == $node_result->session){
 		switch($user_result->level){
 			case 'l1':
@@ -360,7 +360,7 @@ function student_node_refrence_form_submit($form, &$form_state) {
       $collection_item->field_instrument['und'][0]['value'],
       $collection_item->field_levelnumber['und'][0]['value'],
       $collection_item->field_sessionnumber['und'][0]['value'],
-      $collection_item->field_ostad['und'][0]['value']
+      $collection_item->field_ostad['und'][0]['uid']
     );
     drupal_set_message('فیلم مورد نظر به کاربر ارسال شد');
     return;

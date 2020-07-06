@@ -117,8 +117,17 @@
 	font-weight: normal;
 	src: 	url('fonts/hoda/hoda.ttf') format('truetype');
 }
+@font-face {
+  font-family: jsfont;
+  font-style: normal;
+  font-weight: normal;
+  src: 	url('fonts/hoda/JS.ttf') format('truetype');
+}
 .hoda {
   font-family: hoda;
+}
+.jsfont {
+  font-family: jsfont;
 }
 .front .hidden-in-front{
   display: none;

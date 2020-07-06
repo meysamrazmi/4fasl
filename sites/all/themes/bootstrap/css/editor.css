@@ -11,9 +11,9 @@
 @font-face {
 	font-family: "yekan";
 	src: 	url(../fonts/bYekan.eot);
-	src: 	url(../fonts/bYekan.eot?#iefix) format("embedded-opentype"), 
-			url(../fonts/bYekan.woff) format("woff"), 
-			url(../fonts/bYekan.ttf) format("truetype"), 
+	src: 	url(../fonts/bYekan.eot?#iefix) format("embedded-opentype"),
+			url(../fonts/bYekan.woff) format("woff"),
+			url(../fonts/bYekan.ttf) format("truetype"),
 			url(../fonts/bYekan.svg#BYekan) format("svg");
 	font-weight: normal;
 	font-style: normal
@@ -93,17 +93,26 @@
 	font-weight: normal;
 	src: 	url('../fonts/hoda/hoda.ttf') format('truetype');
 }
+@font-face {
+  font-family: jsfont;
+  font-style: normal;
+  font-weight: normal;
+  src: 	url('../fonts/JS.ttf') format('truetype');
+}
+.hoda {
+  font-family: hoda;
+}
+.jsfont {
+  font-family: jsfont;
+}
 body.mceContentBody {
 	direction: rtl;
 	margin: 15px;
 }
 body, td, pre,
 p{
-	font-family: irans;	
+	font-family: irans;
 	font-size: 13px;
-}
-.hoda {
-  font-family: hoda;
 }
 .front .hidden-in-front{
 	display: none;

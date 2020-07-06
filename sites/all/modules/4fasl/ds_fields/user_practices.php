@@ -274,11 +274,6 @@ function user_practices_wrapper($uid) {
       padding: 10px 15px 15px;
       border-top: 1px solid #F44336;
     }
-    .user-practice button {
-      border: none;
-      background: none;
-      padding: 0;
-    }
     p.message.ok:before {
       content: "\f134";
       font-family: mat;

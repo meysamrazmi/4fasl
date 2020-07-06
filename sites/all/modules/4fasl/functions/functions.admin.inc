@@ -21,6 +21,13 @@ function site_setting(){
 	//mdump($rows , true);
 	foreach ($rows as $row) {
 		$ostad = user_load($row->ostad_uid);
+		$picture = $row->ostad_uid . '<a href="/user/'. $row->ostad_uid .'" style="display: inline-flex;align-items: center;">';
+    $picture .= isset($ostad->picture->uri)?
+      theme('image_style', array(
+        'style_name' => '100x100', 'path' => $ostad->picture->uri,
+        'attributes' => array('style' =>"border-radius: 50%;width: 80px;height: 80px; margin-left:10px;")
+      )) : '';
+    $picture .= $ostad->field_naame['und'][0]['value'] . '</a>';
 		$table_rows[] = array(
 			$row->id,
 			t($row->type),
@@ -29,13 +36,7 @@ function site_setting(){
 			$row->name,
 			$row->oid,
       $row->intro_nid,
-			'<a href="/user/'. $row->ostad_uid .'" style="display: inline-flex;align-items: center;">'.
-				isset($ostad->picture->uri)? theme('image_style',
-				array(
-					'style_name' => '100x100', 'path' => $ostad->picture->uri,
-					'attributes' => array('style' =>"border-radius: 50%;width: 80px;height: 80px; margin-left:10px;")
-				)) : ''.
-				$ostad->field_naame['und'][0]['value'] . '</a></div>',
+      $picture,
 			$row->Teacher_OptionId,
 			!is_null($row->teacher_link) ? '<a href="'. $row->teacher_link .'" class="button" target="_blank">فیلم ها</a>' : '',
 			substr(strip_tags($row->Teacher_Intro), 0, 100) . '....',

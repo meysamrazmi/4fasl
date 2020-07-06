@@ -1336,3 +1336,65 @@ function functions_preprocess_page(&$variables) {
 function functions_preprocess_node(&$variables) {
   $variables['theme_hook_suggestions'][] = 'node__' . $variables['type'] . '__' . $variables['view_mode'];
 }
+
+function update_users_fields() {
+  $result = db_query("SELECT DISTINCT entity_id FROM `field_data_field_siteinfo_stu` WHERE entity_type = 'user'");
+  $result = db_query("SELECT DISTINCT users.uid as uid
+
+        FROM field_data_field_siteinfo_stu main
+        INNER JOIN field_data_field_instrument ins ON main.field_siteinfo_stu_value = ins.entity_id
+        INNER JOIN field_data_field_levelnumber levn ON main.field_siteinfo_stu_value = levn.entity_id
+        INNER JOIN field_data_field_sessionnumber sn ON main.field_siteinfo_stu_value = sn.entity_id
+        LEFT JOIN field_data_field_ostad ostad ON main.field_siteinfo_stu_value = ostad.entity_id
+        LEFT JOIN users users ON users.uid = main.entity_id
+
+        WHERE main.entity_type = 'user'
+		AND ostad.field_ostad_uid IS  null
+        ORDER BY `main`.`field_siteinfo_stu_value` DESC");
+  $uids = [];
+  foreach ($result as $row){
+    array_push($uids, $row->uid);
+  }
+  $language = 'und';
+  $users = user_load_multiple($uids);
+  $teachers = array(
+    'guitar' => 64,
+    'piano' => 30,
+    'santor' => 1996,
+    'tonbak' => 108,
+    'guitarflamenco' => 110,
+    'tar' => 164,
+    'setar' => 164,
+    'guitarpop' => 110,
+    'violin' => 107,
+    'daf' => 1011,
+    'ney' => 2785,
+    'guitarelectric' => 3079,
+    'harmonica' => 3314,
+    'music' => 3314,
+    'avaz-irani' => 7313,
+    'avaz-pop' => 10972,
+    'tanboor' => 7259,
+    'orf' => 7262,
+    'flut' => 7263,
+    'hang' => 8070,
+    'kamanche' => 8071,
+    'bass' => 8069,
+    'cajon' => 11393,
+    'guitarclassic' => 64,
+  );
+
+  foreach ($users as $user){
+    foreach ($user->field_siteinfo_stu[$language] as $field) {
+      // Load field collection item.
+      $field_collection = field_collection_field_get_entity($field);
+
+      if(!isset($field_collection->field_ostad[$language][0]) || empty($field_collection->field_ostad[$language][0]['value']))
+        $field_collection->field_ostad[$language][0]['uid'] = $teachers[trim($field_collection->field_instrument[$language][0]['value'])];
+
+      // Save field collection item. Use TRUE since you are updating a field collection item which is already linked with a node.
+      $field_collection->save(TRUE);
+    }
+  }
+}
+

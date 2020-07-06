@@ -118,8 +118,17 @@
 	font-weight: normal;
 	src: 	url('../fonts/hoda/hoda.ttf') format('truetype');
 }
+@font-face {
+  font-family: jsfont;
+  font-style: normal;
+  font-weight: normal;
+  src: 	url('../fonts/JS.ttf') format('truetype');
+}
 .hoda {
   font-family: hoda;
+}
+.jsfont {
+  font-family: jsfont;
 }
 .front .hidden-in-front{
   display: none;
@@ -5139,6 +5148,15 @@ body.page-node-142  ul.action-links ,
 #mini-panel-right_side .user-practice a.disabeld,
 .add-practice.disabeld {
   cursor: pointer;
+}
+.user-practice button {
+  border: none;
+  background: none;
+  padding: 14px 0;
+  width: calc(100% - 35px);
+  text-align: right;
+  margin: -14px 0;
+  outline: none;
 }
 .grade-help {
   background: #fff;
