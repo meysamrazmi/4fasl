@@ -7545,8 +7545,9 @@ html, body {
 #edit-attributes-5 + .card ~ .card {
   display: none;
 }
+
 .form-item-attributes-5.disabled:before {
-    content: "برای این دوره فقط می توانید به صورت VIP ثبت نام کنید. با ثبت نام در دوره vip در هر سطحی که باشید، آموزش آواز توسط استاد برای شما صورت میپذیرد";
+    content: "ثبت نام در دوره آموزش فیناله، بصورت vip و به جهت رفع اشکالات هنرجویان میباشد. جهت تهیه دوره آموزشی فیناله، از طریق فروشگاه اقدام نمایید";
     position: absolute;
     background: #fff;
 	box-shadow: 0 1px 6px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.12);

@@ -250,8 +250,8 @@ var TypeSelection = function(){
 		}
 	});
 
-	//handle limited registration in just VIP for avaz
-/*	if(selected[0] == 44 || selected[0] == 48){
+	//handle limited registration in just VIP for finale
+	if(selected[0] == 74){
 		$('#edit-attributes-5-20')
 			.attr("disabled", true)
 			.prop('checked', false)
@@ -259,9 +259,10 @@ var TypeSelection = function(){
 				.addClass('disabled')
 				.removeClass('selected');
 		$('#edit-attributes-5-21').prop('checked', true).closest('.form-item-attributes-5').addClass('selected');
-	}else{
+    $('#edit-attributes-5').after('<div class="card h5" style="border-right: 4px solid #F44336;margin: -40px 0 50px;">ثبت نام در دوره آموزش فیناله، بصورت vip و به جهت رفع اشکالات هنرجویان میباشد<br>جهت تهیه دوره آموزشی فیناله، از طریق لینک زیر اقدام نمایید:</div><a href="/store/finale1" target="_blank">آموزش فیناله</a>')
+  }else{
 		$('#edit-attributes-5-20').attr("disabled", false).closest('.form-item-attributes-5').removeClass('disabled');
-	}*/
+	}
 
 	//handle multiple registration
 	let expires = Drupal.settings.role_expiration
