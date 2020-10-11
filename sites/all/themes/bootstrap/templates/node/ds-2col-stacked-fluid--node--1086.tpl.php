@@ -259,9 +259,10 @@ var TypeSelection = function(){
 				.addClass('disabled')
 				.removeClass('selected');
 		$('#edit-attributes-5-21').prop('checked', true).closest('.form-item-attributes-5').addClass('selected');
-    $('#edit-attributes-5').after('<div class="card h5" style="border-right: 4px solid #F44336;margin: -40px 0 50px;">ثبت نام در دوره آموزش فیناله، بصورت vip و به جهت رفع اشکالات هنرجویان میباشد<br>جهت تهیه دوره آموزشی فیناله، از طریق لینک زیر اقدام نمایید:</div><a href="/store/finale1" target="_blank">آموزش فیناله</a>')
+    $('#edit-attributes-5').after('<div class="card h5" style="border-right: 4px solid #F44336;margin: -40px 0 50px;">ثبت نام در دوره آموزش فیناله، بصورت vip و به جهت رفع اشکالات هنرجویان میباشد<br>جهت تهیه دوره آموزشی فیناله، از طریق لینک زیر اقدام نمایید: <a href="/store/finale1" target="_blank">آموزش فیناله</a></div>')
   }else{
 		$('#edit-attributes-5-20').attr("disabled", false).closest('.form-item-attributes-5').removeClass('disabled');
+    $('#edit-attributes-5').parent().find('.card.h5').remove();
 	}
 
 	//handle multiple registration
