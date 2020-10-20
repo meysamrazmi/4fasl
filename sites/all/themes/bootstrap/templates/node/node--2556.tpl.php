@@ -62,43 +62,47 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     hide($content['comments']);
     hide($content['links']);
     hide($content['field_tags']);
-	
+
 	print '<div class="description rules"><div><p>ثبت نام در دوره های آموزشی حضوری بصورت ماهیانه بوده و 4 هفته اعتبار دارد و مدت زمان هر جلسه نیم ساعت می باشد.</p><p>پس از انتخاب روز و ساعت کلاس، شما باید هر هفته در همان زمان انتخاب شده در آموزشگاه حضور یابید.</p><p>غیبت از کلاس باعث سوخت شدن جلسه شما می شود. البته در مواقعی که نتوانید در کلاس حضور یابید (بعلت بیماری و یا مسافرت و ...) می توانید جلسه را بصورت مجازی شرکت کنید. بدین منظور حتما یک روز قبل از کلاس باید هماهنگی های لازم را با آموزشگاه به عمل آورید.</p></div></div>';
-	
+
 	//$result = db_query('call classes_timing()')->fetchAll(); //stored procedure didnt worked with parameters
 	//todo : check if we can use parameters in where clause in sql stored procedure
 	if($ostad_uid != 0){
-	$query = "SELECT 
+	$query = "SELECT
 					f.delta as delta,
-					days.field_days_value as days, 
-					times.field_time_value as times, 
-					en.field_enable_value as enabled, 
-					stu.field_user_uid as stu
-					
+					days.field_days_value as days,
+					times.field_time_value as times,
+					en.field_enable_value as enabled,
+					stu.field_user_uid as stu,
+					online.field_is_online_value as online,
+					vip.field_vip_value as grp
+
 					FROM `field_data_field_classes_timing` f
-					
+
 					LEFT JOIN field_data_field_enable en ON en.entity_id = f.field_classes_timing_value and en.bundle = 'field_classes_timing'
 					LEFT JOIN field_data_field_time times  ON times.entity_id = f.field_classes_timing_value and times.bundle = 'field_classes_timing'
 					LEFT JOIN field_data_field_days days ON days.entity_id = f.field_classes_timing_value and days.bundle = 'field_classes_timing'
+					LEFT JOIN field_data_field_vip vip ON vip.entity_id = f.field_classes_timing_value and vip.bundle = 'field_classes_timing'
 					LEFT JOIN field_data_field_user stu ON stu.entity_id = f.field_classes_timing_value and stu.bundle = 'field_classes_timing'
-					
+					LEFT JOIN field_data_field_is_online online ON online.entity_id = f.field_classes_timing_value and online.bundle = 'field_classes_timing'
+
 					WHERE f.entity_type = 'user' and f.entity_id = :uid
 					ORDER BY delta";
 	$result = db_query($query, array(':uid' => $ostad_uid))->fetchAll();
-	
+
 	$i = 0;
 	$print_form = true;
 	foreach($result as $row){
 		$i++;
 		if($row->stu == $user->uid){
 			print '<div class="alert alert-success" role="alert" style="font-family: fanum;">اطلاعات شما با موفقیت ارسال شد.<br>
-			برنامه کلاسی شما: 
+			برنامه کلاسی شما:
 			<span class="selected">روزهای '. translate_days($row->days) .' ساعت '. translate_hours($row->times) .' تا '. translate_hours($result[$i]->times) .'</span>
 			</div>';
 			$print_form = false;
 		}
 	}
-	
+
 	if($print_form || $user->uid == 1){
 		$timing = array();
 		foreach($result as $row){
@@ -115,28 +119,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			$odd = true;
 			foreach($day as $time){
 				$output .= ($odd)? '<td>' : '';
-				$output .= '<label class="'. (is_null($time->stu)? 'empty ' : 'busy ') . (($time->enabled == 1)? 'enabled ' : 'disabled ') .'">'; 
+        $output .= '<label class="'. (is_null($time->stu)? 'empty ' : 'busy ') . (($time->enabled == 1)? 'enabled ' : 'disabled ') . (!empty($time->grp)? 'group ' : '') . (!empty($time->online)? 'online ' : '') .'">';
 				$output .= '<input type="radio" name="time_select" value="select_'. $day_key .'_'. $time->times .'" '. (!is_null($time->stu) || ($time->enabled == 0)? 'disabled' : '') .' required>'. translate_hours($time->times);
 				$output .= '</label>';
 				$output .= ($odd)? '':'</td>' ;
-	
+
 				$odd = ($odd)? false : true;
 			}
 			$output .= '</tr>';
 		}
 		$output .= '
 			</tbody>
-		</table>';
+		</table>
+    <p style="margin: 10px 15px;padding: 5px 15px;border-right: 2px solid #F44336;">
+      مواردی که آیکن <i class="mdi mdi-account-multiple"></i> را دارند، کلاسهای گروهی هستند. <br>
+      و مواردی که آیکن <i class="mdi mdi-video-switch"></i> را دارند، کلاسهای آنلاین هستند.
+    </p>
+    ';
+
 		if($bought > 0){
 			$output .= '<input id="ostad-id" type="hidden" name="ostad_uid" value="'. $ostad_uid .'">
 				<button type="submit" name="submit" value="Submit" class="btn btn-success">تایید و ارسال</button>';
 		}
 		$output .= '</form>';
-		
+
 		if($ostad_uid == 7262){
 			$output = '<p class="hozouri">این کلاس به صورت گروهی برگزار می شود. برای شرکت در این کلاس با دفتر آموزشگاه با شماره های 44044497 - 44043963 تماس بگیرید.</p>' ;
 		}
-		
+
 		print $output;
 	}
 	}
@@ -184,6 +194,32 @@ td.day-name {
 .breadcrumb {
     display: none;
 }
+  .classes-timing td .online ,
+  .classes-timing td .group {
+    background: transparent;
+    border: solid #2196F3;
+    border-width: 0 1px;
+    position: relative;
+  }
+  .classes-timing td .disabled.online ,
+  .classes-timing td .disabled.group {
+    opacity: 0.4;
+    background: #ccc;
+    cursor: default;
+  }
+  .classes-timing td .online:before,
+  .classes-timing td .group:before {
+    content: "\f00e";
+    font-family: mat;
+    font-size: 18px;
+    vertical-align: middle;
+    color: #2196F3;
+    position: absolute;
+    left: 5px;
+  }
+  .classes-timing td .online:before {
+    content: "\f569";
+  }
 #node-2556 {
     padding-top: 0;
 }
@@ -237,6 +273,14 @@ td.day-name {
     padding: 15px 0 0;
     background: #fff;
 }
+  .mdi:before {
+    font-size: 18px;
+    vertical-align: middle;
+    color: #2196F3;
+    padding: 6px;
+    border: 1px solid;
+    margin: 0 5px;
+  }
 @media (max-width: 500px) {
 	.page-node .main-container {
 		padding: 0;
@@ -299,13 +343,13 @@ td.day-name {
 function update_ostad_timing($ostad_uid, $student_uid, $timing) {
 	$selected = explode('_', $timing);
 	//finding exact delta
-	$q = "SELECT 
+	$q = "SELECT
 			f.delta as delta
 			FROM field_data_field_classes_timing f
-			
+
 			LEFT JOIN field_data_field_time times  ON times.entity_id = f.field_classes_timing_value and times.bundle = 'field_classes_timing'
 			LEFT JOIN field_data_field_days days ON days.entity_id = f.field_classes_timing_value and days.bundle = 'field_classes_timing'
-			
+
 			WHERE f.entity_type = 'user' AND days.field_days_value = :day AND times.field_time_value = :timing";
 
 	$delta = db_query($q, array(':day' => $selected[1], ':timing' => $selected[2]))->fetchObject();
@@ -322,6 +366,6 @@ function update_ostad_timing($ostad_uid, $student_uid, $timing) {
 	// Set a new value on the field_example textfield.
     $collection->field_user = array($student_uid);
 	// Save the changes to the entity
-	$collection->save(); 
+	$collection->save();
 }
 ?>

@@ -226,7 +226,7 @@ function functions_menu() {
   $items['time-selection/%'] = array(
     'page callback' => 'time_selection',
     'type' => MENU_CALLBACK,
-	'page arguments' => array(1),
+	  'page arguments' => array(1),
     'access arguments' => array('access content'),
 	//'delivery callback' => 'custom_ajax_callback',
   );
@@ -563,6 +563,7 @@ function time_selection($ostad_uid){
 					times.field_time_value as times,
 					en.field_enable_value as enabled,
 					stu.field_user_uid as stu,
+					online.field_is_online_value as online,
 					vip.field_vip_value as grp
 
 					FROM `field_data_field_classes_timing` f
@@ -572,6 +573,7 @@ function time_selection($ostad_uid){
 					LEFT JOIN field_data_field_days days ON days.entity_id = f.field_classes_timing_value and days.bundle = 'field_classes_timing'
 					LEFT JOIN field_data_field_vip vip ON vip.entity_id = f.field_classes_timing_value and vip.bundle = 'field_classes_timing'
 					LEFT JOIN field_data_field_user stu ON stu.entity_id = f.field_classes_timing_value and stu.bundle = 'field_classes_timing'
+					LEFT JOIN field_data_field_is_online online ON online.entity_id = f.field_classes_timing_value and online.bundle = 'field_classes_timing'
 
 					WHERE f.entity_type = 'user' and f.entity_id = :uid
 					ORDER BY delta";
@@ -584,23 +586,15 @@ function time_selection($ostad_uid){
 		$output = '
 		<form id="time-selection" method="post" action="/enrollment/time-selection" accept-charset="UTF-8">
 		<table class="classes-timing">
-			<tbody>
-		';
+			<tbody>';
+//		mdump($timing);
 		foreach($timing as $day_key => $day){
 			$output .= '<tr>';
 			$output .= '<td class="day-name">'. translate_days($day_key) .'</td>';
 			$odd = true;
-			$group = false;
-			foreach($day as $time){
-				if($time->grp == 1 && $group == false){
-					$group = true;
-				} else if($time->grp == 1){
-					continue;
-				}else{
-					$group = false;
-				}
+			foreach ($day as $time) {
 				$output .= ($odd)? '<td>' : '';
-				$output .= '<label class="'. (is_null($time->stu)? 'empty ' : 'busy ') . (($time->enabled == 1)? 'enabled ' : 'disabled ') . (($group == true)? 'group ' : '') .'">';
+				$output .= '<label class="'. (is_null($time->stu)? 'empty ' : 'busy ') . (($time->enabled == 1)? 'enabled ' : 'disabled ') . (!empty($time->grp)? 'group ' : '') . (!empty($time->online)? 'online ' : '') .'">';
 				//$output .= '<input type="radio" name="time_select" value="select_'. $day_key .'_'. $time->times .'" '. (!is_null($time->stu) || ($time->enabled == 0)? 'disabled' : '') .' required>';
 				$output .= translate_hours($time->times);
 				$output .= '</label>';

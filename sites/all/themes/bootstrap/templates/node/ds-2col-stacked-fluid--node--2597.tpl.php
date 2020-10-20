@@ -64,17 +64,20 @@ $('body').append('<div class="modal fade ostad-timing" tabindex="-1" role="dialo
     cursor: default;
     color: rgba(0, 0, 0, 0.6);
 }
+.classes-timing td .online ,
 .classes-timing td .group {
     background: transparent;
     border: solid #2196F3;
     border-width: 0 1px;
 	position: relative;
 }
+.classes-timing td .disabled.online ,
 .classes-timing td .disabled.group {
     opacity: 0.4;
     background: #ccc;
     cursor: default;
 }
+.classes-timing td .online:before,
 .classes-timing td .group:before {
     content: "\f00e";
     font-family: mat;
@@ -83,6 +86,9 @@ $('body').append('<div class="modal fade ostad-timing" tabindex="-1" role="dialo
     color: #2196F3;
     position: absolute;
     left: 5px;
+}
+.classes-timing td .online:before {
+  content: "\f569";
 }
 .classes-timing td label {
     padding: 10px;
@@ -145,6 +151,7 @@ td.day-persian_name {
     justify-content: space-around;
     box-shadow: 0 1px 6px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.12);
 }
+.classes-timing td .online:after ,
 .classes-timing td .group:after {
     content: "کلاس به صورت گروهی می باشد";
     position: absolute;
@@ -159,6 +166,9 @@ td.day-persian_name {
 	transition: all 0.2s;
     top: -25px;
     opacity: 0;
+}
+.classes-timing td .online:after {
+  content: "کلاس به صورت آنلاین می باشد";
 }
 .classes-timing td .group:hover:after {
     opacity: 1;
@@ -263,9 +273,7 @@ div#edit-attributes-7 .form-item .teacher-intro {
     width: 100%;
     overflow: auto;
 }
-span.icon:before {
-    content: "\f00e";
-    font-family: mat;
+.mdi:before {
     font-size: 18px;
     vertical-align: middle;
     color: #2196F3;
@@ -521,7 +529,14 @@ $('#edit-attributes-7').on('click', '.teacher-intro button', function(){
 	$.ajax({
 		url: "/time-selection/"+ $(this).attr('ostad'),
 		success: function(result){
-			$('.modal-content').html($.parseHTML('<p style="margin: 0;padding: 15px;text-align: center;">زمانهای خالی و قابل انتخاب با رنگ سفید مشخص شده است.</p>' + result.timing + '<p style="margin: 10px 15px;padding: 5px 15px;border-right: 2px solid #F44336;">مواردی که آیکن <span class="icon"></span> را دارند، کلاسهای گروهی هستند.</p><p style="margin: 0;padding: 15px;text-align: center;">پس از تکمیل ثبت نام می توانید آنها را انتخاب کنید</p>'))
+			$('.modal-content').html($.parseHTML('' +
+        '<p style="margin: 0;padding: 15px;text-align: center;">زمانهای خالی و قابل انتخاب با رنگ سفید مشخص شده است.</p>' +
+        result.timing +
+        '<p style="margin: 10px 15px;padding: 5px 15px;border-right: 2px solid #F44336;">' +
+        'مواردی که آیکن <i class="mdi mdi-account-multiple"></i> را دارند، کلاسهای گروهی هستند.' + '<br>' +
+        'و مواردی که آیکن <i class="mdi mdi-video-switch"></i> را دارند، کلاسهای آنلاین هستند.' +
+        '</p>' +
+        '<p style="margin: 0;padding: 15px;text-align: center;">پس از تکمیل ثبت نام می توانید آنها را انتخاب کنید</p>'))
 			$('.modal-content #time-selection tr').each(function(){
 				var hidden = true
 				$(this).find('label').each(function(){

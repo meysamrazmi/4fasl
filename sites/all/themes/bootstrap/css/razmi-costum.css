@@ -1100,6 +1100,10 @@ div#userpoints_list_wrapper > div,
   margin: 10px 0;
   position: relative;
 }
+.field-name-bought-courses {
+  display: inline-block;
+  width: 100%;
+}
 .field.field-name-user-practices {
   padding: 0 !important;
   margin-right: 10px !important;
