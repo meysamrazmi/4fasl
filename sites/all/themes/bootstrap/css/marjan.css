@@ -946,27 +946,20 @@ body ::-webkit-scrollbar-thumb {
     width: 100%;
 	border: 1px solid #f0f1f2;
 }
+.logged-in.page-user .field-name-bought-courses .field-label:before ,
 .logged-in.page-user .field-name-courses-list .field-label:before{
 	content: "\f008";
 }
 .logged-in.page-user .field-name-user-practices .field-label:before{
 	content: "\f044";
 }
+.logged-in.page-user .field-name-bought-courses .field-label:before ,
 .logged-in.page-user .field-name-courses-list .field-label:before ,
 .logged-in.page-user .field-name-user-practices .field-label:before{
 	font-family: fa;
     padding: 0px 0 0px 10px;
     color: #888;
 	font-size: 18px;
-}
-.user-data > div{
-	/*display:inline-block;
-	width:15%;
-	vertical-align:top;
-	background-color:#c0392b;
-	margin:0 4%;
-	padding:20px;
-	*/
 }
 
 .page-cart div.alert.alert-block.alert-danger.messages.error,
