@@ -5,18 +5,18 @@ if (!defined('FILE_ACCESS_USER')) {
 }
 
 if(!function_exists('in_array_r')) {
-	function in_array_r($needle, $haystack, $strict = false) {
-		foreach ($haystack as $item) {
-			if (($strict ? $item === $needle : $item == $needle) || (is_array($item) && in_array_r($needle, $item, $strict))) {
-				return true;
-			}
-		}
-		return false;
-	}
+  function in_array_r($needle, $haystack, $strict = false) {
+    foreach ($haystack as $item) {
+      if (($strict ? $item === $needle : $item == $needle) || (is_array($item) && in_array_r($needle, $item, $strict))) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
 
 function unread_tickets($user){
-	$tickets_query = "SELECT DISTINCT node.nid AS nid, users_node.uid AS uid, GREATEST(node.changed, node_comment_statistics.last_comment_timestamp) AS changed
+  $tickets_query = "SELECT DISTINCT node.nid AS nid, users_node.uid AS uid, GREATEST(node.changed, node_comment_statistics.last_comment_timestamp) AS changed
 		FROM node node
 		LEFT JOIN comment comment_node ON node.nid = comment_node.nid
 		LEFT JOIN users users_node ON node.uid = users_node.uid
@@ -29,46 +29,46 @@ function unread_tickets($user){
 		WHERE ((( (users_node.uid = :uid) )OR( (users_comment.uid = :uid) )OR( (users_support_ticket.uid = :uid) ))AND( (node.status = '1') AND (node.type IN  ('support_ticket')) AND (support_states.state IN  ('new', 'active', 'pending')) ))AND( (st.client IN  ('1')) OR (st.client IS NULL ) )
 		ORDER BY changed DESC";
 
- 	$history_query=	"SELECT DISTINCT node.nid AS nid, history.timestamp AS history_timestamp, node.changed AS node_changed	FROM node node LEFT JOIN history history ON node.nid = history.nid AND history.uid = :uid	WHERE node.nid = :nid";
+  $history_query=	"SELECT DISTINCT node.nid AS nid, history.timestamp AS history_timestamp, node.changed AS node_changed	FROM node node LEFT JOIN history history ON node.nid = history.nid AND history.uid = :uid	WHERE node.nid = :nid";
 
-	$nodecounter = 'SELECT max(viewc.timestamp) AS viewc_timestamp, node.changed AS node_changed
+  $nodecounter = 'SELECT max(viewc.timestamp) AS viewc_timestamp, node.changed AS node_changed
 		FROM node node
 		LEFT JOIN nodeviewcount viewc ON node.nid = viewc.nid
 		WHERE node.nid = :nid AND viewc.uid = :uid';
 
-	$output = array();
-	$i = 0;
-	$tickets = db_query($tickets_query , array(':uid' => $user->uid));
-	foreach($tickets as $ticket){
-		$history = db_query($history_query , array(':uid' => $user->uid , ':nid' => $ticket->nid));//->execute()->fetchAll();
+  $output = array();
+  $i = 0;
+  $tickets = db_query($tickets_query , array(':uid' => $user->uid));
+  foreach($tickets as $ticket){
+    $history = db_query($history_query , array(':uid' => $user->uid , ':nid' => $ticket->nid));//->execute()->fetchAll();
 
-		foreach($history as $row){
-			if(!isset($row->history_timestamp) || $row->history_timestamp < $ticket->changed){
-				$result = db_query($nodecounter , array(':uid' => $user->uid , ':nid' => $ticket->nid))->fetchObject();
-				if(!isset($result->viewc_timestamp) || $result->viewc_timestamp < $result->node_changed){
-					$output[$i]['nid'] = $ticket->nid;
-					$output[$i]['from'] = $ticket->uid;
-					$i++;
-				}
-			}
-		}
-	}
+    foreach($history as $row){
+      if(!isset($row->history_timestamp) || $row->history_timestamp < $ticket->changed){
+        $result = db_query($nodecounter , array(':uid' => $user->uid , ':nid' => $ticket->nid))->fetchObject();
+        if(!isset($result->viewc_timestamp) || $result->viewc_timestamp < $result->node_changed){
+          $output[$i]['nid'] = $ticket->nid;
+          $output[$i]['from'] = $ticket->uid;
+          $i++;
+        }
+      }
+    }
+  }
 
-	if(count($output)){
-		return $output;
-	}else{
-		return null;
-	}
+  if(count($output)){
+    return $output;
+  }else{
+    return null;
+  }
 }
 
 function unread_tickets_count($user){
   $tickets = unread_tickets($user);
-	return ($tickets != null)? count($tickets) : 0;
+  return ($tickets != null)? count($tickets) : 0;
 }
 
 function student_films($uid , $detail = false){
-	$user_q =
-	"SELECT instrument.field_instrument_value AS instrument,
+  $user_q =
+    "SELECT instrument.field_instrument_value AS instrument,
 	_level.field_levelnumber_value AS level,
 	_session.field_sessionnumber_value AS session,
 	_ostad.field_ostad_uid AS ostad
@@ -81,7 +81,7 @@ function student_films($uid , $detail = false){
 
     WHERE field_stu.entity_type = 'user' AND field_stu.entity_id = :uid";
 
-	$nid_q = "SELECT field_stu.entity_id AS nid
+  $nid_q = "SELECT field_stu.entity_id AS nid
     FROM field_data_field_siteinfo_stu field_stu
     INNER JOIN field_data_field_instrument instrument ON field_stu.field_siteinfo_stu_value = instrument.entity_id
     INNER JOIN field_data_field_levelnumber _level ON field_stu.field_siteinfo_stu_value = _level.entity_id
@@ -94,73 +94,73 @@ function student_films($uid , $detail = false){
       AND _session.field_sessionnumber_value = :session
       AND (_ostad.field_ostad_uid IS NULL OR _ostad.field_ostad_uid = :ostad)";
 
-	$output = array();
-	$rows = db_query($user_q , array(':uid' => $uid))->fetchAll();
-	if($detail){
-		foreach($rows as $row){
-			$result = db_query($nid_q ,
+  $output = array();
+  $rows = db_query($user_q , array(':uid' => $uid))->fetchAll();
+  if($detail){
+    foreach($rows as $row){
+      $result = db_query($nid_q ,
         array(
           ':instrument' => $row->instrument,
           ':level' => $row->level,
           ':session' => $row->session,
           ':ostad' => $row->ostad ? $row->ostad : 1)
-        )->fetchAll();
-			foreach($result as $nid){
-				$output[$row->instrument][$row->level][] = $nid->nid;
-			}
-		}
-	}else{
-		foreach($rows as $row){
-			$result = db_query($nid_q ,
-              array(
-                ':instrument' => $row->instrument,
-                ':level' => $row->level,
-                ':session' => $row->session,
-                ':ostad' => $row->ostad ? $row->ostad : 1)
-              )->fetchAll();
-			foreach($result as $nid){
-				$output[] = $nid->nid;
-			}
-		}
-	}
+      )->fetchAll();
+      foreach($result as $nid){
+        $output[$row->instrument][$row->level][] = $nid->nid;
+      }
+    }
+  }else{
+    foreach($rows as $row){
+      $result = db_query($nid_q ,
+        array(
+          ':instrument' => $row->instrument,
+          ':level' => $row->level,
+          ':session' => $row->session,
+          ':ostad' => $row->ostad ? $row->ostad : 1)
+      )->fetchAll();
+      foreach($result as $nid){
+        $output[] = $nid->nid;
+      }
+    }
+  }
 
-	return $output;
+  return $output;
 }
 
 function timetoexpire($uid){
-	$q = db_select('uc_roles_expirations', 'r');
-	$rows = $q->fields('r', array())->condition('r.uid', $uid)->execute()->fetchAll();
-	$timetoexpire = $offline = 0;
-	$timetoexpire_vip = 0;
-	foreach ($rows as $r) {
-		if($r->rid == 4){ //honarjo role id
-			$timetoexpire = $r->expiration - time() ;
-			$timetoexpire = $timetoexpire / (24*60*60) ;
-		}else if($r->rid == 6){//vip role id
-			$timetoexpire_vip = $r->expiration - time() ;
-			$timetoexpire_vip = $timetoexpire_vip / (24*60*60) ;
-		}else if($r->rid == 9){//offline role id
-			$offline = $r->expiration - time() ;
-			$offline = $offline / (24*60*60) ;
-		}
-	}
-	return array('honarjo'=> $timetoexpire , 'vip'=> $timetoexpire_vip, 'offline'=> $offline);
+  $q = db_select('uc_roles_expirations', 'r');
+  $rows = $q->fields('r', array())->condition('r.uid', $uid)->execute()->fetchAll();
+  $timetoexpire = $offline = 0;
+  $timetoexpire_vip = 0;
+  foreach ($rows as $r) {
+    if($r->rid == 4){ //honarjo role id
+      $timetoexpire = $r->expiration - time() ;
+      $timetoexpire = $timetoexpire / (24*60*60) ;
+    }else if($r->rid == 6){//vip role id
+      $timetoexpire_vip = $r->expiration - time() ;
+      $timetoexpire_vip = $timetoexpire_vip / (24*60*60) ;
+    }else if($r->rid == 9){//offline role id
+      $offline = $r->expiration - time() ;
+      $offline = $offline / (24*60*60) ;
+    }
+  }
+  return array('honarjo'=> $timetoexpire , 'vip'=> $timetoexpire_vip, 'offline'=> $offline);
 }
 
 function mdump($var, $depth = 0){
-	global $user;
-	if($user->uid == 1 || $user->uid == 86){
+  global $user;
+  if($user->uid == 1 || $user->uid == 86){
     if($depth > 0){
       $new_array = array_map(function ($v) use ($depth) {
         return parse($v, "...", $depth);
       }, $var);
       $var = $new_array;
     }
-		echo '<pre>';
-		print_r($var);
-		echo '</pre>';
+    echo '<pre>';
+    print_r($var);
+    echo '</pre>';
     die();
-	}
+  }
 }
 
 /**
@@ -172,7 +172,7 @@ function functions_menu() {
     'description' => 'File access settings.',
     'page callback' => 'update_file_access',
     'access arguments' => array('administer file access'),
-	'type' => MENU_LOCAL_TASK,
+    'type' => MENU_LOCAL_TASK,
   );
   $items['admin/4fasl-setting'] = array(
     'title' => 'تنظیمات دوره ها',
@@ -226,9 +226,9 @@ function functions_menu() {
   $items['time-selection/%'] = array(
     'page callback' => 'time_selection',
     'type' => MENU_CALLBACK,
-	  'page arguments' => array(1),
+    'page arguments' => array(1),
     'access arguments' => array('access content'),
-	//'delivery callback' => 'custom_ajax_callback',
+    //'delivery callback' => 'custom_ajax_callback',
   );
   $items['admin/people/relationships/%user_relationships/edit'] = array(
     'title' => 'ویرایش روابط کاربران',
@@ -246,36 +246,36 @@ function functions_menu() {
     'file' => 'functions.admin.inc',
     'type' => MENU_NORMAL_ITEM,
   );
-	$items['user/%/money/charge'] = array(
-		'title' => 'شارژ حساب کاربری',
-		'page callback' => 'drupal_get_form',
-		'access arguments' => array('access content'),
-		'page arguments' => array('user_charge', 1),
-		'description' => t('Accounting Charge'),
-		'type' => MENU_NORMAL_ITEM,
-	);
-	$items['bankcallback/%'] = array(
-		'title' => 'Accounting bank callback',
-		'page callback' => 'bankcallback',
-		'access arguments' => array('access content'),
-		'page arguments' => array(1),
-		'description' => t('Accounting bank callback'),
-		'type' => MENU_CALLBACK,
-	);
-	$items['user/%user/pay/%'] = array(
-		'title' => 'پرداخت برای تمرین جدید',
-		'page callback' => 'pay_for_practice',
-		'description' => 'پرداخت شهریه برای افزودن یک تمرین جدید',
-		'access arguments' => array('access content'),
-		'page arguments' => array(1, 3),
-		'type' => MENU_CALLBACK,
-	);
-	$items['user/%user/get-current-points'] = array(
-		'page callback' => 'get_current_points',
-		'type' => MENU_CALLBACK,
-		'page arguments' => array(1),
-		'access arguments' => array('access content'),
-	);
+  $items['user/%/money/charge'] = array(
+    'title' => 'شارژ حساب کاربری',
+    'page callback' => 'drupal_get_form',
+    'access arguments' => array('access content'),
+    'page arguments' => array('user_charge', 1),
+    'description' => t('Accounting Charge'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['bankcallback/%'] = array(
+    'title' => 'Accounting bank callback',
+    'page callback' => 'bankcallback',
+    'access arguments' => array('access content'),
+    'page arguments' => array(1),
+    'description' => t('Accounting bank callback'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['user/%user/pay/%'] = array(
+    'title' => 'پرداخت برای تمرین جدید',
+    'page callback' => 'pay_for_practice',
+    'description' => 'پرداخت شهریه برای افزودن یک تمرین جدید',
+    'access arguments' => array('access content'),
+    'page arguments' => array(1, 3),
+    'type' => MENU_CALLBACK,
+  );
+  $items['user/%user/get-current-points'] = array(
+    'page callback' => 'get_current_points',
+    'type' => MENU_CALLBACK,
+    'page arguments' => array(1),
+    'access arguments' => array('access content'),
+  );
   return $items;
 }
 
@@ -297,7 +297,7 @@ function functions_theme() {
 
 function update_file_access(){
   $fails = $success = array();
-	$values = db_query("SELECT main.entity_id AS uid ,
+  $values = db_query("SELECT main.entity_id AS uid ,
         ins.field_instrument_value AS instrument,
         levn.field_levelnumber_value AS level,
         sn.field_sessionnumber_value AS session,
@@ -309,16 +309,16 @@ function update_file_access(){
         LEFT JOIN field_data_field_ostad ostad ON main.field_siteinfo_stu_value = ostad.entity_id AND ostad.entity_type = 'field_collection_item'
         WHERE main.entity_type = 'user' ORDER BY `uid` DESC");
 
-	foreach($values as $row){
-		$uid = $row->uid;
-		$instrument = $row->instrument;
-		$level = $row->level;
-		$session = $row->session;
+  foreach($values as $row){
+    $uid = $row->uid;
+    $instrument = $row->instrument;
+    $level = $row->level;
+    $session = $row->session;
     $ostad = $row->ostad;
 
 
-		//for giving user file access
-		$sql = "
+    //for giving user file access
+    $sql = "
 			SELECT main.entity_id as nid
 			FROM field_data_field_siteinfo_stu main
 			INNER JOIN field_data_field_instrument ins ON main.field_siteinfo_stu_value = ins.entity_id
@@ -330,41 +330,41 @@ function update_file_access(){
 			AND levn.field_levelnumber_value = :level
 			AND sn.field_sessionnumber_value = :session
       AND (ostad.field_ostad_uid IS NULL OR ostad.field_ostad_uid = :ostad)" ;
-		$result = db_query($sql, array(
-			':instrument' =>$instrument,
-			':level' =>$level,
-			':session' =>$session,
+    $result = db_query($sql, array(
+      ':instrument' =>$instrument,
+      ':level' =>$level,
+      ':session' =>$session,
       ':ostad' => !is_null($ostad) ? $ostad : 1
-		));
+    ));
 
-		if($rows = $result->fetchAll()){
-			foreach($rows as $row){
-				$node = node_load($row->nid);
-				if(isset($node->field_course_film['und'][0])){
-					if(file_access_set_file_access($node->field_course_film['und'][0]['fid'] , $uid , NULL , FILE_ACCESS_USER)){
-						$success[] = 'uid: '. $uid . ' | nid: '. $node->nid . ' | fid: '. $node->field_course_film['und'][0]['fid'] . '<br>';
-					}else{
-						$fails[] = 'uid: '. $uid . ' | nid: '. $node->nid . ' | fid: '. $node->field_course_film['und'][0]['fid'] . '<br>';
-					}
-				}
-			}
-		}
-	}
+    if($rows = $result->fetchAll()){
+      foreach($rows as $row){
+        $node = node_load($row->nid);
+        if(isset($node->field_course_film['und'][0])){
+          if(file_access_set_file_access($node->field_course_film['und'][0]['fid'] , $uid , NULL , FILE_ACCESS_USER)){
+            $success[] = 'uid: '. $uid . ' | nid: '. $node->nid . ' | fid: '. $node->field_course_film['und'][0]['fid'] . '<br>';
+          }else{
+            $fails[] = 'uid: '. $uid . ' | nid: '. $node->nid . ' | fid: '. $node->field_course_film['und'][0]['fid'] . '<br>';
+          }
+        }
+      }
+    }
+  }
 
-	//adding accesses to files based on node_refrence field
-	$results = db_query("SELECT entity_id as uid, field_node_refrence_nid as nid FROM field_data_field_node_refrence");
-	foreach($results as $result){
-		$uid = $result->uid;
-		$node = node_load($result->nid);
+  //adding accesses to files based on node_refrence field
+  $results = db_query("SELECT entity_id as uid, field_node_refrence_nid as nid FROM field_data_field_node_refrence");
+  foreach($results as $result){
+    $uid = $result->uid;
+    $node = node_load($result->nid);
 
-		if(isset($node->field_course_film['und'][0])){
-			if(file_access_set_file_access($node->field_course_film['und'][0]['fid'] , $uid , NULL , FILE_ACCESS_USER)){
-				$success[] = 'uid: '. $uid . ' | nid: '. $node->nid . ' | fid: '. $node->field_course_film['und'][0]['fid'] . '<br>';
-			}else{
-				$fails[] = 'uid: '. $uid . ' | nid: '. $node->nid . ' | fid: '. $node->field_course_film['und'][0]['fid'] . '<br>';
-			}
-		}
-	}
+    if(isset($node->field_course_film['und'][0])){
+      if(file_access_set_file_access($node->field_course_film['und'][0]['fid'] , $uid , NULL , FILE_ACCESS_USER)){
+        $success[] = 'uid: '. $uid . ' | nid: '. $node->nid . ' | fid: '. $node->field_course_film['und'][0]['fid'] . '<br>';
+      }else{
+        $fails[] = 'uid: '. $uid . ' | nid: '. $node->nid . ' | fid: '. $node->field_course_film['und'][0]['fid'] . '<br>';
+      }
+    }
+  }
 
   //adding accesses to files based on bought courses
   $query = db_select('uc_orders', 'o');
@@ -390,7 +390,7 @@ function update_file_access(){
   }
 
   $resault = array('success' => $success, 'fail' => $fails);
-	mdump($resault ,true);
+  mdump($resault ,true);
 }
 
 /**
@@ -415,8 +415,8 @@ function functions_form_user_profile_form_alter(&$form, &$form_state) {
   $expirations = db_query("SELECT * FROM {uc_roles_expirations} WHERE uid = :uid", array(':uid' => $account->uid));
   foreach ($expirations as $expiration) {
     $form['uc_roles']['expirations']['table'][$expiration->rid]['cancel'] = array(
-		// '#title' => 'حذف '. _uc_roles_get_name($expiration->rid),
-        '#type' => 'checkbox',
+      // '#title' => 'حذف '. _uc_roles_get_name($expiration->rid),
+      '#type' => 'checkbox',
     );
   }
 
@@ -438,7 +438,7 @@ function functions_user_presave(&$edit, $account, $category) {
 
   // Grant a new role if a new temporary role is added.
   if (isset($edit['new_role']) && $edit['new_role'] && $category == 'account') {
-	  $type = 1; //شاگرد relationship id
+    $type = 1; //شاگرد relationship id
     $teacher_uid = which_teacher_name($account->field_favorite['und'][0]['value']);
     if($edit['new_role_add'] == 4){//honarjo role id
 
@@ -464,16 +464,16 @@ function functions_user_presave(&$edit, $account, $category) {
     foreach ((array)$edit['table'] as $rid => $value) {
       // Remove this expiration and role.
       if ($value['cancel']) {
-		if($rid == 4){//honarjo role id
-			$rtid = 1; //شاگرد relationship id
-		}elseif($rid == 6){//vip role id
-			$rtid = 3; //vip relationship id
-		}
-		if(isset($rtid))
-			db_delete('user_relationships')
-				->condition('requester_id', $account->uid)
-				->condition('rtid', $rtid)
-				->execute();
+        if($rid == 4){//honarjo role id
+          $rtid = 1; //شاگرد relationship id
+        }elseif($rid == 6){//vip role id
+          $rtid = 3; //vip relationship id
+        }
+        if(isset($rtid))
+          db_delete('user_relationships')
+            ->condition('requester_id', $account->uid)
+            ->condition('rtid', $rtid)
+            ->execute();
 
         uc_roles_delete($account, $rid);
       }
@@ -494,22 +494,22 @@ function functions_node_access($node, $op, $account){
   }
   switch ($op) {
     case 'view':
-	  if($user->uid == $node->uid){
+      if($user->uid == $node->uid){
         //anyone can see their practices
-		$access = NODE_ACCESS_IGNORE;
-	  }
-	  //teacher role ID
+        $access = NODE_ACCESS_IGNORE;
+      }
+      //teacher role ID
       else if (user_has_role(5 , $user)) {
-		$relation = db_select('user_relationships', 'ur')
-		->fields('ur', array())
-		->condition('requestee_id', $user->uid,'=')
-		->condition('requester_id', $node->uid,'=')
-		->condition('rtid', array(1,3),'IN') //honarjoo and vip relationship type id
-		->execute()->fetchObject();
+        $relation = db_select('user_relationships', 'ur')
+          ->fields('ur', array())
+          ->condition('requestee_id', $user->uid,'=')
+          ->condition('requester_id', $node->uid,'=')
+          ->condition('rtid', array(1,3),'IN') //honarjoo and vip relationship type id
+          ->execute()->fetchObject();
 
-		if(isset($relation->rid)){ //the teacher is seeing his student
-			$access = NODE_ACCESS_IGNORE;
-		}
+        if(isset($relation->rid)){ //the teacher is seeing his student
+          $access = NODE_ACCESS_IGNORE;
+        }
       }
       else {
         $access = NODE_ACCESS_DENY;
@@ -520,19 +520,19 @@ function functions_node_access($node, $op, $account){
 
 
 function instrument_info($condition = '', $value = '', $fileds = array(), $type = 'both'){
-	$q = db_select('site_settings', 's')->fields('s', $fileds);
-	if($condition != '') $q = $q->condition($condition, $value, '=');
-	$q = ($type == 'both')? $q : $q->condition('type', array($type, 'both'), 'IN');
-	$q = $q->orderBy('type', 'ASC');
-	$q = $q->execute()->fetchObject();
+  $q = db_select('site_settings', 's')->fields('s', $fileds);
+  if($condition != '') $q = $q->condition($condition, $value, '=');
+  $q = ($type == 'both')? $q : $q->condition('type', array($type, 'both'), 'IN');
+  $q = $q->orderBy('type', 'ASC');
+  $q = $q->execute()->fetchObject();
 //	mdump($q, true);
-	if (is_object($q)){
-		if(isset($fileds[0]) && !isset($fileds[1])){
-			return $q->{$fileds[0]};
-		}else {
-			return $q;
-		}
-	}
+  if (is_object($q)){
+    if(isset($fileds[0]) && !isset($fileds[1])){
+      return $q->{$fileds[0]};
+    }else {
+      return $q;
+    }
+  }
 }
 
 /*
@@ -557,7 +557,7 @@ function parse($v, $r, $max_d = 1, $d = 0) {
 }
 
 function time_selection($ostad_uid){
-	$query = "SELECT
+  $query = "SELECT
 					f.delta as delta,
 					days.field_days_value as days,
 					times.field_time_value as times,
@@ -577,152 +577,152 @@ function time_selection($ostad_uid){
 
 					WHERE f.entity_type = 'user' and f.entity_id = :uid
 					ORDER BY delta";
-	$result = db_query($query, array(':uid' => $ostad_uid))->fetchAll();
+  $result = db_query($query, array(':uid' => $ostad_uid))->fetchAll();
 
-		$timing = array();
-		foreach($result as $row){
-			$timing[$row->days][] = $row;
-		}
-		$output = '
+  $timing = array();
+  foreach($result as $row){
+    $timing[$row->days][] = $row;
+  }
+  $output = '
 		<form id="time-selection" method="post" action="/enrollment/time-selection" accept-charset="UTF-8">
 		<table class="classes-timing">
 			<tbody>';
 //		mdump($timing);
-		foreach($timing as $day_key => $day){
-			$output .= '<tr>';
-			$output .= '<td class="day-name">'. translate_days($day_key) .'</td>';
-			$odd = true;
-			foreach ($day as $time) {
-				$output .= ($odd)? '<td>' : '';
-				$output .= '<label class="'. (is_null($time->stu)? 'empty ' : 'busy ') . (($time->enabled == 1)? 'enabled ' : 'disabled ') . (!empty($time->grp)? 'group ' : '') . (!empty($time->online)? 'online ' : '') .'">';
-				//$output .= '<input type="radio" name="time_select" value="select_'. $day_key .'_'. $time->times .'" '. (!is_null($time->stu) || ($time->enabled == 0)? 'disabled' : '') .' required>';
-				$output .= translate_hours($time->times);
-				$output .= '</label>';
-				$output .= ($odd)? '':'</td>' ;
+  foreach($timing as $day_key => $day){
+    $output .= '<tr>';
+    $output .= '<td class="day-name">'. translate_days($day_key) .'</td>';
+    $odd = true;
+    foreach ($day as $time) {
+      $output .= ($odd)? '<td>' : '';
+      $output .= '<label class="'. (is_null($time->stu)? 'empty ' : 'busy ') . (($time->enabled == 1)? 'enabled ' : 'disabled ') . (!empty($time->grp)? 'group ' : '') . (!empty($time->online)? 'online ' : '') .'">';
+      //$output .= '<input type="radio" name="time_select" value="select_'. $day_key .'_'. $time->times .'" '. (!is_null($time->stu) || ($time->enabled == 0)? 'disabled' : '') .' required>';
+      $output .= translate_hours($time->times);
+      $output .= '</label>';
+      $output .= ($odd)? '':'</td>' ;
 
-				$odd = ($odd)? false : true;
-			}
-			$output .= '</tr>';
-		}
-		$output .= '
+      $odd = ($odd)? false : true;
+    }
+    $output .= '</tr>';
+  }
+  $output .= '
 			</tbody>
 		</table>';
-		// if($bought > 0){
-			// $output .= '<input id="ostad-id" type="hidden" name="ostad_uid" value="'. $ostad_uid .'">
-				// <button type="submit" name="submit" value="Submit" class="btn btn-success">تایید و ارسال</button>';
-		// }
-		$output .= '</form>';
+  // if($bought > 0){
+  // $output .= '<input id="ostad-id" type="hidden" name="ostad_uid" value="'. $ostad_uid .'">
+  // <button type="submit" name="submit" value="Submit" class="btn btn-success">تایید و ارسال</button>';
+  // }
+  $output .= '</form>';
 
 //	if($ostad_uid == 7262 || $ostad_uid == 1011){
 //		$output = '<p class="hozouri">این کلاس به صورت گروهی برگزار می شود. برای شرکت در این کلاس با دفتر آموزشگاه با شماره های 44044497 - 44043963 تماس بگیرید.</p>' ;
 //	}
 
-	$data = array('timing' => $output);
+  $data = array('timing' => $output);
 
-	drupal_json_output($data);
-	drupal_exit();
-	return $data;
+  drupal_json_output($data);
+  drupal_exit();
+  return $data;
 }
 
 function translate_days($value){
-	switch($value){
-		case 0:
-			return 'شنبه';
-			break;
-		case 1:
-			return 'یکشنبه';
-			break;
-		case 2:
-			return 'دوشنبه';
-			break;
-		case 3:
-			return 'سه شنبه';
-			break;
-		case 4:
-			return 'چهارشنبه';
-			break;
-		case 5:
-			return 'پنجشنبه';
-			break;
-		case 6:
-			return 'جمعه';
-			break;
-		default:
-			return false;
-	}
+  switch($value){
+    case 0:
+      return 'شنبه';
+      break;
+    case 1:
+      return 'یکشنبه';
+      break;
+    case 2:
+      return 'دوشنبه';
+      break;
+    case 3:
+      return 'سه شنبه';
+      break;
+    case 4:
+      return 'چهارشنبه';
+      break;
+    case 5:
+      return 'پنجشنبه';
+      break;
+    case 6:
+      return 'جمعه';
+      break;
+    default:
+      return false;
+  }
 }
 
 function translate_hours($value){
-	switch($value){
-		case '1000':
-			return '10';
-			break;
-		case '1030':
-			return '10:30';
-			break;
-		case '1100':
-			return '11';
-			break;
-		case '1130':
-			return '11:30';
-			break;
-		case '1200':
-			return '12';
-			break;
-		case '1230':
-			return '12:30';
-			break;
-		case '1300':
-			return '13';
-			break;
-		case '1330':
-			return '13:30';
-			break;
-		case '1400':
-			return '14';
-			break;
-		case '1430':
-			return '14:30';
-			break;
-		case '1500':
-			return '15';
-			break;
-		case '1530':
-			return '15:30';
-			break;
-		case '1600':
-			return '16';
-			break;
-		case '1630':
-			return '16:30';
-			break;
-		case '1700':
-			return '17';
-			break;
-		case '1730':
-			return '17:30';
-			break;
-		case '1800':
-			return '18';
-			break;
-		case '1830':
-			return '18:30';
-			break;
-		case '1900':
-			return '19';
-			break;
-		case '1930':
-			return '19:30';
-			break;
-		case '2000':
-			return '20';
-			break;
-		case '2030':
-			return '20:30';
-			break;
-		default:
-			return '';
-	}
+  switch($value){
+    case '1000':
+      return '10';
+      break;
+    case '1030':
+      return '10:30';
+      break;
+    case '1100':
+      return '11';
+      break;
+    case '1130':
+      return '11:30';
+      break;
+    case '1200':
+      return '12';
+      break;
+    case '1230':
+      return '12:30';
+      break;
+    case '1300':
+      return '13';
+      break;
+    case '1330':
+      return '13:30';
+      break;
+    case '1400':
+      return '14';
+      break;
+    case '1430':
+      return '14:30';
+      break;
+    case '1500':
+      return '15';
+      break;
+    case '1530':
+      return '15:30';
+      break;
+    case '1600':
+      return '16';
+      break;
+    case '1630':
+      return '16:30';
+      break;
+    case '1700':
+      return '17';
+      break;
+    case '1730':
+      return '17:30';
+      break;
+    case '1800':
+      return '18';
+      break;
+    case '1830':
+      return '18:30';
+      break;
+    case '1900':
+      return '19';
+      break;
+    case '1930':
+      return '19:30';
+      break;
+    case '2000':
+      return '20';
+      break;
+    case '2030':
+      return '20:30';
+      break;
+    default:
+      return '';
+  }
 }
 
 function test_input($data) {
@@ -733,7 +733,7 @@ function test_input($data) {
 }
 
 function custom_ajax_callback($page_callback_result) {
-   // Only render content and validates return
+  // Only render content and validates return
   $content = is_string($page_callback_result) ? $page_callback_result :   drupal_render($page_callback_result);
   $html = '' . drupal_get_css() . drupal_get_js() . '' . $content . '';
   print $html;
@@ -741,19 +741,19 @@ function custom_ajax_callback($page_callback_result) {
 }
 
 function translate_teachers_att_id($att_id){
-	return instrument_info('Teacher_OptionId',$att_id,array('ostad_uid'));
+  return instrument_info('Teacher_OptionId',$att_id,array('ostad_uid'));
 }
 
 function get_site_setting($type = 'both', $fileds = array()){
-	$q = db_select('site_settings', 's')->fields('s', $fileds);
-	$q = ($type == 'both')? $q : $q->condition('type', array($type, 'both'), 'IN');
-	$result = $q->execute()->fetchAll();
+  $q = db_select('site_settings', 's')->fields('s', $fileds);
+  $q = ($type == 'both')? $q : $q->condition('type', array($type, 'both'), 'IN');
+  $result = $q->execute()->fetchAll();
 
-	$data = array('timing' => $result);
+  $data = array('timing' => $result);
 
-	drupal_json_output($result);
-	drupal_exit();
-	return $result;
+  drupal_json_output($result);
+  drupal_exit();
+  return $result;
 }
 
 
@@ -761,237 +761,237 @@ function get_site_setting($type = 'both', $fileds = array()){
  * menu callbak handler for user_charge
  */
 function user_charge($form, &$form_state, $uid) {
-	$form['text'] = array(
-		'#markup' => t('charge_your_account_hint'),
-		);
-	$form['your_charge'] = array(
-		'#prefix' => '<div>',
-		'#suffix' => '</div>',
-		'#markup' => '<div class="avail-points">'. t('Your current point is <strong>!point</strong>', array('!point' => formatMoney(userpoints_get_current_points($uid, 'all')))) . '</div>',
-		);
-	$form['uid'] = array(
-		'#type' => 'hidden',
-		'#value' => $uid,
-		);
-	$form['price'] = array(
-		'#type' => 'textfield',
-		'#title' => t('Charge amount'),
-		'#required' => TRUE,
-		'#attributes' => array('placeholder' => t('Charge amount in toman')),
-		);
-	$form['submit'] = array(
-		'#type' => 'submit',
-		'#value' => 'شارژ اعتبار حساب',
-		);
-		/*
-		*	برای تخفیفات گروهی برای 20 درصد شارژ هدیه
-		*
-	$form['festival'] = array(
-		'#markup' => '<div id="smile">
-			<canvas>
-			</canvas>
-			<div class="festival">تخفیف 20 درصد به مناسبت جشنواره عید تا عید</div>
-			<div class="last-price">مبلغ نهایی شارژ: <span></span> تومان</div>
-			</div>',
-		);*/
+  $form['text'] = array(
+    '#markup' => t('charge_your_account_hint'),
+  );
+  $form['your_charge'] = array(
+    '#prefix' => '<div>',
+    '#suffix' => '</div>',
+    '#markup' => '<div class="avail-points">'. t('Your current point is <strong>!point</strong>', array('!point' => formatMoney(userpoints_get_current_points($uid, 'all')))) . '</div>',
+  );
+  $form['uid'] = array(
+    '#type' => 'hidden',
+    '#value' => $uid,
+  );
+  $form['price'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Charge amount'),
+    '#required' => TRUE,
+    '#attributes' => array('placeholder' => t('Charge amount in toman')),
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'شارژ اعتبار حساب',
+  );
+  /*
+  *	برای تخفیفات گروهی برای 20 درصد شارژ هدیه
+  *
+$form['festival'] = array(
+  '#markup' => '<div id="smile">
+    <canvas>
+    </canvas>
+    <div class="festival">تخفیف 20 درصد به مناسبت جشنواره عید تا عید</div>
+    <div class="last-price">مبلغ نهایی شارژ: <span></span> تومان</div>
+    </div>',
+  );*/
 
   $output = node_view_multiple(node_load_multiple([4460,4462,4463,4464]), 'teaser');
   $charge_cards = '<h2 class="titr">افزودن اعتبار</h2><div class="charge-cards">'. render($output) .'</div>';
   $form['#suffix'] = $charge_cards;
 
-	return $form;
+  return $form;
 }
 
 /**
  * validate handler for user_charge
  */
 function user_charge_validate($form, &$form_state) {
-	if($form_state['values']['price'] < 1000 && $form_state['values']['uid'] != 1) {
-		form_set_error('price', 'میزان شارژ می بایست بیشتر از ۱۰۰۰ تومان باشد.');
-	}
+  if($form_state['values']['price'] < 1000 && $form_state['values']['uid'] != 1) {
+    form_set_error('price', 'میزان شارژ می بایست بیشتر از ۱۰۰۰ تومان باشد.');
+  }
 }
 
 /**
  * Summit handler for user_charge
  */
 function user_charge_submit($form, &$form_state) {
-	$uid = $form_state['values']['uid'];
-	global $base_url;
-	$price = intval($form_state['values']['price']);
-	$resnumber = time();
-	$description = 'شارژ حساب کاربری';
+  $uid = $form_state['values']['uid'];
+  global $base_url;
+  $price = intval($form_state['values']['price']);
+  $resnumber = time();
+  $description = 'شارژ حساب کاربری';
 
-	$result = zarinpal_send($price, $uid , $description , $resnumber, $base_url."/bankcallback/". $resnumber ,'charge', 'charge' );
+  $result = zarinpal_send($price, $uid , $description , $resnumber, $base_url."/bankcallback/". $resnumber ,'charge', 'charge' );
 }
 
 function bankcallback($resnumber) {
-	$event = get_bank_event($resnumber);
-	if(!$event){
-		global $user;
-		drupal_set_message('متاسفانه عملیات بانکی ناموفق  پایان یافته است.', 'error');
-		drupal_goto('/user/'. $user->uid .'/money/charge');
-	}
-	$price = $event->value;
-	$result = zarinpal_receive($resnumber, $price);
+  $event = get_bank_event($resnumber);
+  if(!$event){
+    global $user;
+    drupal_set_message('متاسفانه عملیات بانکی ناموفق  پایان یافته است.', 'error');
+    drupal_goto('/user/'. $user->uid .'/money/charge');
+  }
+  $price = $event->value;
+  $result = zarinpal_receive($resnumber, $price);
 
-	update_bank_event($resnumber, $result['message'], $result['refnumber']);
-	if($result['message'] == 'success') {
-		drupal_set_message('حساب کاربری شما شارژ شد.', 'status');
-		$params = array(
-		  'uid' => $event->user,
-		  'points' => ($price * 1), /* ($price * 1.2) شارژ اضافه برای جشنواره*/
-		  'operation' => 'از طریق بانک شارژ شده',
-		);
-		userpoints_userpointsapi($params);
-		drupal_goto('/user/'. $event->user);
-	}
-	else {
-		drupal_set_message('متاسفانه عملیات بانکی ناموفق  پایان یافته است.', 'error');
-		drupal_goto('/user/'. $event->user .'/money/charge');
-	}
+  update_bank_event($resnumber, $result['message'], $result['refnumber']);
+  if($result['message'] == 'success') {
+    drupal_set_message('حساب کاربری شما شارژ شد.', 'status');
+    $params = array(
+      'uid' => $event->user,
+      'points' => ($price * 1), /* ($price * 1.2) شارژ اضافه برای جشنواره*/
+      'operation' => 'از طریق بانک شارژ شده',
+    );
+    userpoints_userpointsapi($params);
+    drupal_goto('/user/'. $event->user);
+  }
+  else {
+    drupal_set_message('متاسفانه عملیات بانکی ناموفق  پایان یافته است.', 'error');
+    drupal_goto('/user/'. $event->user .'/money/charge');
+  }
 }
 
 function zarinpal_send($Amount , $uid , $Description , $resnumber  , $CallbackURL , $type , $type_description){
-	$user = user_load($uid);
-	$Email = $user->mail;
-	$Mobile = isset($user->field_text_mobile['und'][0]['value'])? $user->field_text_mobile['und'][0]['value'] : "";
+  $user = user_load($uid);
+  $Email = $user->mail;
+  $Mobile = isset($user->field_text_mobile['und'][0]['value'])? $user->field_text_mobile['und'][0]['value'] : "";
 
-	$api = variable_get('uc_zarinpal_MerchantID', '');
+  $api = variable_get('uc_zarinpal_MerchantID', '');
 
-	$client = new SoapClient('https://ir.zarinpal.com/pg/services/WebGate/wsdl', array('encoding' => 'UTF-8'));
-	$result = $client->PaymentRequest(
-		array(
-			'MerchantID' 	=> $api,
-			'Amount' 	=> $Amount,
-			'Description' 	=> $Description,
-			'Email' 	=> $Email,
-			'Mobile' 	=> $Mobile,
-			'CallbackURL' 	=> $CallbackURL
-		)
-	);
+  $client = new SoapClient('https://ir.zarinpal.com/pg/services/WebGate/wsdl', array('encoding' => 'UTF-8'));
+  $result = $client->PaymentRequest(
+    array(
+      'MerchantID' 	=> $api,
+      'Amount' 	=> $Amount,
+      'Description' 	=> $Description,
+      'Email' 	=> $Email,
+      'Mobile' 	=> $Mobile,
+      'CallbackURL' 	=> $CallbackURL
+    )
+  );
 
-	if($result->Status == 100){
-		add_bank_event($Amount, $type , $type_description , $uid, array('id' => $resnumber) );
-		Header('Location: https://www.zarinpal.com/pg/StartPay/'. $result->Authority);
-		die();
-	} else {
-		drupal_set_message(t('لطفا با پشتیبانی تماس بگیرید. کد خطا: %code' , array('%code' => $result->Status)), 'error');
-		drupal_goto($CallbackURL);
-	}
+  if($result->Status == 100){
+    add_bank_event($Amount, $type , $type_description , $uid, array('id' => $resnumber) );
+    Header('Location: https://www.zarinpal.com/pg/StartPay/'. $result->Authority);
+    die();
+  } else {
+    drupal_set_message(t('لطفا با پشتیبانی تماس بگیرید. کد خطا: %code' , array('%code' => $result->Status)), 'error');
+    drupal_goto($CallbackURL);
+  }
 }
 
 function zarinpal_receive($resnumber , $Amount){
-	if(isset($_GET['Status']) && $_GET['Status'] == 'OK'){
-		$Authority = $_GET['Authority'];
-		$Status = $_GET['Status'];
+  if(isset($_GET['Status']) && $_GET['Status'] == 'OK'){
+    $Authority = $_GET['Authority'];
+    $Status = $_GET['Status'];
 
-		$api = variable_get('uc_zarinpal_MerchantID', '');
-		$client = new SoapClient('https://ir.zarinpal.com/pg/services/WebGate/wsdl', array('encoding' => 'UTF-8'));
-		$result = $client->PaymentVerification(
-			array(
-				'MerchantID'	 => $api,
-				'Authority' 	 => $Authority,
-				'Amount'	 => $Amount
-			)
-		);
+    $api = variable_get('uc_zarinpal_MerchantID', '');
+    $client = new SoapClient('https://ir.zarinpal.com/pg/services/WebGate/wsdl', array('encoding' => 'UTF-8'));
+    $result = $client->PaymentVerification(
+      array(
+        'MerchantID'	 => $api,
+        'Authority' 	 => $Authority,
+        'Amount'	 => $Amount
+      )
+    );
 
-		$Status = $result->Status ;
-		$Refnumber = $result->RefID;
+    $Status = $result->Status ;
+    $Refnumber = $result->RefID;
 
-		if($Status == 100)// Your Peyment Code Only This Event
-		{
-			return array(
-				'message'=>'success',
-				'resnumber' => $resnumber,
-				'refnumber' => $Refnumber,
-				'price' => $Amount);
-		}else{
-			return array(
-				'message'=> 'fail(' . $Status . ')',
-				'resnumber' => -1,
-				'refnumber' => -1,
-				'price' => -1);
-		}
-	}else{
-		return array(
-				'message'=>'fail',
-				'resnumber' => -1,
-				'refnumber' => -1,
-				'price' => -1);
-	}
+    if($Status == 100)// Your Peyment Code Only This Event
+    {
+      return array(
+        'message'=>'success',
+        'resnumber' => $resnumber,
+        'refnumber' => $Refnumber,
+        'price' => $Amount);
+    }else{
+      return array(
+        'message'=> 'fail(' . $Status . ')',
+        'resnumber' => -1,
+        'refnumber' => -1,
+        'price' => -1);
+    }
+  }else{
+    return array(
+      'message'=>'fail',
+      'resnumber' => -1,
+      'refnumber' => -1,
+      'price' => -1);
+  }
 }
 
 function formatMoney($number, $fractional=false) {
-    if ($fractional) {
-        $number = sprintf('%.2f', $number);
+  if ($fractional) {
+    $number = sprintf('%.2f', $number);
+  }
+  while (true) {
+    $replaced = preg_replace('/(-?\d+)(\d\d\d)/', '$1,$2', $number);
+    if ($replaced != $number) {
+      $number = $replaced;
+    } else {
+      break;
     }
-    while (true) {
-        $replaced = preg_replace('/(-?\d+)(\d\d\d)/', '$1,$2', $number);
-        if ($replaced != $number) {
-            $number = $replaced;
-        } else {
-            break;
-        }
-    }
-    return $number;
+  }
+  return $number;
 }
 
 function add_bank_event($price, $name, $text, $user = 0, $attr = array() ) {
-	$query = "INSERT INTO {bank_events} (id, user, name, value, text, date, status) VALUES (:id, :user, :name, :value, :text, :date, :status)";
+  $query = "INSERT INTO {bank_events} (id, user, name, value, text, date, status) VALUES (:id, :user, :name, :value, :text, :date, :status)";
 
-	$queryParams = array(
-		':id' => isset($attr['id'])? $attr['id'] : NULL,
-		':user' => $user,
-		':name' => $name,
-		':text' => $text,
-		':value' => $price,
-		':status' => isset($attr['status'])?$attr['status']:'pending',
-		':date' => time()
-	);
-	$result = db_query($query, $queryParams, array('return' => Database::RETURN_INSERT_ID));
-	return $result;
+  $queryParams = array(
+    ':id' => isset($attr['id'])? $attr['id'] : NULL,
+    ':user' => $user,
+    ':name' => $name,
+    ':text' => $text,
+    ':value' => $price,
+    ':status' => isset($attr['status'])?$attr['status']:'pending',
+    ':date' => time()
+  );
+  $result = db_query($query, $queryParams, array('return' => Database::RETURN_INSERT_ID));
+  return $result;
 }
 
 function get_bank_event($resnumber) {
-	return db_select('bank_events', 'b')->fields('b', array()) ->condition('id', $resnumber)->execute()->fetch();
+  return db_select('bank_events', 'b')->fields('b', array()) ->condition('id', $resnumber)->execute()->fetch();
 }
 
 function update_bank_event($id, $status, $refnum) {
-	$query = "UPDATE {bank_events} SET status = :status , date = :date, refference = :refference WHERE id = :id";
-	$queryParams = array(
-		':id' => $id,
-		':status' => $status,
-		':date' => time(),
-		':refference' => $refnum
-		);
-	$result = db_query($query, $queryParams);
-	return $result;
+  $query = "UPDATE {bank_events} SET status = :status , date = :date, refference = :refference WHERE id = :id";
+  $queryParams = array(
+    ':id' => $id,
+    ':status' => $status,
+    ':date' => time(),
+    ':refference' => $refnum
+  );
+  $result = db_query($query, $queryParams);
+  return $result;
 }
 
 /**
  * Implements hook_init().
  */
 function functions_init(){
-	global $user;
-	$path = drupal_get_path_alias();
-	$aliases = explode('/', $path);
-	//mdump($aliases, true);
+  global $user;
+  $path = drupal_get_path_alias();
+  $aliases = explode('/', $path);
+  //mdump($aliases, true);
 
-	//redirecting userpoints module pages
-	if(isset($aliases[1]) && $aliases[0] == 'myuserpoints' && $aliases[1] == 'transaction' ){
-		//redirecting myuserpoints/transaction/% to user/%/points/%
-		array_splice($aliases, 0, 2);//removing myuserpoints/transaction
-		$url = implode('/', $aliases);
-		//drupal_goto("user/$user->uid/points/$url");
-		Header('Location: https://4faslmusic.ir/user/'. $user->uid .'/points/'. $url);
-		die();
-	}
-	elseif (isset($aliases[1]) && $aliases[0] == 'store' && $aliases[1] == 'film'){
-	  $nid = db_select('uc_product_kits', 'kit')
-            ->fields('kit', array('nid'))
-            ->condition('kit.product_id', $aliases[2])
-            ->execute()->fetchObject();
-	  if($user->uid != 1 && isset($nid->nid)){
+  //redirecting userpoints module pages
+  if(isset($aliases[1]) && $aliases[0] == 'myuserpoints' && $aliases[1] == 'transaction' ){
+    //redirecting myuserpoints/transaction/% to user/%/points/%
+    array_splice($aliases, 0, 2);//removing myuserpoints/transaction
+    $url = implode('/', $aliases);
+    //drupal_goto("user/$user->uid/points/$url");
+    Header('Location: https://4faslmusic.ir/user/'. $user->uid .'/points/'. $url);
+    die();
+  }
+  elseif (isset($aliases[1]) && $aliases[0] == 'store' && $aliases[1] == 'film'){
+    $nid = db_select('uc_product_kits', 'kit')
+      ->fields('kit', array('nid'))
+      ->condition('kit.product_id', $aliases[2])
+      ->execute()->fetchObject();
+    if($user->uid != 1 && isset($nid->nid)){
       Header('Location: /node/'. $nid->nid . '#products');
       die();
     }
@@ -999,63 +999,63 @@ function functions_init(){
 }
 
 function pay_for_practice($user, $points){
-	//points for each practice
-	$userpoints = userpoints_get_current_points($user->uid, 'all');
-	if ($userpoints < $points) {
-		drupal_set_message(t("You haven't enough point in your account, please charge your account."), 'error');
-		drupal_goto("user/$user->uid/money/charge");
-	}
+  //points for each practice
+  $userpoints = userpoints_get_current_points($user->uid, 'all');
+  if ($userpoints < $points) {
+    drupal_set_message(t("You haven't enough point in your account, please charge your account."), 'error');
+    drupal_goto("user/$user->uid/money/charge");
+  }
 
-	$_sql = "INSERT INTO {pay_practice} (uid, nid, date, price, description) VALUES (:uid, :nid, :date, :price, :description)";
-	$result = db_query($_sql , array(
-		':uid' => $user->uid,
-		':date' => time(),
-		':price' => $points,
-		':nid' => 0,
-		':description' => ''
-	));
-	if($result){
-		$params = array(
-			'uid' => $user->uid,
-			'points' => -$points,
-			'operation' => 'بابت افزودن تمرین',
-			'description' => NULL,
-		);
-		userpoints_userpointsapi($params);
-		drupal_set_message('مبلغ '. $points .' از اعتبار شما کسر شد.');
-	}else{
-		$data = array(
-			'status' => 'fail',
-			'message' => 'خطایی در فرم رخ داده است. لطفا با پشتیبانی تماس حاصل فرمایید. کد خطا:'
-		);
-	}
+  $_sql = "INSERT INTO {pay_practice} (uid, nid, date, price, description) VALUES (:uid, :nid, :date, :price, :description)";
+  $result = db_query($_sql , array(
+    ':uid' => $user->uid,
+    ':date' => time(),
+    ':price' => $points,
+    ':nid' => 0,
+    ':description' => ''
+  ));
+  if($result){
+    $params = array(
+      'uid' => $user->uid,
+      'points' => -$points,
+      'operation' => 'بابت افزودن تمرین',
+      'description' => NULL,
+    );
+    userpoints_userpointsapi($params);
+    drupal_set_message('مبلغ '. $points .' از اعتبار شما کسر شد.');
+  }else{
+    $data = array(
+      'status' => 'fail',
+      'message' => 'خطایی در فرم رخ داده است. لطفا با پشتیبانی تماس حاصل فرمایید. کد خطا:'
+    );
+  }
 
-	$data = array(
-		'status' => 'ok',
-		'message' => 'پرداخت برای افزودن تمرین جدید با موفقیت انجام شد'
-	);
+  $data = array(
+    'status' => 'ok',
+    'message' => 'پرداخت برای افزودن تمرین جدید با موفقیت انجام شد'
+  );
 
-	drupal_json_output($data);
-	drupal_exit();
-	return $data;
+  drupal_json_output($data);
+  drupal_exit();
+  return $data;
 }
 
 function get_current_points($user){
-	$points = userpoints_get_current_points($user->uid, 'all');
+  $points = userpoints_get_current_points($user->uid, 'all');
   $last_practice = 0;
 
-	$payed = db_select('pay_practice', 'payed')
-			->fields('payed', array())
-			->condition('uid', $user->uid)
-			->condition('nid', 0)
-			->execute()->fetchAll();
+  $payed = db_select('pay_practice', 'payed')
+    ->fields('payed', array())
+    ->condition('uid', $user->uid)
+    ->condition('nid', 0)
+    ->execute()->fetchAll();
 
-	$last =  db_select('pay_practice', 'payed')
-			->fields('payed', array())
-			->condition('uid', $user->uid)
-			->condition('nid', 0, '!=')
-			->orderBy('description', 'DESC')
-			->execute()->fetchObject();
+  $last =  db_select('pay_practice', 'payed')
+    ->fields('payed', array())
+    ->condition('uid', $user->uid)
+    ->condition('nid', 0, '!=')
+    ->orderBy('description', 'DESC')
+    ->execute()->fetchObject();
   $last_practice = isset($last->id)? $last->description : 0;
 
   //new user just enrolled
@@ -1071,99 +1071,99 @@ function get_current_points($user){
       $last_practice = (int)$expiration->expiration - (60*60*24*7);
     }
   }
-	$data = array(
-		'points' => $points,
-		'displayPoints' => formatMoney($points),
-		'available' => count($payed),
-		'lastPractice' => $last_practice
-	);
+  $data = array(
+    'points' => $points,
+    'displayPoints' => formatMoney($points),
+    'available' => count($payed),
+    'lastPractice' => $last_practice
+  );
 
-	drupal_json_output($data);
-	drupal_exit();
-	return $data;
+  drupal_json_output($data);
+  drupal_exit();
+  return $data;
 }
 
 /**
  * Implements hook_node_presave().
  */
 function functions_node_presave($node) {
-	if ($node->type =='homework' && $node->is_new) {
-		$payed = db_select('pay_practice', 'payed')
-					->fields('payed', array())
-					->condition('nid', 0)
-					->condition('uid', $node->uid)
-					->execute()->fetchAll();
-		if(count($payed) < 1){
-			drupal_set_message('شما ابتدا باید بابت افزودن تمرین مبلغ مورد نظر را از اعتبار خود پرداخت کنید.', 'error');
-			drupal_goto('user/'. $node->uid);
-		}
-	}
+  if ($node->type =='homework' && $node->is_new) {
+    $payed = db_select('pay_practice', 'payed')
+      ->fields('payed', array())
+      ->condition('nid', 0)
+      ->condition('uid', $node->uid)
+      ->execute()->fetchAll();
+    if(count($payed) < 1){
+      drupal_set_message('شما ابتدا باید بابت افزودن تمرین مبلغ مورد نظر را از اعتبار خود پرداخت کنید.', 'error');
+      drupal_goto('user/'. $node->uid);
+    }
+  }
 }
 
 /**
  * Implements hook_node_insert().
  */
 function functions_node_insert($node){
-	if ($node->type =='homework' && $node->is_new){
-		$payed = db_select('pay_practice', 'payed')
-					->fields('payed', array())
-					->condition('nid', 0)
-					->condition('uid', $node->uid)
-					->execute()->fetchAll();
+  if ($node->type =='homework' && $node->is_new){
+    $payed = db_select('pay_practice', 'payed')
+      ->fields('payed', array())
+      ->condition('nid', 0)
+      ->condition('uid', $node->uid)
+      ->execute()->fetchAll();
 
-		$userpoint_transaction = db_select('userpoints_txn', 'points')
-				->fields('points', array())
-				->condition('description', NULL)
-				->condition('uid', $node->uid)
-				->orderBy('txn_id', 'asc')
-				->execute()->fetchObject();
+    $userpoint_transaction = db_select('userpoints_txn', 'points')
+      ->fields('points', array())
+      ->condition('description', NULL)
+      ->condition('uid', $node->uid)
+      ->orderBy('txn_id', 'asc')
+      ->execute()->fetchObject();
 
-    	//TODO: I handled this if in hook_node_presave function so make sure about payment and delete this if
-		if(count($payed) > 0){
-			db_update('pay_practice')
-				->fields(array('description' => time(), 'nid' => $node->nid))
-				->condition('id', $payed[0]->id)
-				->execute();
+    //TODO: I handled this if in hook_node_presave function so make sure about payment and delete this if
+    if(count($payed) > 0){
+      db_update('pay_practice')
+        ->fields(array('description' => time(), 'nid' => $node->nid))
+        ->condition('id', $payed[0]->id)
+        ->execute();
 
-			db_update('userpoints_txn')
-				->fields(array('description' => 'تمرین '. $node->nid))
-				->condition('txn_id', $userpoint_transaction->txn_id)
-				->execute();
+      db_update('userpoints_txn')
+        ->fields(array('description' => 'تمرین '. $node->nid))
+        ->condition('txn_id', $userpoint_transaction->txn_id)
+        ->execute();
 
-			$user = user_load($node->uid);
-			if($node->field_vip['und'][0]['value'] == 0) //honarjoo role id
-				$role = 4;
-			else if($node->field_vip['und'][0]['value'] == 1) //vip role id
-				$role = 6;
+      $user = user_load($node->uid);
+      if($node->field_vip['und'][0]['value'] == 0) //honarjoo role id
+        $role = 4;
+      else if($node->field_vip['und'][0]['value'] == 1) //vip role id
+        $role = 6;
 
-			uc_roles_grant($user, $role, time() + (7 * 24 * 60 * 60), true, true);
+      uc_roles_grant($user, $role, time() + (7 * 24 * 60 * 60), true, true);
 
-			//I'm not sure if I should make relationship based on user's favorite field
-			//$teacher_uid = instrument_info('name', $user->field_favorite['und'][0]['value'], array('ostad_uid'), 'online');
-			//$relationship = user_relationships_request_relationship($order->uid, $teacher_uid , $type , $approved);
+      //I'm not sure if I should make relationship based on user's favorite field
+      //$teacher_uid = instrument_info('name', $user->field_favorite['und'][0]['value'], array('ostad_uid'), 'online');
+      //$relationship = user_relationships_request_relationship($order->uid, $teacher_uid , $type , $approved);
 
-			drupal_set_message('تمرین شما ارسال شد، منتظر پاسخ استاد باشید.');
-		}
-	}
+      drupal_set_message('تمرین شما ارسال شد، منتظر پاسخ استاد باشید.');
+    }
+  }
 }
 
 /**
  * Implements hook_comment_insert().
  */
 function functions_comment_insert($comment){
-	if($comment->node_type == "comment_node_homework"){
-		$node = node_load($comment->nid);
-		$user = user_load($comment->uid);
+  if($comment->node_type == "comment_node_homework"){
+    $node = node_load($comment->nid);
+    $user = user_load($comment->uid);
 
-		//this comment is the first one and a teacher is posting
-		if($node->comment_count = 1 && (isset($user->roles[5]) || isset($user->roles[3]))){
-			db_update('pay_practice')
-				->fields(array('description' => time()))
-				->condition('nid', $comment->nid)
-				->condition('uid', $node->uid)
-				->execute();
-		}
-	}
+    //this comment is the first one and a teacher is posting
+    if($node->comment_count = 1 && (isset($user->roles[5]) || isset($user->roles[3]))){
+      db_update('pay_practice')
+        ->fields(array('description' => time()))
+        ->condition('nid', $comment->nid)
+        ->condition('uid', $node->uid)
+        ->execute();
+    }
+  }
 }
 
 /**
