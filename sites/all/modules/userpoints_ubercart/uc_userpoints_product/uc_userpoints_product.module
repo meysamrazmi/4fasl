@@ -32,7 +32,7 @@ function uc_userpoints_product_userpoints($op, $params = array()) {
         $form[$group][USERPOINTS_PRODUCT_MODERATE] = array(
           '#type' => 'radios',
           '#title' => t('Moderate userpoints transaction'),
-          '#default_value' => variable_get(USERPOINTS_PRODUCT_MODERATE, 0), 
+          '#default_value' => variable_get(USERPOINTS_PRODUCT_MODERATE, 0),
           '#options' => array(t('No'), t('Yes')),
         );
         $form[$group][USERPOINTS_PRODUCT_CATEGORY] = array(
@@ -143,7 +143,7 @@ function uc_userpoints_product_feature_form_submit($form, &$form_state) {
   if (!$affected_rows) {
     $pf = db_query("SELECT pfid FROM {uc_product_features} WHERE nid = :nid AND fid = :fid", array(':nid' => $data['nid'], ':fid' => $data['fid']));
     foreach ($pf as $row) {
-      $data['pfid'] = $row->pfid;      
+      $data['pfid'] = $row->pfid;
     }
     // D6
     // db_query("INSERT INTO {uc_userpoints_products} (pfid,nid,points,tid) VALUES (%d,%d,%d,%d)",$data['pfid'],$data['nid'],$data['points'],$data['tid']);
@@ -243,6 +243,7 @@ function uc_userpoints_product_uc_order($op, $order, $status) {
 function uc_userpoints_product_form_alter(&$form, &$form_state, $form_id) {
   // We may need to alter the checkout form to remove invalid payment methods.
   if ($form_id == 'uc_cart_checkout_form' && isset($form['panes']['payment'])) {
+    $order = new stdClass;
     $order->products = uc_cart_get_contents();
     // Make no changes if no products containing Userpoints are found.
     if (uc_userpoints_find_points_products($order) == array()) {
