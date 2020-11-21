@@ -1100,6 +1100,10 @@ div#userpoints_list_wrapper > div,
   margin: 10px 0;
   position: relative;
 }
+.field-name-bought-courses {
+  display: inline-block;
+  width: 100%;
+}
 .field.field-name-user-practices {
   padding: 0 !important;
   margin-right: 10px !important;
@@ -1123,6 +1127,7 @@ div#userpoints_list_wrapper > div,
   border-bottom: 1px solid #eaeaea;
   font-size: 22px;
 }
+.field-name-bought-courses .field-label-main,
 .field-name-courses-list.field-label-above > .field-label {
     font-weight: 400;
     font-size: 22px;
@@ -8500,11 +8505,11 @@ a#edit-new-message-button {
   flex-flow: wrap;
   justify-content: center;
 }
-.view-products .view-content > div[class*="col-"] {
+.kit-item {
   max-width: 450px;
 }
 @media (max-width: 600px){
-  .view-products .view-content > div[class*="col-"] {
+  .kit-item {
     width: 100%;
   }
 }
@@ -8623,4 +8628,13 @@ a#edit-new-message-button {
 .active-filters span {
   margin-left: 10px !important;
 }
-
+.field-name-bought-courses {
+  background: transparent !important;
+  box-shadow: none !important;
+  margin: 80px 0 0 !important;
+  display: inline-block;
+  width: 100%;
+}
+.kit-item {
+  float: right;
+}
