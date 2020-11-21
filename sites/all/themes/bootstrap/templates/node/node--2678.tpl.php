@@ -30,19 +30,30 @@
 	margin: 50px 0 0;">شروع کنید</span>
 	<p style="font-size: 15px;text-align: center;margin: 0px auto 0;max-width: 870px;border: 5px solid #673AB7;border-width: 0 3px;padding: 0px 10px;">
     <br>
-در آموزشگاه موسیقی چهارفصل، میتوانید ساز و آواز مورد علاقه خود را، زیر نظر اساتید برجسته موسیقی آموزش ببینید. در صورت تمایل<br> میتوانید بصورت حضوری و یا مجازی، آموزش ببینید. انتخاب کنید:</p>
+    در آموزشگاه موسیقی چهارفصل، میتوانید ساز و آواز مورد علاقه خود را، زیر نظر اساتید برجسته موسیقی آموزش ببینید. در صورت تمایل
+    <br>
+    میتوانید بصورت حضوری و یا مجازی، آموزش ببینید. انتخاب کنید:
+    <br>
+    حضوری یا آنلاین بودن کلاس خود را میتوانید بعد از پرداخت در قسمت انتخاب زمان کلاس انتخاب کنید.
+  </p>
 
 	<div class="links">
 			<a href="/get-started/حضوری" target="_blank" class="draw">
 			  <span class="for-draw"></span>
 				<span class="img" style="z-index: 4;"><img src="/sites/all/themes/bootstrap/images/location.png"></span>
-				<span style="z-index: 4;">ثبت نام در دوره های حضوری</span>
+				<span style="z-index: 4;text-align: center;">ثبت نام در دوره های حضوری و آنلاین
+				<br>
+				 (به صورت تماس تصویری)
+				 </span>
 				<span class="for-spin"></span>
 			</a>
 			<a href="/get-started/مجازی" target="_blank" class="draw">
         <span class="for-draw"></span>
 				<img src="/sites/all/themes/bootstrap/images/monitor.png" style="width: 40px; margin-left: 20px; z-index: 4;">
-				<span style="z-index: 4;">ثبت نام در دوره های مجازی</span>
+				<span style="z-index: 4;text-align: center;">ثبت نام در دوره های مجازی
+				<br>
+				 (آفلاین به صورت ارسال فیلم)
+				</span>
 				<span class="for-spin"></span>
 			</a>
 	</div>
@@ -87,12 +98,6 @@
   justify-content: center;
   margin: 50px auto 20px;
 }
-@media all and (max-width: 600px){
-  .links{
-    flex-direction: column;
-  }
-  .links a {  margin: 10px;}
-}
 .links img {
   width: auto;
   max-height: 100%;
@@ -112,6 +117,12 @@
   margin: 0 15px;
   position: relative;
   overflow: hidden;
+}
+@media all and (max-width: 600px){
+  .links{
+    flex-direction: column;
+  }
+  .links a {  margin: 10px;}
 }
 .links .img {
   width: 40px;
