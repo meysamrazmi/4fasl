@@ -1,0 +1,73 @@
+<?php
+/**
+ * Implements hook_schema().
+ */
+function functions_schema() {
+  $schema['site_setting_types'] = array(
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => t('Primary Key : id'),
+      ),
+      'setting_id' => array(
+        'type' => 'int',
+        'not null' => True,
+        'unsigned' => TRUE,
+        'default' => 0,
+        'description' => t('The setting id'),
+      ),
+      'type' => array(
+        'type' => 'varchar',
+        'length' => 40,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => t('Type of the course'),
+      ),
+    ),
+
+    'primary key' => array('id'),
+    'unique keys' => array(
+      'unique_fields' => array('setting_id' , 'type'),
+    ),
+  );
+
+  return $schema;
+}
+
+
+/**
+ * Implementation of hook_install()
+ */
+function functions_install() {
+  $success = drupal_install_schema('functions');
+  if ($success) {
+    drupal_set_message(st('functions module installed schema successfully.'));
+  }
+  else {
+    drupal_set_message(st('The installation of functions module schema failed.'), 'error');
+  }
+}
+
+/**
+ * Implementation of hook_uninstall()
+ */
+function functions_uninstall() {
+  $success = drupal_uninstall_schema('functions');
+  if ($success) {
+    drupal_set_message(st('functions module uninstalled schema successfully.'));
+  }
+  else {
+    drupal_set_message(st('The uninstall of functions module schema failed.'), 'error');
+  }
+}
+function functions_update_7001() {
+  $success = drupal_install_schema('functions');
+  if ($success) {
+    drupal_set_message(st('functions module schema installed successfully.'));
+  }
+  else {
+    drupal_set_message(st('The installation of functions module schema failed.'), 'error');
+  }
+}

@@ -39,6 +39,12 @@
 				<span style="z-index: 4;">ثبت نام در دوره های حضوری</span>
 				<span class="for-spin"></span>
 			</a>
+			<a href="/get-started/آنلاین" target="_blank" class="draw">
+			  <span class="for-draw"></span>
+				<span class="img" style="z-index: 4;"><img src="/sites/all/themes/bootstrap/images/online.png"></span>
+				<span style="z-index: 4;">ثبت نام در دوره های آنلاین</span>
+				<span class="for-spin"></span>
+			</a>
 			<a href="/get-started/مجازی" target="_blank" class="draw">
         <span class="for-draw"></span>
 				<img src="/sites/all/themes/bootstrap/images/monitor.png" style="width: 40px; margin-left: 20px; z-index: 4;">

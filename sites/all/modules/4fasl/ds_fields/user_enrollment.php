@@ -1,38 +1,67 @@
 <?php
+/**
+ * called from display suit field
+ * show the user's courses in profile page
+ */
 function user_enrollment($uid){
 	$user = user_load($uid);
 
 	$query = db_select('uc_orders', 'o');
 	$query->join('uc_order_products', 'p', 'o.order_id = p.order_id');
-	$user_orders = $query->fields('o', array('order_id'))
-					->fields('p', array('qty', 'data'))
-					->fields('o', array('created'))
-					->condition('o.uid', $user->uid)
-					->condition('p.nid', '2597')
-					->condition('o.order_status', 'completed')
-					->execute()
-					->fetchAll();
-
+	$query->fields('o', array('order_id', 'created'));
+  $query->fields('p', array('nid', 'qty', 'data'));
+  $query->condition('o.uid', $user->uid);
+  $or = db_or();
+  $or->condition('p.nid', '2597');
+  $or->condition('p.nid', '7131');
+  $query->condition($or);
+  $query->condition('o.order_status', 'completed');
+  $query->orderBy('p.nid', 'DESC');
+  $user_orders = $query->execute()->fetchAll();
 	//check to see if student has been assigned to any teacher
-	$q = "SELECT 
+	/*
+  $q = "SELECT
 			f.delta as delta,
-			days.field_days_value as days, 
-			times.field_time_value as times, 
-			en.field_enable_value as enabled, 
+			days.field_days_value as days,
+			times.field_time_value as times,
+			en.field_enable_value as enabled,
 			stu.field_user_uid as stu,
 			f.entity_id as ostad_uid
-			
+
 			FROM `field_data_field_classes_timing` f
-			
+
 			LEFT JOIN field_data_field_enable en ON en.entity_id = f.field_classes_timing_value and en.bundle = 'field_classes_timing'
 			LEFT JOIN field_data_field_time times  ON times.entity_id = f.field_classes_timing_value and times.bundle = 'field_classes_timing'
 			LEFT JOIN field_data_field_days days ON days.entity_id = f.field_classes_timing_value and days.bundle = 'field_classes_timing'
 			LEFT JOIN field_data_field_user stu ON stu.entity_id = f.field_classes_timing_value and stu.bundle = 'field_classes_timing'
-			
-			WHERE f.entity_type = 'user' 
+
+			WHERE f.entity_type = 'user'
 			AND stu.field_user_uid = :uid
 			ORDER BY delta";
 	$assigned_teachers = db_query($q, array(':uid' => $user->uid))->fetchAll();
+	*/
+
+
+
+  $query = db_select("field_data_field_classes_timing", 'f');
+  $query->leftJoin("field_data_field_enable", "en", "en.entity_id = f.field_classes_timing_value and en.bundle = 'field_classes_timing' ");
+  $query->leftJoin("field_data_field_time", "times", "times.entity_id = f.field_classes_timing_value and times.bundle = 'field_classes_timing' ");
+  $query->leftJoin("field_data_field_days", "days", "days.entity_id = f.field_classes_timing_value and days.bundle = 'field_classes_timing' ");
+  $query->leftJoin("field_data_field_user", "stu", "stu.entity_id = f.field_classes_timing_value and stu.bundle = 'field_classes_timing' ");
+
+  $query->addField("f", "delta", "delta");
+  $query->addField("f", "entity_id", "ostad_uid");
+  $query->addField("days", "field_days_value", "days");
+  $query->addField("en", "field_enable_value", "enabled");
+  $query->addField("stu", "field_user_uid", "stu");
+
+  $query->condition("f.entity_type", "user");
+  $query->condition("stu.field_user_uid", $user->uid);
+
+  $query->orderBy("f.delta", "DESC");
+  $assigned_teachers = $query->execute()->fetchAll();
+
+
 
 	if( isset($user->roles[9]) && count($assigned_teachers)){ //offline student
 
@@ -79,6 +108,13 @@ function user_enrollment($uid){
       $ostad = user_load($ostad_uid);
       print '<div class="course-info">';
       print   '<p class="saaz">دوره : <span>'. t($product_attributes[0][0]) .'</span></p>';
+
+      print   '<span class="seperator"></span>';
+      if($row->nid == 2597)
+        print   '<p class="saaz">نوع : <span>حضوری</span></p>';
+      elseif ($row->nid == 7131)
+        print   '<p class="saaz" style="color:darkred;">نوع : <span>آنلاین</span></p>';
+
 			print   '<span class="seperator"></span>';
       print   '<p class="ostad">استاد : <span>'. $ostad->field_naame['und'][0]['value'] .'</span></p>';
       print   '<span class="seperator"></span>';
@@ -95,7 +131,7 @@ function user_enrollment($uid){
         }
       }
       if(!$assigned && $remain >= 0)
-        print '<a href="/enrollment/time-selection" target="_blank">انتخاب برنامه زمانی</a>';
+        print '<a href="/enrollment/time-selection?course=' . $row->order_id . '" target="_blank">انتخاب برنامه زمانی</a>';
 
       if($remain < 2)
         print '<a href="/get-started/حضوری" target="_blank">تمدید کنید</a>';

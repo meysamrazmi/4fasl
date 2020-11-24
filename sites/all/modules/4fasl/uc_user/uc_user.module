@@ -38,7 +38,6 @@ function uc_user_uc_order($op, $order, $status) {
                 }
               }
             }
-//            mdump($product);
 
             if($product->nid == 1086 ){ // registration in online courses
               foreach ($product->data['attributes']['instrument'] as $key=> $value) {
@@ -100,8 +99,8 @@ function uc_user_uc_order($op, $order, $status) {
               }
             }
 
-            if ($product->nid == 2597){// for offline registration
-              drupal_goto('enrollment/time-selection');
+            if ($product->nid == 2597 || $product->nid == 7131){// for attendance or online registration
+              drupal_goto('enrollment/time-selection', array("query" => array("course" => $order->order_id)));
             }
 
             if (isset($product->type) && $product->type == 'prod') {

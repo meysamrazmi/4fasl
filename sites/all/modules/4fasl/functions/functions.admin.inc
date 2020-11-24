@@ -55,16 +55,18 @@ function site_setting(){
 	return $output;
 }
 
+
+/*----------------------------------------------------------------*/
 function add_site_setting($form, $form_state){
 	if (!is_array($form)) {
 		$form = array();
 	}
 
 	$form['type'] = array(
-		'#type' => 'select',
+		'#type' => 'checkboxes',
 		'#title' => t('Type'),
 		'#options' => array(
-			'both' => t('both'),
+			'attendance' => t('attendance'),
 			'online' => t('online'),
 			'offline' => t('offline')
         ),
@@ -118,6 +120,38 @@ function add_site_setting($form, $form_state){
 	return $form;
 }
 
+function add_site_setting_submit($form, &$form_state){
+  $sid = db_insert('site_settings')
+    ->fields(array(
+      'type' => 					"type",
+      'aid' => 						$form_state['values']['aid'],
+      'oid' => 						$form_state['values']['oid'],
+      'intro_nid' =>      $form_state['values']['intro_nid'],
+      'persian_name' => 	$form_state['values']['persian_name'],
+      'name' => 					$form_state['values']['name'],
+      'ostad_uid' => 			$form_state['values']['ostad_uid'],
+      'teacher_link' => 	$form_state['values']['teacher_link'],
+      'Teacher_OptionId' => 	$form_state['values']['Teacher_OptionId'],
+      'Teacher_Intro' => 	$form_state['values']['Teacher_Intro']['value'],
+    ))
+    ->execute();
+
+  foreach ($form_state['values']['type'] as $type){
+    if(isset($type) && !empty($type) && $type != '0') {
+      db_insert('site_setting_types')
+        ->fields(array(
+          'setting_id' => $sid,
+          'type' => $type,
+        ))->execute();
+    }
+  }
+
+  $form_state['redirect'] = 'admin/4fasl-setting';
+}
+/*----------------------------------------------------------------*/
+
+
+/*----------------------------------------------------------------*/
 function edit_site_setting($form, $form_state, $id){
 	if (!is_array($form)) {
 		$form = array();
@@ -128,15 +162,20 @@ function edit_site_setting($form, $form_state, $id){
 				->condition('id', $id)
 				->execute()->fetchObject();
 
+	$types = db_select("site_setting_types", "types")
+        ->fields("types", array("type"))
+        ->condition("setting_id", $id)
+	      ->execute()->fetchCol();
+
 	$form['type'] = array(
-		'#type' => 'select',
+		'#type' => 'checkboxes',
 		'#title' => t('Type'),
 		'#options' => array(
-			'both' => t('both'),
+			'attendance' => t('attendance'),
 			'online' => t('online'),
 			'offline' => t('offline')
         ),
-		'#default_value' => $result->type,
+		'#default_value' => $types,
 	);
 	$form['markup'] = array(
 		'#title' => t('Id'),
@@ -215,28 +254,11 @@ function edit_site_setting($form, $form_state, $id){
 	return $form;
 }
 
-function add_site_setting_submit($form, &$form_state){
-	db_insert('site_settings')
-		->fields(array(
-			'type' => 					$form_state['values']['type'],
-			'aid' => 						$form_state['values']['aid'],
-			'oid' => 						$form_state['values']['oid'],
-			'intro_nid' =>      $form_state['values']['intro_nid'],
-			'persian_name' => 	$form_state['values']['persian_name'],
-			'name' => 					$form_state['values']['name'],
-			'ostad_uid' => 			$form_state['values']['ostad_uid'],
-			'teacher_link' => 	$form_state['values']['teacher_link'],
-			'Teacher_OptionId' => 	$form_state['values']['Teacher_OptionId'],
-			'Teacher_Intro' => 	$form_state['values']['Teacher_Intro']['value'],
-			))
-		->execute();
-	$form_state['redirect'] = 'admin/4fasl-setting';
-}
-
 function edit_site_setting_submit($form, &$form_state){
-	db_update('site_settings')
+
+  db_update('site_settings')
 		->fields(array(
-			'type' => 					$form_state['values']['type'],
+			'type' => 					"type",
 			'aid' => 						$form_state['values']['aid'],
 			'oid' => 						$form_state['values']['oid'],
       'intro_nid' =>      $form_state['values']['intro_nid'],
@@ -249,9 +271,78 @@ function edit_site_setting_submit($form, &$form_state){
 			))
 		->condition('id', $form_state['values']['id'])
 		->execute();
+
+  $updated_types = array_values($form_state['values']['type']);
+  $deleted = db_select("site_setting_types", "types")
+        ->fields("types", array("id"))
+        ->condition("types.setting_id", $form_state['values']['id'])
+        ->condition("types.type", $updated_types, "NOT IN")
+        ->execute()->fetchCol();
+  foreach ($deleted as $id){
+    db_delete("site_setting_types")
+      ->condition("id", $id)
+      ->execute();
+  }
+
+  $repetitive = db_select("site_setting_types", "types")
+    ->fields("types", array("type"))
+    ->condition("types.setting_id", $form_state['values']['id'])
+    ->condition("types.type", $updated_types, "IN")
+    ->execute()->fetchCol();
+  $new_types = array_diff($updated_types, $repetitive);
+  foreach ($new_types as $new_type){
+    if(isset($new_type) && !empty($new_type) && $new_type != '0') {
+      db_insert('site_setting_types')
+        ->fields(array(
+          'setting_id' => $form_state['values']['id'],
+          'type' => $new_type,
+        ))->execute();
+    }
+  }
+
 	$form_state['redirect'] = 'admin/4fasl-setting';
 }
+/*----------------------------------------------------------------*/
 
+
+/*----------------------------------------------------------------*/
+function add_relationship($form, $form_state){
+  $form['user'] = array(
+    '#type' => 'textfield',
+    '#title' => t('User'),
+    '#autocomplete_path' => 'user/autocomplete',
+  );
+  $form['ostad'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Ostad'),
+    '#autocomplete_path' => 'user/autocomplete',
+  );
+  $form['type'] = array(
+    '#type' => 'select',
+    '#title' => t('Type'),
+    '#options' => array(
+      '1' => "هنرجوی عادی",
+      '3' => "vip",
+    ),
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+  );
+  return $form;
+}
+
+function add_relationship_submit($form, &$form_state){
+  $user = user_load_by_name($form_state['values']['user']);
+  $ostad = user_load_by_name($form_state['values']['ostad']);
+
+  user_relationships_request_relationship($user, $ostad , $form_state['values']['type'] , true);
+  $form_state['redirect'] = array('admin/people/relationships', array('query' => array('requester_id' => $user->name)));
+}
+/*----------------------------------------------------------------*/
+
+
+/*----------------------------------------------------------------*/
 function edit_relationship($form, $form_state, $relationship){
 	$user = user_load($relationship->requester_id);
 	$suffix =  '<a href="/user/' . $user->uid . '" style="margin: 0 20px;display: inline-flex;align-items: center;">';
@@ -320,42 +411,10 @@ function edit_relationship_submit($form, &$form_state){
 
 	$form_state['redirect'] = array('admin/people/relationships', array('query' => array('requester_id' => $user->name)));
 }
-
-function add_relationship($form, $form_state){
-	$form['user'] = array(
-		'#type' => 'textfield',
-		'#title' => t('User'),
-		'#autocomplete_path' => 'user/autocomplete',
-	);
-	$form['ostad'] = array(
-		'#type' => 'textfield',
-		'#title' => t('Ostad'),
-		'#autocomplete_path' => 'user/autocomplete',
-	);
-	$form['type'] = array(
-		'#type' => 'select',
-		'#title' => t('Type'),
-		'#options' => array(
-			'1' => "هنرجوی عادی",
-			'3' => "vip",
-        ),
-	);
-	$form['submit'] = array(
-		'#type' => 'submit',
-		'#value' => t('Submit'),
-	);
-	return $form;
-}
-
-function add_relationship_submit($form, &$form_state){
-	$user = user_load_by_name($form_state['values']['user']);
-	$ostad = user_load_by_name($form_state['values']['ostad']);
-
-	user_relationships_request_relationship($user, $ostad , $form_state['values']['type'] , true);
-	$form_state['redirect'] = array('admin/people/relationships', array('query' => array('requester_id' => $user->name)));
-}
+/*----------------------------------------------------------------*/
 
 
+/*----------------------------------------------------------------*/
 function site_rules_form($form){
   $form = array();
   $result = db_select('site_rules', 's')
@@ -401,3 +460,22 @@ function site_rules_form_submit($form, &$form_state){
 
   $form_state['redirect'] = 'admin/4fasl-setting/rules';
 }
+/*----------------------------------------------------------------*/
+
+/*----------------------------------------------------------------*/
+function developer(){
+  $user = user_load(1);
+
+  $query = db_select('uc_orders', 'o');
+  $query->join('uc_order_products', 'p', 'o.order_id = p.order_id');
+  $query->fields('o', array('order_id'));
+  $query->fields('p', array('qty', 'data'));
+  $query->condition('o.uid', $user->uid);
+  $query->condition('o.order_id', '6866');
+  $query->condition('o.order_status', 'completed');
+  $results = $query->execute()->fetchAll();
+
+  mdump($results);
+
+}
+/*----------------------------------------------------------------*/

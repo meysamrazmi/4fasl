@@ -7,15 +7,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 
 <?php
+$course = $_GET['course'];
+
 $query = db_select('uc_orders', 'o');
 $query->join('uc_order_products', 'p', 'o.order_id = p.order_id');
-$results = $query->fields('o', array('order_id'))
-  ->fields('p', array('qty', 'data'))
-  ->condition('o.uid', $user->uid)
-  ->condition('p.nid', '2597')
-  ->condition('o.order_status', 'completed')
-  ->execute()
-  ->fetchAll();
+$query->fields('o', array('order_id'));
+$query->fields('p', array('qty', 'data'));
+$query->condition('o.uid', $user->uid);
+if(isset($course) && !empty($course)){
+  $query->condition('o.order_id', $course);
+}else{
+  //$query->condition('p.nid', '2597');
+  $or = db_or();
+  $or->condition('p.nid', '2597');
+  $or->condition('p.nid', '7131');
+  $query->condition($or);
+
+}
+$query->condition('o.order_status', 'completed');
+$results = $query->execute()->fetchAll();
+
 $ostad_uid = $bought = 0;
 if(count($results) > 0){
   $product_attributes = array();
@@ -63,7 +74,13 @@ if(count($results) > 0){
   hide($content['links']);
   hide($content['field_tags']);
 
-  print '<div class="description rules"><div><p>ثبت نام در دوره های آموزشی حضوری بصورت ماهیانه بوده و 4 هفته اعتبار دارد و مدت زمان هر جلسه نیم ساعت می باشد.</p><p>پس از انتخاب روز و ساعت کلاس، شما باید هر هفته در همان زمان انتخاب شده در آموزشگاه حضور یابید.</p><p>غیبت از کلاس باعث سوخت شدن جلسه شما می شود. البته در مواقعی که نتوانید در کلاس حضور یابید (بعلت بیماری و یا مسافرت و ...) می توانید جلسه را بصورت مجازی شرکت کنید. بدین منظور حتما یک روز قبل از کلاس باید هماهنگی های لازم را با آموزشگاه به عمل آورید.</p></div></div>';
+  print '<div class="description rules">
+            <div>
+                <p>ثبت نام در دوره های آموزشی حضوری بصورت ماهیانه بوده و 4 هفته اعتبار دارد و مدت زمان هر جلسه نیم ساعت می باشد.</p>
+                <p>پس از انتخاب روز و ساعت کلاس، شما باید هر هفته در همان زمان انتخاب شده در آموزشگاه حضور یابید.</p>
+                <p>غیبت از کلاس باعث سوخت شدن جلسه شما می شود. البته در مواقعی که نتوانید در کلاس حضور یابید (بعلت بیماری و یا مسافرت و ...) می توانید جلسه را بصورت مجازی شرکت کنید. بدین منظور حتما یک روز قبل از کلاس باید هماهنگی های لازم را با آموزشگاه به عمل آورید.</p>
+            </div>
+          </div>';
 
   //$result = db_query('call classes_timing()')->fetchAll(); //stored procedure didnt worked with parameters
   //todo : check if we can use parameters in where clause in sql stored procedure

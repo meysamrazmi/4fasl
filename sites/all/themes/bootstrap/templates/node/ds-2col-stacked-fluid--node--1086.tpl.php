@@ -48,7 +48,7 @@
 (function ($) {
 var translate_options = []
 $.ajax({
-	url: "/admin/4fasl-setting/get/online",
+	url: "/admin/4fasl-setting/get/offline",
 	success: function(result){
 		translate_options = result
 		console.log(translate_options.length)

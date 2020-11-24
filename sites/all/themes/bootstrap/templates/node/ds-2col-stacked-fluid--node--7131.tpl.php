@@ -222,33 +222,33 @@ print $header; ?>
     bottom: 38px !important;
     height: initial !important;
   }
-  form#uc-product-add-to-cart-form-2597 {
+  form#uc-product-add-to-cart-form-7131 {
     overflow: hidden;
   }
-  div#uc_product_add_to_cart_form-2597-attributes {
+  div#uc_product_add_to_cart_form-7131-attributes {
     display: flex;
     width: 200%;
     overflow: auto;
     align-items: flex-start;
     margin-right: 0%;
   }
-  div#uc_product_add_to_cart_form-2597-attributes > .attribute {
+  div#uc_product_add_to_cart_form-7131-attributes > .attribute {
     width: 100%;
     overflow: hidden;
     height: 0;
     padding: 0 15px;
     margin-bottom: 0;
   }
-  div#uc_product_add_to_cart_form-2597-attributes > .attribute.active {
+  div#uc_product_add_to_cart_form-7131-attributes > .attribute.active {
     height: initial;
   }
   .add-to-cart .alert {
     margin: -15px 25px 0px;
   }
-  form#uc-product-add-to-cart-form-2597:not(.last-one) .form-actions {
+  form#uc-product-add-to-cart-form-7131:not(.last-one) .form-actions {
     display: none;
   }
-  #edit-submit-2597.node-add-to-cart {
+  #edit-submit-7131.node-add-to-cart {
     background-color: #5cb85c;
     border-color: #4cae4c;
     margin-left: 15px;
@@ -302,7 +302,7 @@ print $header; ?>
 
     var translate_options = []
     $.ajax({
-      url: "/admin/4fasl-setting/get/attendance",
+      url: "/admin/4fasl-setting/get/online",
       success: function(result){
         translate_options = result
       }
@@ -373,8 +373,8 @@ print $header; ?>
         });
         $("div#edit-attributes-3 label[for*='edit-attributes-3-23']").prepend('<i>تخفیف ویژه</i>'); */
         /*-----------------------------------------------------------------------------------------------------------*/
-        $('#uc-product-add-to-cart-form-2597 .attribute.attribute-3').append('<button class="btn btn-primary">انتخاب استاد<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button>');
-        $('#uc-product-add-to-cart-form-2597 .attribute.attribute-5').append('<button class="btn btn-primary">انتخاب استاد<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button>');
+        $('#uc-product-add-to-cart-form-7131 .attribute.attribute-3').append('<button class="btn btn-primary">انتخاب استاد<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button>');
+        $('#uc-product-add-to-cart-form-7131 .attribute.attribute-5').append('<button class="btn btn-primary">انتخاب استاد<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button>');
         $('.attribute-5 > .form-item-attributes-5').prepend('<div class="description"><p><span>دوره مقدماتی:</span> با ثبت نام در این دوره، موارد آموزشی از ابتدا برای شما صورت میگیرد. ثبت نام در دوره مقدماتی احتیاج به هیچ پیش نیاز و آموزش قبلی در موسیقی نداشته و پس از ثبت نام، جلسه به جلسه زیر نظر استاد، موارد آموزشی را فرا خواهید گرفت.</p><p><span>دوره VIP:</span> با ثبت نام در این دوره، موارد آموزشی بر اساس سطح نوازندگی شما، به شما ارائه میشود. این دوره مخصوص هنرجویانی است که آشنایی قبلی با موسیقی و ساز مورد نظر دارند و تمایل به آموزش از سطح مقدماتی را ندارند. در صورتیکه برای آغاز آموزش، نیاز به مشاوره با استاد را دارید میتوانید در بخش پشتیبانی و در قسمت تعیین سطح، اقدام به ارسال توضیحات و ویدیوی تصویری از نوازندگی خود کنید. استاد راهنمایی های لازم را به جهت ادامه ی آموزش به شما ارائه خواهند داد.</p></div>');
         $('.attribute-3 > .form-item-attributes-3').append('<div class="description rules"><div>' +
           '<p>هزینه های پرداختی، بعنوان پیش ثبت نام در دوره های آموزشی در نظر گرفته شده است و پس از حضور در اولین جلسه می توانید ثبت نام خود را کامل کنید.</p>' +
@@ -383,11 +383,11 @@ print $header; ?>
           '<p>کلاسهای حضوری در محل آموزشگاه موسیقی چهارفصل به نشانی: تهران - جنت آباد جنوبی - بلوار لاله - تقاطع شاهین (شهید پژوهنده) برگزار میشود.</p>' +
           '<p>برای آشنایی بیشتر می توانید <a href="/faq" class="btn" target="_blank">سوالات متداول</a> و <a href="/node/66" class="btn" target="_blank">نحوه ی کار</a> را مشاهده کنید.</p>' +
           '</div><div class="title"><img src="/sites/all/themes/bootstrap/images/law-book.svg"><span>شرایط و قوانین ثبت نام</span></div></div>');
-        $('#uc-product-add-to-cart-form-2597 .attribute.attribute-3').addClass('active');
+        $('#uc-product-add-to-cart-form-7131 .attribute.attribute-3').addClass('active');
 
         $('.shopping-stepper .step').click(function(){
           $('.add-to-cart .alert').remove();
-          if(!$('form#uc-product-add-to-cart-form-2597 > div').hasClass('rule-checked')){
+          if(!$('form#uc-product-add-to-cart-form-7131 > div').hasClass('rule-checked')){
             $('.add-to-cart').prepend('<div class="alert alert-dismissible alert-warning" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>تیک شرایط و قوانین را بزنید.</div>');
             return;
           }
@@ -413,7 +413,7 @@ print $header; ?>
           }
           if(flag){
             if($(this).index() == 3){
-              $('#edit-submit-2597.node-add-to-cart').click();
+              $('#edit-submit-7131.node-add-to-cart').click();
               return;
             }
             $('.shopping-stepper .active, .attributes > .active').removeClass('active');
@@ -423,9 +423,9 @@ print $header; ?>
             $('.attributes').css({'margin-right' : ($(this).index() * -100) + '%'});
             $('.attribute-4.rule-checked').css({'display': 'none'});
             if($('.attribute-7').hasClass('active')){
-              $('form#uc-product-add-to-cart-form-2597').addClass('last-one');
+              $('form#uc-product-add-to-cart-form-7131').addClass('last-one');
             }else{
-              $('form#uc-product-add-to-cart-form-2597').removeClass('last-one');
+              $('form#uc-product-add-to-cart-form-7131').removeClass('last-one');
             }
           }else{
             $('.add-to-cart').prepend('<div class="alert alert-dismissible alert-warning" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>باید یکی از گزینه ها را انتخاب کنید.</div>');
@@ -435,7 +435,7 @@ print $header; ?>
         $('.attributes .attribute > .btn').click(function(e){
           e.preventDefault();
           $('.add-to-cart .alert').remove();
-          if(!$('form#uc-product-add-to-cart-form-2597 > div').hasClass('rule-checked')){
+          if(!$('form#uc-product-add-to-cart-form-7131 > div').hasClass('rule-checked')){
             $('.add-to-cart').prepend('<div class="alert alert-dismissible alert-warning" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>تیک شرایط و قوانین را بزنید.</div>');
             $('html, body').animate({scrollTop: 200}, 200);
             return;
@@ -465,9 +465,9 @@ print $header; ?>
             if($('.attribute-7').hasClass('active')) SelectingTeacher();
             $('.attributes').css({'margin-right' : (index * -100) + '%'});
             if($('.attribute-7').hasClass('active')){
-              $('form#uc-product-add-to-cart-form-2597').addClass('last-one');
+              $('form#uc-product-add-to-cart-form-7131').addClass('last-one');
             }else{
-              $('form#uc-product-add-to-cart-form-2597').removeClass('last-one');
+              $('form#uc-product-add-to-cart-form-7131').removeClass('last-one');
             }
             $('.attribute-4.rule-checked').css({'display': 'none'});
           }else{
@@ -509,7 +509,7 @@ print $header; ?>
     '+ (key.teacher_link != null ? '<a href="'+ key.teacher_link +'" target="_blank" class="btn btn-default">مشاهده فیلم های استاد</a>' : '') + '</p></div>');
         }
 
-        $('#edit-submit-2597.node-add-to-cart').click(function(e){
+        $('#edit-submit-7131.node-add-to-cart').click(function(e){
           $('.add-to-cart .alert').remove();
           var flag = false;
           $('.attribute-7').find('.form-item').each(function(){

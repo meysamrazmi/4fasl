@@ -276,6 +276,15 @@ function functions_menu() {
     'page arguments' => array(1),
     'access arguments' => array('access content'),
   );
+  $items['admin/developer'] = array(
+    'title' => t('developer page'),
+    'description' => t('developer page'),
+    'page callback' => 'developer',
+    'access arguments' => array('administer modules'),
+    'type' => MENU_CALLBACK,
+    'file' => 'functions.admin.inc',
+  );
+
   return $items;
 }
 
@@ -744,9 +753,9 @@ function translate_teachers_att_id($att_id){
   return instrument_info('Teacher_OptionId',$att_id,array('ostad_uid'));
 }
 
-function get_site_setting($type = 'both', $fileds = array()){
+function get_site_setting($type = 'attendance', $fileds = array()){
   $q = db_select('site_settings', 's')->fields('s', $fileds);
-  $q = ($type == 'both')? $q : $q->condition('type', array($type, 'both'), 'IN');
+  $q->join("site_setting_types", "t", "s.id = t.setting_id and t.type = '" . $type . "' ");
   $result = $q->execute()->fetchAll();
 
   $data = array('timing' => $result);
