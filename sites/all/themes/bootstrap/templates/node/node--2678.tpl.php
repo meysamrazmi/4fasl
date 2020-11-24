@@ -41,16 +41,7 @@
 			<a href="/get-started/حضوری" target="_blank" class="draw">
 			  <span class="for-draw"></span>
 				<span class="img" style="z-index: 4;"><img src="/sites/all/themes/bootstrap/images/location.png"></span>
-				<span style="z-index: 4;text-align: center;">ثبت نام در دوره های حضوری و آنلاین
-				<br>
-				 (به صورت تماس تصویری)
-				 </span>
-				<span class="for-spin"></span>
-			</a>
-			<a href="/get-started/آنلاین" target="_blank" class="draw">
-			  <span class="for-draw"></span>
-				<span class="img" style="z-index: 4;"><img src="/sites/all/themes/bootstrap/images/online.png"></span>
-				<span style="z-index: 4;">ثبت نام در دوره های آنلاین</span>
+				<span style="z-index: 4;text-align: center;">ثبت نام در دوره های حضوری</span>
 				<span class="for-spin"></span>
 			</a>
 			<a href="/get-started/مجازی" target="_blank" class="draw">
@@ -59,6 +50,15 @@
 				<span style="z-index: 4;text-align: center;">ثبت نام در دوره های مجازی
 				<br>
 				 (آفلاین به صورت ارسال فیلم)
+				</span>
+				<span class="for-spin"></span>
+			</a>
+			<a href="/get-started/آنلاین" target="_blank" class="draw">
+			  <span class="for-draw"></span>
+				<span class="img" style="z-index: 4;"><img src="/sites/all/themes/bootstrap/images/online.png"></span>
+				<span style="z-index: 4;">ثبت نام در دوره های آنلاین
+				<br>
+				 (به صورت تماس تصویری)
 				</span>
 				<span class="for-spin"></span>
 			</a>
