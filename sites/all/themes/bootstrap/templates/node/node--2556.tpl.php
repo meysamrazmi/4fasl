@@ -74,13 +74,13 @@ if(count($results) > 0){
   hide($content['links']);
   hide($content['field_tags']);
 
-  print '<div class="description rules">
-            <div>
-                <p>ثبت نام در دوره های آموزشی حضوری بصورت ماهیانه بوده و 4 هفته اعتبار دارد و مدت زمان هر جلسه نیم ساعت می باشد.</p>
-                <p>پس از انتخاب روز و ساعت کلاس، شما باید هر هفته در همان زمان انتخاب شده در آموزشگاه حضور یابید.</p>
-                <p>غیبت از کلاس باعث سوخت شدن جلسه شما می شود. البته در مواقعی که نتوانید در کلاس حضور یابید (بعلت بیماری و یا مسافرت و ...) می توانید جلسه را بصورت مجازی شرکت کنید. بدین منظور حتما یک روز قبل از کلاس باید هماهنگی های لازم را با آموزشگاه به عمل آورید.</p>
-            </div>
-          </div>';
+//  print '<div class="description rules">
+//            <div>
+//                <p>ثبت نام در دوره های آموزشی حضوری بصورت ماهیانه بوده و 4 هفته اعتبار دارد و مدت زمان هر جلسه نیم ساعت می باشد.</p>
+//                <p>پس از انتخاب روز و ساعت کلاس، شما باید هر هفته در همان زمان انتخاب شده در آموزشگاه حضور یابید.</p>
+//                <p>غیبت از کلاس باعث سوخت شدن جلسه شما می شود. البته در مواقعی که نتوانید در کلاس حضور یابید (بعلت بیماری و یا مسافرت و ...) می توانید جلسه را بصورت مجازی شرکت کنید. بدین منظور حتما یک روز قبل از کلاس باید هماهنگی های لازم را با آموزشگاه به عمل آورید.</p>
+//            </div>
+//          </div>';
 
   //$result = db_query('call classes_timing()')->fetchAll(); //stored procedure didnt worked with parameters
   //todo : check if we can use parameters in where clause in sql stored procedure
@@ -112,10 +112,12 @@ if(count($results) > 0){
     foreach($result as $row){
       $i++;
       if($row->stu == $user->uid){
-        print '<div class="alert alert-success" role="alert" style="font-family: fanum;">اطلاعات شما با موفقیت ارسال شد.<br>
+        print '
+        <div class="alert alert-success" role="alert" style="font-family: fanum;">اطلاعات شما با موفقیت ارسال شد.<br>
 			برنامه کلاسی شما:
-			<span class="selected">روزهای '. translate_days($row->days) .' ساعت '. translate_hours($row->times) .' تا '. translate_hours($result[$i]->times) .'</span>
-			</div>';
+			      <span class="selected">روزهای '. translate_days($row->days) .' ساعت '. translate_hours($row->times) .' تا '. translate_hours($result[$i]->times) .'</span>
+			      <a href="/user/'. $user->uid .'">ورود به صفحه کاربری</a>
+			  </div>';
         $print_form = false;
       }
     }

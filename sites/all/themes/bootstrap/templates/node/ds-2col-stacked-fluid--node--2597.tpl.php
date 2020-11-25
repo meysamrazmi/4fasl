@@ -377,8 +377,8 @@ print $header; ?>
         $('#uc-product-add-to-cart-form-2597 .attribute.attribute-5').append('<button class="btn btn-primary">انتخاب استاد<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button>');
         $('.attribute-5 > .form-item-attributes-5').prepend('<div class="description"><p><span>دوره مقدماتی:</span> با ثبت نام در این دوره، موارد آموزشی از ابتدا برای شما صورت میگیرد. ثبت نام در دوره مقدماتی احتیاج به هیچ پیش نیاز و آموزش قبلی در موسیقی نداشته و پس از ثبت نام، جلسه به جلسه زیر نظر استاد، موارد آموزشی را فرا خواهید گرفت.</p><p><span>دوره VIP:</span> با ثبت نام در این دوره، موارد آموزشی بر اساس سطح نوازندگی شما، به شما ارائه میشود. این دوره مخصوص هنرجویانی است که آشنایی قبلی با موسیقی و ساز مورد نظر دارند و تمایل به آموزش از سطح مقدماتی را ندارند. در صورتیکه برای آغاز آموزش، نیاز به مشاوره با استاد را دارید میتوانید در بخش پشتیبانی و در قسمت تعیین سطح، اقدام به ارسال توضیحات و ویدیوی تصویری از نوازندگی خود کنید. استاد راهنمایی های لازم را به جهت ادامه ی آموزش به شما ارائه خواهند داد.</p></div>');
         $('.attribute-3 > .form-item-attributes-3').append('<div class="description rules"><div>' +
-          '<p>هزینه های پرداختی، بعنوان پیش ثبت نام در دوره های آموزشی در نظر گرفته شده است و پس از حضور در اولین جلسه می توانید ثبت نام خود را کامل کنید.</p>' +
-          '<p>در مرحله بعد (انتخاب استاد) میتوانید شرایط برگزاری و هزینه کلاس را مطالعه فرمایید و همچنین از رزومه و برنامه زمانی اساتید مطلع شوید.</p>' +
+          '<p>هزینه پرداختی، برای چهار جلسه (هر هفته یک جلسه) در نظر گرفته شده است.</p>' +
+          '<p>در مرحله بعد (انتخاب استاد) از رزومه و برنامه زمانی استاد مطلع میشوید.</p>' +
           '<p>پس از تکمیل ثبت نام، روز و ساعت کلاس آموزشی برای شما اختصاص داده میشود و شما هر هفته در همان زمان اعلام شده از کلاس آموزشی استفاده می کنید.</p>' +
           '<p>کلاسهای حضوری در محل آموزشگاه موسیقی چهارفصل به نشانی: تهران - جنت آباد جنوبی - بلوار لاله - تقاطع شاهین (شهید پژوهنده) برگزار میشود.</p>' +
           '<p>برای آشنایی بیشتر می توانید <a href="/faq" class="btn" target="_blank">سوالات متداول</a> و <a href="/node/66" class="btn" target="_blank">نحوه ی کار</a> را مشاهده کنید.</p>' +
@@ -502,8 +502,9 @@ print $header; ?>
           $('.attribute-7').find('.form-item input').attr( "checked" , false)
 
           var $item = $('#edit-attributes-7 .form-item input#edit-attributes-7-' + key.Teacher_OptionId).closest('.form-item')
-          if(key.ostad_uid == 7262 || key.ostad_uid == 1011)
-            key.Teacher_Intro = '<p style="border-right: 2px solid #F44335;padding: 10px 15px;background: #eee;">کلاس های این استاد به صورت گروهی و ترمی می باشد و هزینه پرداختی بابت ثبت نام اولیه می باشد.</p>' + key.Teacher_Intro
+          // if(key.ostad_uid == 7262 || key.ostad_uid == 1011)
+          //   key.Teacher_Intro = '<p style="border-right: 2px solid #F44335;padding: 10px 15px;background: #eee;">کلاس های این استاد به صورت گروهی و ترمی می باشد و هزینه پرداختی بابت ثبت نام اولیه می باشد.</p>' + key.Teacher_Intro
+
           $item.css({'display':'block'}).addClass('acrive').append('<div class="teacher-intro">' + key.Teacher_Intro + '<p style="margin-top: 15px;">\
     <button type="button" class="btn btn-info" data-toggle="modal" data-target=".ostad-timing" ostad="'+ key.ostad_uid +'" style="margin-left: 5px;">مشاهده برنامه زمانی استاد</button>\
     '+ (key.teacher_link != null ? '<a href="'+ key.teacher_link +'" target="_blank" class="btn btn-default">مشاهده فیلم های استاد</a>' : '') + '</p></div>');
