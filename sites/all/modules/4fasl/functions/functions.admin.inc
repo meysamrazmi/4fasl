@@ -464,18 +464,6 @@ function site_rules_form_submit($form, &$form_state){
 
 /*----------------------------------------------------------------*/
 function developer(){
-  $user = user_load(1);
-
-  $query = db_select('uc_orders', 'o');
-  $query->join('uc_order_products', 'p', 'o.order_id = p.order_id');
-  $query->fields('o', array('order_id'));
-  $query->fields('p', array('qty', 'data'));
-  $query->condition('o.uid', $user->uid);
-  $query->condition('o.order_id', '6866');
-  $query->condition('o.order_status', 'completed');
-  $results = $query->execute()->fetchAll();
-
-  mdump($results);
 
 }
 /*----------------------------------------------------------------*/

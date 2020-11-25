@@ -54,6 +54,7 @@ function user_enrollment($uid){
   $query->addField("days", "field_days_value", "days");
   $query->addField("en", "field_enable_value", "enabled");
   $query->addField("stu", "field_user_uid", "stu");
+  $query->addField("times", "field_time_value", "times");
 
   $query->condition("f.entity_type", "user");
   $query->condition("stu.field_user_uid", $user->uid);

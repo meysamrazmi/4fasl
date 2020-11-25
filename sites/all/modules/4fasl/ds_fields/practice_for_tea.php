@@ -36,7 +36,7 @@ function practice_for_teacher($uid){
         //				print '<form id="student-confirmation-form-1" style="border-color: rgb(244, 67, 54);"><span>هنرجو تایید شده است و تمرین جدیدی ارسال نکرده است.</span></form>';
         //			}else{
         //$student_confirm = drupal_get_form('student_confirmation_form_'. $stu->uid , intval($stu->uid));
-        $student_confirm = drupal_get_form('student_node_refrence_form_'. $stu->uid , intval($stu->uid));
+        $student_confirm = drupal_get_form('student_node_refrence_form' , intval($stu->uid));
         print drupal_render($student_confirm);
         //			}
       }else{
@@ -81,7 +81,7 @@ function practice_for_teacher($uid){
       if ($vip_count){
         print views_embed_view('courses_list', 'students_practices', intval($stu->uid) , 1);
         // print '<form id="student-confirmation-form-1" style="border-color: rgb(244, 67, 54);"><span>هنرجو VIP است.</span></form>';
-        $student_confirm = drupal_get_form('student_node_refrence_form_'. $stu->uid , intval($stu->uid));
+        $student_confirm = drupal_get_form('student_node_refrence_form' , intval($stu->uid));
         print drupal_render($student_confirm);
       }else{
         if(array_key_exists(3,$user->roles))

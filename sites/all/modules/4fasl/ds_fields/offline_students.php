@@ -1,19 +1,19 @@
 <?php
 function offline_students($uid){
-  $query = "SELECT 
+  $query = "SELECT
 					f.delta as delta,
-					days.field_days_value as days, 
-					times.field_time_value as times, 
-					en.field_enable_value as enabled, 
+					days.field_days_value as days,
+					times.field_time_value as times,
+					en.field_enable_value as enabled,
 					stu.field_user_uid as stu
-					
+
 					FROM `field_data_field_classes_timing` f
-					
+
 					LEFT JOIN field_data_field_enable en ON en.entity_id = f.field_classes_timing_value and en.bundle = 'field_classes_timing'
 					LEFT JOIN field_data_field_time times  ON times.entity_id = f.field_classes_timing_value and times.bundle = 'field_classes_timing'
 					LEFT JOIN field_data_field_days days ON days.entity_id = f.field_classes_timing_value and days.bundle = 'field_classes_timing'
 					LEFT JOIN field_data_field_user stu ON stu.entity_id = f.field_classes_timing_value and stu.bundle = 'field_classes_timing'
-					
+
 					WHERE f.entity_type = 'user' and f.entity_id = :uid and stu.field_user_uid IS NOT NULL
 					ORDER BY days,times";
   $result = db_query($query, array(':uid' => $uid))->fetchAll();
@@ -41,7 +41,7 @@ function offline_students($uid){
       print '</a>
 					<p>'. $stu->field_naame['und'][0]['value'] .'</p><p class="selected">روزهای '. translate_days($row->days) .' ساعت '. translate_hours($row->times) .'</p>';
 
-      $student_confirm = drupal_get_form('student_node_refrence_form_'. $stu->uid , intval($stu->uid));
+      $student_confirm = drupal_get_form('student_node_refrence_form', intval($stu->uid));
       print drupal_render($student_confirm);
       print '</div>';
 

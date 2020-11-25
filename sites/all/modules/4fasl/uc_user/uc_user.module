@@ -39,12 +39,12 @@ function uc_user_uc_order($op, $order, $status) {
               }
             }
 
-            if($product->nid == 1086 ){ // registration in online courses
+            if($product->nid == 1086 ){ // registration for offline courses
               foreach ($product->data['attributes']['instrument'] as $key=> $value) {
 
                 if(isset($product->data['attributes']['teacher']) && key($product->data['attributes']['teacher']) ){
                   $teacher_oid = key($product->data['attributes']['teacher']);
-                  $teacher_uid = instrument_info('Teacher_OptionId', $teacher_oid, array('ostad_uid'), 'online');
+                  $teacher_uid = instrument_info('Teacher_OptionId', $teacher_oid, array('ostad_uid'), 'offline');
                   if($teacher_uid == false){
                     continue; //skip the rest
                   }
@@ -53,7 +53,7 @@ function uc_user_uc_order($op, $order, $status) {
                   continue; //skip the rest
                 }
 
-                $instrument_name = instrument_info('oid', $key, array('name'), 'online');
+                $instrument_name = instrument_info('oid', $key, array('name'), 'offline');
                 if($instrument_name != false){
                   if(isset($product->data['attributes']['level'][20])){ //vip registration
                     add_collection($order_user , $instrument_name , 'l1' , '1', $teacher_uid);
@@ -116,14 +116,14 @@ function uc_user_uc_order($op, $order, $status) {
 }
 
 function uc_user_forms($form_id, $args) {
-  $forms = array();
+//  $forms = array();
 //  $users = entity_load('user');
-  $users = db_query("SELECT uid from users where uid != 0")->fetchAll();
-  foreach($users as $user){
-	$forms['student_confirmation_form_'. $user->uid]['callback'] = 'student_confirmation_form';
-	$forms['student_node_refrence_form_'. $user->uid]['callback'] = 'student_node_refrence_form';
-  }
-  return $forms;
+//  $users = db_query("SELECT uid from users where uid != 0")->fetchAll();
+//  foreach($users as $user){
+//	  $forms['student_confirmation_form_'. $user->uid]['callback'] = 'student_confirmation_form';
+//	  $forms['student_node_refrence_form_'. $user->uid]['callback'] = 'student_node_refrence_form';
+//  }
+//  return $forms;
 }
 
 function student_confirmation_form($form, &$form_state, $uid) {
@@ -263,30 +263,30 @@ function add_collection($user, $instrument , $level , $session, $ostad = null) {
 }
 
 function which_teacher($value){
-	return instrument_info('persian_name', $value, array('ostad_uid'), 'online');
+	return instrument_info('persian_name', $value, array('ostad_uid'), 'offline');
 }
 
 function which_teacher_name($value){
-	return instrument_info('name', $value, array('ostad_uid'), 'online');
+	return instrument_info('name', $value, array('ostad_uid'), 'offline');
 }
 
 function which_instrument($value){
-	return instrument_info('persian_name', $value, array('name'), 'online');
+	return instrument_info('persian_name', $value, array('name'), 'offline');
 }
 
 function which_teacher_key($value){
-	return instrument_info('oid', $value, array('ostad_uid'), 'online');
+	return instrument_info('oid', $value, array('ostad_uid'), 'offline');
 }
 
 function which_instrument_key($value){
-	return instrument_info('oid', $value, array('name'), 'online');
+	return instrument_info('oid', $value, array('name'), 'offline');
 }
 
 /*
  * returns uid of teachers by option ids of attribute 5
  */
 function which_teacher_by_TeacherOptionId($value){
-	return instrument_info('Teacher_OptionId', $value, array('ostad_uid'), 'online');
+	return instrument_info('Teacher_OptionId', $value, array('ostad_uid'), 'offline');
 }
 
 /**
@@ -300,8 +300,10 @@ function uc_user_menu() {
   return $items;
 }
 
+
+
 function student_node_refrence_form($form, &$form_state, $uid) {
-	if (!is_array($form)) {
+  if (!is_array($form)) {
 		$form = array();
 	}
 	$era_query_settings = array(array('type', 'course', '='));
@@ -321,7 +323,7 @@ function student_node_refrence_form($form, &$form_state, $uid) {
   $nids = user_nodes($uid);
   if(!empty($nids))
     $era_query_settings[] = array('nid', $nids, 'NOT IN');
-//  mdump($era_query_settings);
+
 	$form['refrenced_node'] = array(
 		'#type' => 'entityreference',
 		'#required' => true,

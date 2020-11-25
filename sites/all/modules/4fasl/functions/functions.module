@@ -528,10 +528,13 @@ function functions_node_access($node, $op, $account){
 }
 
 
-function instrument_info($condition = '', $value = '', $fileds = array(), $type = 'both'){
+function instrument_info($condition = '', $value = '', $fileds = array(), $type = 'all'){
   $q = db_select('site_settings', 's')->fields('s', $fileds);
   if($condition != '') $q = $q->condition($condition, $value, '=');
-  $q = ($type == 'both')? $q : $q->condition('type', array($type, 'both'), 'IN');
+  if($type != 'all'){
+    $q->join("site_setting_types", "t", "s.id = t.setting_id and t.type = '" . $type . "' ");
+    $q->addField("t", "type", "type");
+  }
   $q = $q->orderBy('type', 'ASC');
   $q = $q->execute()->fetchObject();
 //	mdump($q, true);
@@ -753,9 +756,12 @@ function translate_teachers_att_id($att_id){
   return instrument_info('Teacher_OptionId',$att_id,array('ostad_uid'));
 }
 
-function get_site_setting($type = 'attendance', $fileds = array()){
+function get_site_setting($type = 'all', $fileds = array()){
   $q = db_select('site_settings', 's')->fields('s', $fileds);
-  $q->join("site_setting_types", "t", "s.id = t.setting_id and t.type = '" . $type . "' ");
+  if($type != 'all'){
+    $q->join("site_setting_types", "t", "s.id = t.setting_id and t.type = '" . $type . "' ");
+    $q->addField("t", "type", "type");
+  }
   $result = $q->execute()->fetchAll();
 
   $data = array('timing' => $result);
