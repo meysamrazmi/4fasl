@@ -1,26 +1,26 @@
 <?php
 function practice_for_teacher($uid){
-  $students = db_select('user_relationships', 'ur')
-    ->fields('ur', array('requester_id' , 'rtid'))
-    ->condition('requestee_id', $uid,'=')
-	->condition('rtid', array(1,3),'IN') //honarjoo and vip relationship type id
-  ->execute()->fetchAll();
+    $students = db_select('user_relationships', 'ur')
+    ->fields('ur', array('requester_id', 'rtid'))
+    ->condition('requestee_id', $uid, '=')
+    ->condition('rtid', array(1, 3), 'IN') //honarjoo and vip relationship type id
+    ->execute()->fetchAll();
 
-  $user_flag = array(true , true);
+  $user_flag = array(true, true);
   global $user;
 
-  foreach($students as $row){
-    if($row->rtid == 3){
+  foreach ($students as $row) {
+    if ($row->rtid == 3) {
       continue;
     }
     $stu = user_load(intval($row->requester_id));
-    if(array_key_exists(4,$stu->roles)){ //4 = student's role id ,6 = vip's role id
-      if($user_flag[0]){
+    if (array_key_exists(4, $stu->roles)) { //4 = student's role id ,6 = vip's role id
+      if ($user_flag[0]) {
         print '<h4 class="student-managing-title">هنرجویان معمولی</h4>';
         $user_flag[0] = false;
       }
 
-      $q = db_select('node','n');
+      $q = db_select('node', 'n');
       $q->join('field_data_field_vip', 'v', 'n.nid = v.entity_id');
       $count = $q->fields('n', array())
         ->condition('v.field_vip_value', 0)
@@ -30,46 +30,46 @@ function practice_for_teacher($uid){
         ->condition('n.type', 'homework')
         ->execute()->rowCount();
 
-      if ($count){
-        print views_embed_view('courses_list', 'students_practices', intval($stu->uid) , 0);
+      if ($count) {
+        print views_embed_view('courses_list', 'students_practices', intval($stu->uid), 0);
         //			if($count < count(student_films($stu->uid))){
         //				print '<form id="student-confirmation-form-1" style="border-color: rgb(244, 67, 54);"><span>هنرجو تایید شده است و تمرین جدیدی ارسال نکرده است.</span></form>';
         //			}else{
         //$student_confirm = drupal_get_form('student_confirmation_form_'. $stu->uid , intval($stu->uid));
-        $student_confirm = drupal_get_form('student_node_refrence_form' , intval($stu->uid));
+        $student_confirm = drupal_get_form('student_node_refrence_form_' . $stu->uid, intval($stu->uid));
         print drupal_render($student_confirm);
         //			}
-      }else{
-        if(array_key_exists(3,$user->roles))
+      } else {
+        if (array_key_exists(3, $user->roles))
           print no_practice($stu->uid);
       }
     }
   }
 
-  if(array_key_exists(3,$user->roles)){
+  if (array_key_exists(3, $user->roles)) {
     print '<h4 class="student-managing-title">هنرجویان غیر فعال</h4>';
-    foreach($students as $row){
-      if($row->rtid == 3)
+    foreach ($students as $row) {
+      if ($row->rtid == 3)
         continue;
       $stu = user_load(intval($row->requester_id));
-      if(!array_key_exists(4,$stu->roles)){ //4 = student's role id ,6 = vip's role id
-        print views_embed_view('courses_list', 'students_practices', intval($stu->uid) , 0);
+      if (!array_key_exists(4, $stu->roles)) { //4 = student's role id ,6 = vip's role id
+        print views_embed_view('courses_list', 'students_practices', intval($stu->uid), 0);
       }
     }
   }
 
-  foreach($students as $row){
-    if($row->rtid == 1){
+  foreach ($students as $row) {
+    if ($row->rtid == 1) {
       continue;
     }
     $stu = user_load(intval($row->requester_id));
-    if(array_key_exists(6,$stu->roles)){ //4 = student's role id ,6 = vip's role id
-      if($user_flag[1]){
+    if (array_key_exists(6, $stu->roles)) { //4 = student's role id ,6 = vip's role id
+      if ($user_flag[1]) {
         print '<h4 class="student-managing-title">هنرجویان VIP</h4>';
         $user_flag[1] = false;
       }
 
-      $q = db_select('node','n');
+      $q = db_select('node', 'n');
       $q->join('field_data_field_vip', 'v', 'n.nid = v.entity_id');
       $vip_count = $q->fields('n', array())
         ->condition('v.field_vip_value', 1)
@@ -78,30 +78,29 @@ function practice_for_teacher($uid){
         ->condition('n.type', 'homework')
         ->execute()->rowCount();
 
-      if ($vip_count){
-        print views_embed_view('courses_list', 'students_practices', intval($stu->uid) , 1);
+      if ($vip_count) {
+        print views_embed_view('courses_list', 'students_practices', intval($stu->uid), 1);
         // print '<form id="student-confirmation-form-1" style="border-color: rgb(244, 67, 54);"><span>هنرجو VIP است.</span></form>';
-        $student_confirm = drupal_get_form('student_node_refrence_form' , intval($stu->uid));
+        $student_confirm = drupal_get_form('student_node_refrence_form_' . $stu->uid, intval($stu->uid));
         print drupal_render($student_confirm);
-      }else{
-        if(array_key_exists(3,$user->roles))
+      } else {
+        if (array_key_exists(3, $user->roles))
           print no_practice($stu->uid);
       }
     }
   }
 
-  if(array_key_exists(3,$user->roles)){
+  if (array_key_exists(3, $user->roles)) {
     print '<h4 class="student-managing-title">هنرجویان غیر فعال VIP</h4>';
-    foreach($students as $row){
-      if($row->rtid == 1)
+    foreach ($students as $row) {
+      if ($row->rtid == 1)
         continue;
       $stu = user_load(intval($row->requester_id));
-      if(!array_key_exists(6, $stu->roles)){
-        print views_embed_view('courses_list', 'students_practices', intval($stu->uid) , 1);
+      if (!array_key_exists(6, $stu->roles)) {
+        print views_embed_view('courses_list', 'students_practices', intval($stu->uid), 1);
       }
     }
   }
-
 }
 
 function no_practice($uid){

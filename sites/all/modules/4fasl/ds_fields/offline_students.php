@@ -41,7 +41,9 @@ function offline_students($uid){
       print '</a>
 					<p>'. $stu->field_naame['und'][0]['value'] .'</p><p class="selected">روزهای '. translate_days($row->days) .' ساعت '. translate_hours($row->times) .'</p>';
 
-      $student_confirm = drupal_get_form('student_node_refrence_form', intval($stu->uid));
+
+      $form_id = 'student_node_refrence_form_' . $stu->uid;
+      $student_confirm = drupal_get_form($form_id, intval($stu->uid));
       print drupal_render($student_confirm);
       print '</div>';
 

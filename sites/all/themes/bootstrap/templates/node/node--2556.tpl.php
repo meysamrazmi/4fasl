@@ -7,7 +7,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 
 <?php
-$course = $_GET['course'];
+$course = isset($_GET['course']) ? $_GET['course'] : "";
 
 $query = db_select('uc_orders', 'o');
 $query->join('uc_order_products', 'p', 'o.order_id = p.order_id');

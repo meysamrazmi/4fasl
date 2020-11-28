@@ -116,14 +116,18 @@ function uc_user_uc_order($op, $order, $status) {
 }
 
 function uc_user_forms($form_id, $args) {
-//  $forms = array();
+  $forms = array();
 //  $users = entity_load('user');
-//  $users = db_query("SELECT uid from users where uid != 0")->fetchAll();
-//  foreach($users as $user){
-//	  $forms['student_confirmation_form_'. $user->uid]['callback'] = 'student_confirmation_form';
-//	  $forms['student_node_refrence_form_'. $user->uid]['callback'] = 'student_node_refrence_form';
-//  }
-//  return $forms;
+  $users = db_query("SELECT uid from users where uid != 0")->fetchAll();
+  foreach($users as $user){
+	  $forms['student_confirmation_form_'. $user->uid] = array(
+      'callback' => 'student_confirmation_form'
+    );
+	  $forms['student_node_refrence_form_'. $user->uid] = array(
+      'callback' => 'student_node_refrence_form'
+    );
+  }
+  return $forms;
 }
 
 function student_confirmation_form($form, &$form_state, $uid) {
@@ -345,6 +349,7 @@ function student_node_refrence_form($form, &$form_state, $uid) {
 		'#type' => 'submit',
 		'#value' => t('approve'),
 	);
+	print $uid;
 	return $form;
 }
 
@@ -352,7 +357,7 @@ function student_node_refrence_form_submit($form, &$form_state) {
 	$node = node_load($form_state['values']['refrenced_node']['entity_id']);
 	$user = user_load($form_state['values']['uid']);
 
-  //sending categorized course
+	//sending categorized course
   if(isset($node->field_siteinfo_stu['und'][0])){
     $collection_items = entity_load('field_collection_item', array($node->field_siteinfo_stu['und'][0]['value']));
     $collection_item = array_pop($collection_items);
