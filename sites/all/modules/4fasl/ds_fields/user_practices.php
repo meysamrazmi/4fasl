@@ -153,11 +153,11 @@ function user_practices_wrapper($uid) {
             else{
               var now = (new Date().getTime() / 1000);
               if((now - parseInt(result.lastPractice)) < (60*60*24*7)){
-                var prices = '<span><i>55000  تومان</i><strong>45000  تومان</strong></span>'
-                var price = 45000
+                var prices = '<span><i>120000  تومان</i><strong>110000  تومان</strong></span>'
+                var price = 110000
               }else{
-                var prices = '<span><strong>55000  تومان</strong></span>'
-                var price = 55000
+                var prices = '<span><strong>120000  تومان</strong></span>'
+                var price = 120000
               }
 
               $('.modal-content').html($.parseHTML('<div id="timer2" class="timer"></div><p style="text-align: center;margin: 15px;">برای افزودن تمرین جدید باید مبلغ '+ prices +' از حساب کاربری شما کسر شود</p><div class="avail-points">میزان اعتبار قابل برداشت شما برابر <strong>'+ result.displayPoints +'  تومان</strong> است.</div>'))
